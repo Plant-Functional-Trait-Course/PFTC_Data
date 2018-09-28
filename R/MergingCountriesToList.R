@@ -1,14 +1,22 @@
 #### MAKE A LIST FOR ALL COUNTRIES ####
 
-MakeCountryList <- function(traitCH, communityCH, traitPE, communityPE, traitSV, communitySV){
+MakeCountryList <- function(metaCH, traitCH, communityCH, 
+                            metaPE, traitPE, communityPE, 
+                            traitSV, communitySV,
+                            metaNO){
   
   CountryList <- list(China = list(meta = metaCH,
                                    community = communityCH,
                                    trait = traitCH),
-                      Peru = list(community = communityPE,
+                      
+                      Peru = list(meta = metaPE,
+                                  community = communityPE,
                                   trait = traitPE),
+                      
                       Svalbard = list(community = communitySV,
-                                      trait = traitSV)
+                                      trait = traitSV),
+                      
+                      Norway = list(meta = metaNO)
                       )
   
 }
