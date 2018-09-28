@@ -26,6 +26,9 @@ vignettes/*.pdf
 *.xls
 *.csv
 *.Rdata
+!metaCH.Rdata
+!metaPE.Rdata
+!metaNO.Rdata
 *.odb
 *.zip
 *.jpg
