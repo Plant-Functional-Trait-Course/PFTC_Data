@@ -3,7 +3,7 @@
 MakeCountryList <- function(metaCH, traitCH, communityCH, 
                             metaPE, traitPE, communityPE, 
                             traitSV, communitySV,
-                            metaNO){
+                            metaNO, traitNO, communityNO){
   
   CountryList <- list(China = list(meta = metaCH,
                                    community = communityCH,
