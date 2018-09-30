@@ -8,7 +8,7 @@ CleanChinaTrait <- function(dat){
     filter(Project %in% c("LOCAL", "0", "C")) %>% 
     mutate(Treatment = plyr::mapvalues(Project, c("C", "0", "LOCAL"), c("control", "local", "gradient"))) %>% 
     mutate(Year = year(Date),
-           Country = "China",
+           Country = "CH",
            Gradient = 1,
            Project = "T") %>% 
     rename(BlockID = Location) %>%
@@ -26,12 +26,42 @@ CleanChinaCommunity <- function(dat){
   dat2 <- dat %>% 
     filter(TTtreat %in% c("control", "local")) %>% 
     rename(Year = year, Site = originSiteID, BlockID = originBlockID, PlotID = turfID, Treatment = TTtreat, Taxon = speciesName, Cover = cover) %>% 
-    mutate(Country = "China",
+    mutate(Country = "CH",
            Gradient = 1) %>% 
     select(Country, Gradient, Year, Site, BlockID, PlotID, Treatment, Taxon, Cover)
   
   return(dat2)
 }
 
+# Cleaning Svalbard community
+CleanSvalbardCommunity <- function(dat){
+  dat2 <- dat %>% 
+  rename(Latitude = Latitude_N, Longitude = Longitude_E, Elevation = Elevation_m)
+  
+  return(dat2)
+}
 
+
+CleanPeruCommunity <- function(dat){
+  dat2 <- dat %>% 
+    mutate(Country = "PE")
+  return(dat2)
+}
+  
+  
+
+CleanNorwayCommunity <- function(dat){
+  dat2 <- dat %>% 
+    select(-Treatment, -'Nid herb', 'Nid gram', -'Nid rosett', -'Nid seedling', -liver, -lichen, -litter, -soil, -rock, -'#Seedlings', -TotalGraminoids, -totalForbs, -totalBryophytes, -vegetationHeight, -mossHeight, -comment, -'ver seedl', -canum, -totalVascular, totalBryophytes__1, -acro, -pleuro, -totalLichen) %>% 
+    gather(key = Taxon, value = cover, -Site, -Block, -turfID, -subPlot, -year, -date, -Measure, -recorder) %>% 
+    filter(!is.na(cover)) %>% 
+    mutate(Site = substr(Site, 1, 3)) %>% 
+    mutate(Country = "NO",
+           Gradient = 1) %>% 
+    rename(Year = year, BlockID = Block, PlotID = turfID) %>% 
+    group_by(Site, Taxon)%>%
+    mutate(cover = sum(cover, na.rm=TRUE))
+  
+  return(dat2)
+}
 
