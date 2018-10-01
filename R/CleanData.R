@@ -52,15 +52,14 @@ CleanPeruCommunity <- function(dat){
 
 CleanNorwayCommunity <- function(dat){
   dat2 <- dat %>% 
+    filter(Measure == "Cover") %>% 
     select(-Treatment, -'Nid herb', 'Nid gram', -'Nid rosett', -'Nid seedling', -liver, -lichen, -litter, -soil, -rock, -'#Seedlings', -TotalGraminoids, -totalForbs, -totalBryophytes, -vegetationHeight, -mossHeight, -comment, -'ver seedl', -canum, -totalVascular, totalBryophytes__1, -acro, -pleuro, -totalLichen) %>% 
-    gather(key = Taxon, value = cover, -Site, -Block, -turfID, -subPlot, -year, -date, -Measure, -recorder) %>% 
-    filter(!is.na(cover)) %>% 
+    gather(key = Taxon, value = Cover, -Site, -Block, -turfID, -subPlot, -year, -date, -Measure, -recorder) %>% 
+    filter(!is.na(Cover)) %>% 
     mutate(Site = substr(Site, 1, 3)) %>% 
     mutate(Country = "NO",
            Gradient = 1) %>% 
-    rename(Year = year, BlockID = Block, PlotID = turfID) %>% 
-    group_by(Site, Taxon)%>%
-    mutate(cover = sum(cover, na.rm=TRUE))
+    rename(Year = year, BlockID = Block, PlotID = turfID)
   
   return(dat2)
 }
