@@ -11,7 +11,7 @@ drop_and_load <- function(myfile, localpath){
 
 drop_and_load.csv <- function(myfile, localpath){
   drop_download(path = myfile, local_path = localpath, overwrite = TRUE)
-  dat <- read_csv(file = localpath, col_names = TRUE, stringsAsFactors = FALSE)
+  dat <- read_csv(file = localpath, col_names = TRUE)
   return(dat)
 }
 
