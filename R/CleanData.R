@@ -50,6 +50,13 @@ CleanPeruCommunity <- function(dat){
   
   
 
+CleanNorwayMetaCommunity <- function(dat){
+  dat2 <- dat %>% 
+    rename(Site = SiteID)
+  return(dat2)
+}  
+
+    
 CleanNorwayCommunity <- function(dat){
   dat2 <- dat %>% 
     filter(Measure == "Cover") %>% 
