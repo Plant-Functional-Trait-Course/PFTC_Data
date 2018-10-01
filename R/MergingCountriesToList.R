@@ -1,35 +1,29 @@
 #### MAKE A LIST FOR ALL COUNTRIES ####
 
-MakeCountryList <- function(metaCH, communityCH, metaCommunityCH, traitCH, 
-                            metaPE, communityPE, traitPE, 
-                            communitySV, metaCommunitySV, traitSV, 
-                            metaNO, communityNO, metaCommunityNO, traitNO
+MakeCountryList <- function(metaCH, metaCommunityCH, communityCH, traitCH, 
+                            metaPE, metaCommunityPE, communityPE, traitPE, 
+                            metaCommunitySV, communitySV, traitSV, 
+                            metaNO, metaCommunityNO, communityNO, traitNO
                             ){
   
   CountryList <- list(China = list(meta = metaCH,
-                                   community = communityCH,
                                    metaCommunity = metaCommunityCH,
+                                   community = communityCH,
                                    trait = traitCH),
                       
                       Peru = list(meta = metaPE,
+                                  metaCommunity = metaCommunityPE,
                                   community = communityPE,
-                                  metaCommunity = NA,
                                   trait = traitPE),
                       
-                      Svalbard = list(meta = NA,
+                      Svalbard = list(metaCommunity = metaCommunitySV,
                                       community = communitySV,
-                                      metaCommunity = metaCommunitySV,
                                       trait = traitSV),
                       
                       Norway = list(meta = metaNO,
-                                    community = communityNO,
                                     metaCommunity = metaCommunityNO,
-                                    trait = traitNO),
-                      
-                      Colorado = list(meta = NA,
-                                    community = NA,
-                                    metaCommunity = NA,
-                                    trait = NA)
+                                    community = communityNO,
+                                    trait = traitNO)
                       )
   
 }
