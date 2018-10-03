@@ -71,3 +71,18 @@ CleanNorwayCommunity <- function(dat){
   return(dat2)
 }
 
+
+
+CleanColoradoCommunity <- function(dat){
+  dat2 <- dat %>% 
+    filter(!species_or_ground_cover %in% c("Bare (Bare soil + Litter + Dead)", "Rock", "Total Graminoid", "Total Herb", "Total Shrub", "Bare soil", "Litter", "Dead")) %>% 
+    select(-X16, -X17, -X18, -X19, -X20, -X21, -X22, -X23, -X24, -X25, -X26, -plot1_count, -plot2_count, -plot3_count, -plot4_count, -plot5_count, -total_site_percent) %>% 
+    gather(key = PlotID, value = Cover, -site, -date_yyyymmdd, -species_or_ground_cover, -growth_habit) %>% 
+    mutate(Country = "CO",
+           Year = 2016) %>% 
+    rename(Site = site, Taxon = species_or_ground_cover, functionalGroup = growth_habit)
+  return(dat2)
+}  
+
+species_or_ground_co
+plot1_count plot1_pct
