@@ -29,10 +29,12 @@ vignettes/*.pdf
 !metaCH.Rdata
 !metaPE.Rdata
 !metaNO.Rdata
+!metaCO.Rdata
 !metaCommunity_CH_2012_2016.Rdata
 !metaCommunity_PE_2018.Rdata
 !metaCommunitySV_2018.Rdata
 !metaCommunityNO_2016.Rdata
+!metaCommunityCO_2016.Rdata
 *.odb
 *.zip
 *.jpg
