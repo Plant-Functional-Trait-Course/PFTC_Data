@@ -84,5 +84,11 @@ CleanColoradoCommunity <- function(dat){
   return(dat2)
 }  
 
-species_or_ground_co
-plot1_count plot1_pct
+
+CleanColoradoTrait <- function(dat){
+  dat2 <- dat %>% 
+    select(year, site, elev, block, taxon_std, family, no_of_leaves, leaf_area, wet_mass, dry_mass, SLA, LDMC, WC, height_flower, height_leaf, height, height_2, thickness_1, thickness_2, thickness_3, thickness, pc_C, pc_N, pc_P, d13C, d15N,  C_N,  N_C,  N_P) %>% 
+    rename(Year = year, Site = site, Elevation = elev, PlotID = block, Taxon = taxon_std, Family = family, Leaf_Area_cm2 = leaf_area, Wet_mass_g = wet_mass, Dry_Mass_g = dry_mass, SLA_cm_g = SLA, Plant_Height_cm = height_flower, Leaf_Thickness_1_mm = thickness_1, Leaf_Thickness_2_mm = thickness_2, Leaf_Thickness_3_mm = thickness_3, Leaf_Thickness_Ave_mm = thickness, C_percent = pc_C, N_percent = pc_N, dC13_percent = d13C, dN15_percent = d15N, CN_ratio = C_N, NC_ratio = N_C, NP_ratio = N_P, P_AVG = pc_P) %>%
+    mutate(Country = "CO")
+  return(dat2)
+}  
