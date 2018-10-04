@@ -148,7 +148,7 @@ analyses <- drake_plan(
                                 metaPE, metaCommunityPE, communityPE, traitPE, fluxPE,
                                 metaSV, metaCommunitySV, communitySV, traitSV, fluxSV,
                                 metaNO, metaCommunityNO, communityNO, traitNO, fluxNO,
-                                metaCO, metaCommunityCO, communityCO, traitCO, fluxCO),
+                                metaCO, metaCommunityCO, communityCO, traitCO, fluxCO)
   
   
   
