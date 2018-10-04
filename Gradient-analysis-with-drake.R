@@ -14,6 +14,7 @@ source("R/MergingCountriesToList.R")
 source("R/CleanData.R")
 source("R/LoadingFiles.R")
 source("R/sync_from_dropbox.R")
+#source("R/CommunityWeightedTraitMeans.R")
 
 # Functions to download and load data from dropbox and google drive
 drop_acc()
@@ -21,11 +22,7 @@ drop_acc()
 
 
 ### NEEDS DOING!!!
-# SV coords for site 1 from gradient
-#load("data/traitsGradients_SV_2018", verbose = TRUE)
-#metaSV <- traitsGradients_SV_2018 %>% filter(Project == "T") %>% distinct(Country, Gradient, Site, Elevation_m, Latitude_N, Longitude_E) %>% rename(Elevation = Elevation_m, Latitude = Latitude_N, Longitude = Longitude_E)
-
-# Colorado: everything
+# Colorado: trait and height
 
 
 
@@ -48,6 +45,11 @@ analyses <- drake_plan(
                   localpath = "data/cover_thin_CH_2012_2016.Rdata"),
     trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/cover_thin_CH_2012_2016.Rdata")$content_hash)
   ),
+  fluxCH = target(
+    drop_and_load(myfile = "transplant/USE THIS DATA/standardControlFluxCH_2016.Rdata",
+                  localpath = "data/standardControlFluxCH_2016.Rdata"),
+    trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/standardControlFluxCH_2016.Rdata")$content_hash)
+  ),
   
   ## PERU
   metaPE = get(load(file = "data/metaPE.Rdata")),
@@ -62,8 +64,15 @@ analyses <- drake_plan(
                   localpath = "data/CommunityCover_2018_Peru.Rdata"),
     trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC3_Peru/CommunityCover_2018_Peru.Rdata")$content_hash)
   ),
+  fluxPE = target(
+    drop_and_load(myfile = "transplant/USE THIS DATA/PFTC3_Peru/standardControlFluxPE_2016.Rdata",
+                  localpath = "data/standardControlFluxPE_2016.Rdata"),
+    trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC3_Peru/standardControlFluxPE_2016.Rdata")$content_hash)
+  ),
+  
   
   ## SVALBARD
+  metaSV = get(load(file = "data/metaSV.Rdata")),
   metaCommunitySV = get(load(file = "data/metaCommunitySV_2018.Rdata")),
   traitSV = target(
     drop_and_load(myfile = "transplant/USE THIS DATA/PFTC4_Svalbard/traitsGradients_SV_2018.Rdata",
@@ -75,11 +84,17 @@ analyses <- drake_plan(
                   localpath = "data/communitySV_2018.Rdata"),
     trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC4_Svalbard/communitySV_2018.Rdata")$content_hash)
   ),
+  fluxSV = target(
+    drop_and_load(myfile = "transplant/USE THIS DATA/PFTC4_Svalbard/standardControlFluxSV_2016.Rdata",
+                  localpath = "data/standardControlFluxSV_2016.Rdata"),
+    trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC4_Svalbard/standardControlFluxSV_2016.Rdata")$content_hash)
+  ),
+  
   
   ## NORWAY
   metaNO = get(load(file = "data/metaNO.Rdata")),
-  metaCommunityNO.raw = get(load(file = "data/metaCommunityNO_2016.Rdata")),
-  traitNO = target(
+  metaCommunityNO_raw = get(load(file = "data/metaCommunityNO_2016.Rdata")),
+  traitNO_raw = target(
     drop_and_load.csv(myfile = "transplant/USE THIS DATA/Norway/traitdata_NO.csv",
                   localpath = "data/traitdata_NO.csv"),
     trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/traitdata_NO.csv")$content_hash)
@@ -89,11 +104,32 @@ analyses <- drake_plan(
                       localpath = "data/funcab_composition_2016.xlsx"),
     trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/funcab_composition_2016.xlsx")$content_hash)
   ),
+  fluxNO = target(
+    drop_and_load(myfile = "transplant/USE THIS DATA/Norway/standardControlFluxNO_2016.Rdata",
+                  localpath = "data/standardControlFluxNO_2016.Rdata"),
+    trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/standardControlFluxNO_2016.Rdata")$content_hash)
+  ),
+  
   
   ## COLORADO
-  #metaCO = load(file = "data/metaNO.Rdata"),
-  #traitCO = 
-  #communityCO
+  metaCO = load(file = "data/metaCO.Rdata"),
+  metaCommunityCO = get(load(file = "data/metaCommunityCO_2016.Rdata")),
+  communityCO_raw = target(
+    drop_and_load.csv(myfile = "transplant/USE THIS DATA/Colorado/CO_gradient_2016_Species_Cover.csv",
+                      localpath = "data/CO_gradient_2016_Species_Cover.csv"),
+    trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Colorado/CO_gradient_2016_Species_Cover.csv")$content_hash)
+),
+  traitCO_raw = target(
+    drop_and_load.csv(myfile = "transplant/USE THIS DATA/Colorado/rmbl_trait_data_master.csv",
+                      localpath = "data/rmbl_trait_data_master.csv"),
+    trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Colorado/rmbl_trait_data_master.csv")$content_hash)
+),
+  fluxCO = target(
+    drop_and_load(myfile = "transplant/USE THIS DATA/Colorado/standardControlFluxCO_2016.Rdata",
+                  localpath = "data/standardControlFluxCO_2016.Rdata"),
+    trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Colorado/standardControlFluxCO_2016.Rdata")$content_hash)
+),
+
   
   
   #### CLEAN DATA SETS
@@ -103,30 +139,34 @@ analyses <- drake_plan(
   communitySV = CleanSvalbardCommunity(communitySV_raw),
   metaCommunityNO = CleanNorwayMetaCommunity(metaCommunityNO_raw),
   communityNO = CleanNorwayCommunity(communityNO_raw),
+  traitNO = CleanNorwayTrait(traitNO_raw),
+  communityCO = CleanColoradoCommunity(communityCO_raw),
+  traitCO = CleanColoradoTrait(traitCO_raw),
   
   # make a list with all data sets
-  CountryList = MakeCountryList(metaCH, metaCommunityCH, communityCH, traitCH, 
-                                metaPE, metaCommunityPE, communityPE, traitPE, 
-                                metaCommunitySV, communitySV, traitSV, 
-                                metaNO, metaCommunityNO, communityNO, traitNO)
+  CountryList = MakeCountryList(metaCH, metaCommunityCH, communityCH, traitCH, fluxCH,
+                                metaPE, metaCommunityPE, communityPE, traitPE, fluxPE,
+                                metaSV, metaCommunitySV, communitySV, traitSV, fluxSV,
+                                metaNO, metaCommunityNO, communityNO, traitNO, fluxNO,
+                                metaCO, metaCommunityCO, communityCO, traitCO, fluxCO),
   
   
   
   #### CALCULATIONS, ANALYSES, FIGURES
-  #DivIndex <- CountryList %>% map(CalculateDiversityIndices())
-  
+  #DivIndex = CountryList %>% map("community") %>% map(CalculateDiversityIndices)
+  #TraitMeans = CountryList %>% map("trait") %>% map(GlobalAndLocalMeans),
+
+  #Combo = CountryList %>% map(reduce(left_join(trait, community, by = c("Site", "Taxon"))))
+
+
 )
 
 
 #configure and make drake plan
 config <- drake_config(analyses)
-outdated(config)        # Which targets need to be (re)built?
+# outdated(config)        # Which targets need to be (re)built?
 make(analyses)          # Build the right things.
 
-loadd(metaCH, metaCommunityCH, traitCH, communityCH, 
-      metaPE, metaCommunityPE, traitPE, communityPE, 
-      metaCommunitySV, traitSV, communitySV,
-      metaNO, metaCommunityNO, traitNO, communityNO,
-      CountryList)
+loadd()
 #voew dependency graph
 vis_drake_graph(config, targets_only = TRUE)
