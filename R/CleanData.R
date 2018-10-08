@@ -68,11 +68,12 @@ CleanNorwayCommunity <- function(dat){
     gather(key = Taxon, value = Cover, -Site, -Block, -turfID, -subPlot, -year, -date, -Measure, -recorder) %>% 
     filter(!is.na(Cover)) %>% 
     mutate(Site = substr(Site, 1, 3)) %>% 
-    mutate(Country = "NO",
-           mutate(Gradient = case_when(Site %in% c("Fau", "Alr", "Ulv") ~ 1,
+    mutate(Country = "NO") %>% 
+    mutate(Gradient = case_when(Site %in% c("Fau", "Alr", "Ulv") ~ 1,
                                        Site %in% c("Vik", "Hog", "Lav") ~ 2,
                                        Site %in% c("Arh", "Ram", "Gud") ~ 3,
-                                       Site %in% c("Ovs", "Ves", "Skj") ~ 4))) %>% 
+                                       Site %in% c("Ovs", "Ves", "Skj") ~ 4
+                                )) %>% 
     rename(Year = year, BlockID = Block, PlotID = turfID)
   
   return(dat2)
@@ -82,10 +83,11 @@ CleanNorwayCommunity <- function(dat){
 CleanNorwayTrait <- function(dat){
   dat2 <- dat %>% 
     mutate(Leaf_Thickness_Ave_mm = (Leaf_Thickness_1_mm + Leaf_Thickness_2_mm + Leaf_Thickness_3_mm)/3) %>% 
-    mutate(mutate(Gradient = case_when(Site %in% c("Fau", "Alr", "Ulv") ~ 1,
-                                       Site %in% c("Vik", "Hog", "Lav") ~ 2,
-                                       Site %in% c("Arh", "Ram", "Gud") ~ 3,
-                                       Site %in% c("Ovs", "Ves", "Skj") ~ 4)))
+    mutate(Gradient = case_when(Site %in% c("Fau", "Alr", "Ulv") ~ 1,
+                                Site %in% c("Vik", "Hog", "Lav") ~ 2,
+                                Site %in% c("Arh", "Ram", "Gud") ~ 3,
+                                Site %in% c("Ovs", "Ves", "Skj") ~ 4
+    )) 
   
   return(dat2)
 }
@@ -95,10 +97,11 @@ CleanNorwayFlux <- function(dat){
   dat2 <- dat %>% 
     mutate(Site = tolower(Site)) %>% 
     mutate(Site = paste(toupper(substr(Site, 1, 1)), substr(Site, 2, 3), sep = "")) %>% 
-    mutate(mutate(Gradient = case_when(Site %in% c("Fau", "Alr", "Ulv") ~ 1,
-                                       Site %in% c("Vik", "Hog", "Lav") ~ 2,
-                                       Site %in% c("Arh", "Ram", "Gud") ~ 3,
-                                       Site %in% c("Ovs", "Ves", "Skj") ~ 4)))
+    mutate(Gradient = case_when(Site %in% c("Fau", "Alr", "Ulv") ~ 1,
+                                Site %in% c("Vik", "Hog", "Lav") ~ 2,
+                                Site %in% c("Arh", "Ram", "Gud") ~ 3,
+                                Site %in% c("Ovs", "Ves", "Skj") ~ 4
+    )) 
   
   return(dat2)
 }
