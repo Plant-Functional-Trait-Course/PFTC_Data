@@ -52,7 +52,11 @@ CleanPeruCommunity <- function(dat){
 
 CleanNorwayMetaCommunity <- function(dat){
   dat2 <- dat %>% 
-    rename(Site = SiteID)
+    rename(Site = SiteID) %>% 
+    mutate(Gradient = case_when(Site %in% c("Fau", "Alr", "Ulv") ~ 1,
+                                Site %in% c("Vik", "Hog", "Lav") ~ 2,
+                                Site %in% c("Arh", "Ram", "Gud") ~ 3,
+                                Site %in% c("Ovs", "Ves", "Skj") ~ 4))
   return(dat2)
 }  
 
@@ -65,7 +69,10 @@ CleanNorwayCommunity <- function(dat){
     filter(!is.na(Cover)) %>% 
     mutate(Site = substr(Site, 1, 3)) %>% 
     mutate(Country = "NO",
-           Gradient = 1) %>% 
+           mutate(Gradient = case_when(Site %in% c("Fau", "Alr", "Ulv") ~ 1,
+                                       Site %in% c("Vik", "Hog", "Lav") ~ 2,
+                                       Site %in% c("Arh", "Ram", "Gud") ~ 3,
+                                       Site %in% c("Ovs", "Ves", "Skj") ~ 4))) %>% 
     rename(Year = year, BlockID = Block, PlotID = turfID)
   
   return(dat2)
@@ -74,21 +81,45 @@ CleanNorwayCommunity <- function(dat){
 
 CleanNorwayTrait <- function(dat){
   dat2 <- dat %>% 
-    mutate(Leaf_Thickness_Ave_mm = (Leaf_Thickness_1_mm + Leaf_Thickness_2_mm + Leaf_Thickness_3_mm)/3)
+    mutate(Leaf_Thickness_Ave_mm = (Leaf_Thickness_1_mm + Leaf_Thickness_2_mm + Leaf_Thickness_3_mm)/3) %>% 
+    mutate(mutate(Gradient = case_when(Site %in% c("Fau", "Alr", "Ulv") ~ 1,
+                                       Site %in% c("Vik", "Hog", "Lav") ~ 2,
+                                       Site %in% c("Arh", "Ram", "Gud") ~ 3,
+                                       Site %in% c("Ovs", "Ves", "Skj") ~ 4)))
   
   return(dat2)
 }
 
 
-
-CleanColoradoCommunity <- function(dat){
+CleanNorwayFlux <- function(dat){
   dat2 <- dat %>% 
+    mutate(Site = tolower(Site)) %>% 
+    mutate(Site = paste(toupper(substr(Site, 1, 1)), substr(Site, 2, 3), sep = "")) %>% 
+    mutate(mutate(Gradient = case_when(Site %in% c("Fau", "Alr", "Ulv") ~ 1,
+                                       Site %in% c("Vik", "Hog", "Lav") ~ 2,
+                                       Site %in% c("Arh", "Ram", "Gud") ~ 3,
+                                       Site %in% c("Ovs", "Ves", "Skj") ~ 4)))
+  
+  return(dat2)
+}
+
+
+CleanColoradoFlux <- function(dat){
+dat2 <- dat %>% 
+  mutate(Site = tolower(Site)) %>% 
+  mutate(Site = paste(toupper(substr(Site, 1, 1)), substr(Site, 2, 3), sep = "")) %>% 
+  mutate(mutate(Gradient = case_when(Site %in% c("Fau", "Alr", "Ulv") ~ 1,
+                                     Site %in% c("Vik", "Hog", "Lav") ~ 2,
+                                     Site %in% c("Arh", "Ram", "Gud") ~ 3,
+                                     Site %in% c("Ovs", "Ves", "Skj") ~ 4))) %>% 
+
     filter(!species_or_ground_cover %in% c("Bare (Bare soil + Litter + Dead)", "Rock", "Total Graminoid", "Total Herb", "Total Shrub", "Bare soil", "Litter", "Dead")) %>% 
     select(-X16, -X17, -X18, -X19, -X20, -X21, -X22, -X23, -X24, -X25, -X26, -plot1_count, -plot2_count, -plot3_count, -plot4_count, -plot5_count, -total_site_percent) %>% 
     gather(key = PlotID, value = Cover, -site, -date_yyyymmdd, -species_or_ground_cover, -growth_habit) %>% 
     mutate(Country = "CO",
            Year = 2016) %>% 
     rename(Site = site, Taxon = species_or_ground_cover, functionalGroup = growth_habit)
+  
   return(dat2)
 }  
 

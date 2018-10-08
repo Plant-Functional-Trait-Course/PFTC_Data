@@ -14,7 +14,7 @@ source("R/MergingCountriesToList.R")
 source("R/CleanData.R")
 source("R/LoadingFiles.R")
 source("R/sync_from_dropbox.R")
-#source("R/CommunityWeightedTraitMeans.R")
+source("R/CommunityWeightedTraitMeans.R")
 
 # Functions to download and load data from dropbox and google drive
 drop_acc()
@@ -104,7 +104,7 @@ analyses <- drake_plan(
                       localpath = "data/funcab_composition_2016.xlsx"),
     trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/funcab_composition_2016.xlsx")$content_hash)
   ),
-  fluxNO = target(
+  fluxNO_raw = target(
     drop_and_load(myfile = "transplant/USE THIS DATA/Norway/standardControlFluxNO_2016.Rdata",
                   localpath = "data/standardControlFluxNO_2016.Rdata"),
     trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/standardControlFluxNO_2016.Rdata")$content_hash)
@@ -140,6 +140,7 @@ analyses <- drake_plan(
   metaCommunityNO = CleanNorwayMetaCommunity(metaCommunityNO_raw),
   communityNO = CleanNorwayCommunity(communityNO_raw),
   traitNO = CleanNorwayTrait(traitNO_raw),
+  fluxNO = CleanNorwayFlux(fluxNO_raw),
   communityCO = CleanColoradoCommunity(communityCO_raw),
   traitCO = CleanColoradoTrait(traitCO_raw),
   
@@ -148,7 +149,7 @@ analyses <- drake_plan(
                                 metaPE, metaCommunityPE, communityPE, traitPE, fluxPE,
                                 metaSV, metaCommunitySV, communitySV, traitSV, fluxSV,
                                 metaNO, metaCommunityNO, communityNO, traitNO, fluxNO,
-                                metaCO, metaCommunityCO, communityCO, traitCO, fluxCO)
+                                metaCO, metaCommunityCO, communityCO, traitCO, fluxCO),
   
   
   
@@ -156,7 +157,10 @@ analyses <- drake_plan(
   #DivIndex = CountryList %>% map("community") %>% map(CalculateDiversityIndices)
   #TraitMeans = CountryList %>% map("trait") %>% map(GlobalAndLocalMeans),
 
-  #Combo = CountryList %>% map(reduce(left_join(trait, community, by = c("Site", "Taxon"))))
+  TraitCommunity = CountryList %>% 
+    map_df(~left_join(.$trait, .$community, by = c("Site", "Taxon")), .id = "country"),
+  
+  res = CommunityW_GlobalAndLocalMeans(TraitCommunity)
 
 
 )
