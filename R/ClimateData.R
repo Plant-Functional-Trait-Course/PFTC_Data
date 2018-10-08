@@ -24,8 +24,12 @@ load(file = "data/metaNO.Rdata")
 load(file = "data/metaCO.Rdata")
 
 MetaAllCountries <- metaCH %>% 
-  mutate(Elevation = as.numeric(as.character(Elevation))) %>% 
-  bind_rows(metaPE, metaSV, metaNO, metaCO)
+  bind_rows(metaPE, metaSV, metaNO, metaCO) %>% 
+  mutate(Gradient = ifelse(is.na(Gradient), 1, Gradient)) %>% 
+  mutate(Gradient = ifelse(Country == "NO" & Site %in% c("Vik", "Hog", "Lav"), 2, Gradient)) %>% 
+  mutate(Gradient = ifelse(Country == "NO" & Site %in% c("Arh", "Ram", "Gud"), 3, Gradient)) %>% 
+  mutate(Gradient = ifelse(Country == "NO" & Site %in% c("Ovs", "Ves", "Skj"), 4, Gradient)) %>% 
+  mutate(Country = ifelse(is.na(Country), "CO", Country))
 
 coords <- MetaAllCountries %>% 
   select(Longitude, Latitude)
@@ -51,7 +55,7 @@ MetaBioclim <- MetaAllCountries %>%
          ) %>% 
   rename(MeanAnnTemp = bio1, MeanDiurnalRange = bio2, Isothermality = bio3, TempSeasonality = bio4, MaxTempWarmestMonth = bio5, MinTempColdestMonth = bio6, TempAnnRange = bio7, MeanTempWettestQuarter = bio8, MeanTempDriestQuarter = bio9, MeanTempWarmestQuarter = bio10, MeanTempColdestQuarter = bio11, AnnPrec = bio12, PrecWettestMonth = bio13, PrecDriestMonth = bio14, PrecSeasonality = bio15, PrecWettestQuarter = bio16, PrecDriestQuarter = bio17, PrecWarmestQuarter = bio18, PrecColdestQuarter = bio19)
 
-  
+save(MetaBioclim, file = "MetaBioclim.Rdata")  
 
 metaCH <- MetaBioclim %>% 
   filter(Country == "CH")
@@ -66,13 +70,15 @@ metaSV <- MetaBioclim %>%
 save(metaSV, file = "data/metaSV")
 
 metaNO <- MetaBioclim %>% 
-  filter(Country == "NO") %>% 
-  mutate(Gradient = case_when(Site %in% c("Fau", "Alr", "Ulv") ~ 1,
-                              Site %in% c("Vik", "Hog", "Lav") ~ 2,
-                              Site %in% c("Arh", "Ram", "Gud") ~ 3,
-                              Site %in% c("Ovs", "Ves", "Skj") ~ 4))
+  filter(Country == "NO")
 save(metaNO, file = "data/metaNO")
 
 metaCO <- MetaBioclim %>% 
-  filter(Country == "CO")
+  filter(Country == "CO") %>%
 save(metaCO, file = "data/metaCO")
+
+MetaBioclim %>% 
+  mutate(CountGrad = paste(Country, Gradient, sep = "_")) %>% 
+  ggplot(aes(x = Elevation, y = MeanTempWarmestQuarter, colour = CountGrad)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
