@@ -52,6 +52,7 @@ CleanPeruCommunity <- function(dat){
 
 CleanNorwayMetaCommunity <- function(dat){
   dat2 <- dat %>% 
+    filter(!is.na(MedianHeight_cm)) %>% 
     rename(Site = SiteID) %>% 
     mutate(Gradient = case_when(Site %in% c("Fau", "Alr", "Ulv") ~ 1,
                                 Site %in% c("Vik", "Hog", "Lav") ~ 2,
@@ -109,13 +110,6 @@ CleanNorwayFlux <- function(dat){
 
 CleanColoradoFlux <- function(dat){
 dat2 <- dat %>% 
-  mutate(Site = tolower(Site)) %>% 
-  mutate(Site = paste(toupper(substr(Site, 1, 1)), substr(Site, 2, 3), sep = "")) %>% 
-  mutate(mutate(Gradient = case_when(Site %in% c("Fau", "Alr", "Ulv") ~ 1,
-                                     Site %in% c("Vik", "Hog", "Lav") ~ 2,
-                                     Site %in% c("Arh", "Ram", "Gud") ~ 3,
-                                     Site %in% c("Ovs", "Ves", "Skj") ~ 4))) %>% 
-
     filter(!species_or_ground_cover %in% c("Bare (Bare soil + Litter + Dead)", "Rock", "Total Graminoid", "Total Herb", "Total Shrub", "Bare soil", "Litter", "Dead")) %>% 
     select(-X16, -X17, -X18, -X19, -X20, -X21, -X22, -X23, -X24, -X25, -X26, -plot1_count, -plot2_count, -plot3_count, -plot4_count, -plot5_count, -total_site_percent) %>% 
     gather(key = PlotID, value = Cover, -site, -date_yyyymmdd, -species_or_ground_cover, -growth_habit) %>% 
