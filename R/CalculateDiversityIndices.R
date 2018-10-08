@@ -6,7 +6,7 @@ CalculateDiversityIndices <- function(dat){
               #Diversity = diversity(Cover), 
               #N1 = exp(Diversity),
               #Evenness = Diversity/log(Richness),
-              #sumAbundance = sum(Cover)
+              sumAbundance = sum(Cover)
     )
   return(dat2)
 }
