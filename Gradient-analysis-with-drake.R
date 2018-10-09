@@ -183,8 +183,9 @@ analyses <- drake_plan(
   #### CALCULATIONS, ANALYSES, FIGURES
   TraitMeans = CountryList %>% 
     map_df(CommunityW_GlobalAndLocalMeans) %>% 
-    left_join(metaBioclim)
-
+    left_join(metaBioclim),
+    
+  GradientPlot = MakeFigure(TraitMeans)
 
 )
 
@@ -194,6 +195,7 @@ config <- drake_config(analyses)
 # outdated(config)        # Which targets need to be (re)built?
 make(analyses)          # Build the right things.
 loadd()
+readd(GradientPlot)
 
 TraitMeans %>% filter(!is.na(Trait)) %>% count(Country)
 #voew dependency graph
