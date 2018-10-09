@@ -40,7 +40,7 @@ CleanChinaCommunity <- function(dat){
 # Cleaning Svalbard meta
 CleanSvalbardMeta <- function(dat){
   dat2 <- dat %>% 
-    mutate(SiteID = paste(Site, Gradient, sep =""))
+    mutate(Site = paste(Site, Gradient, sep =""))
   
   return(dat2)
 }
@@ -49,8 +49,8 @@ CleanSvalbardMeta <- function(dat){
 CleanSvalbardCommunity <- function(dat){
   dat2 <- dat %>% 
   rename(Latitude = Latitude_N, Longitude = Longitude_E, Elevation = Elevation_m)%>%
-  mutate(Site = paste(Site, Gradient, sep =""),
-         PlotID = paste(Site, Gradient, PlotID, sep=""),
+  mutate(PlotID = paste(Site, Gradient, PlotID, sep=""),
+         Site = paste(Site, Gradient, sep =""),
          BlockID = as.character(1),
          Cover = as.numeric(Cover)) %>% 
     select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover)
@@ -62,9 +62,10 @@ CleanSvalbardCommunity <- function(dat){
 CleanSvalbardTrait <- function(dat){
   dat2 <- dat %>% 
     rename(Latitude = Latitude_N, Longitude = Longitude_E, Elevation = Elevation_m)%>%
-    mutate(Site = paste(Site, Gradient, sep =""),
+    mutate(PlotID = paste(Site, Gradient, PlotID, sep=""),
            BlockID = as.character(1),
-           PlotID = paste(Site, Gradient, PlotID, sep="")) %>%
+           Site = paste(Site, Gradient, sep ="")
+           ) %>%
     select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC) %>% 
     gather(key = Trait, value = Value, -Country, -Year, -Site, -Gradient, -BlockID, -PlotID, -Taxon) %>% 
     filter(!is.na(Value))
@@ -122,12 +123,19 @@ CleanNorwayMetaCommunity <- function(dat){
 
 #Cleaning Norway Community
     
-CleanNorwayCommunity <- function(dat){
+CleanNorwayCommunity <- function(dat, sp){
+  sp <- sp %>% 
+    mutate(Species = gsub("_", " ", Species))
+  
   dat2 <- dat %>% 
     filter(Measure == "Cover") %>%
     select(-Treatment, -'Nid herb', 'Nid gram', -'Nid rosett', -'Nid seedling', -liver, -lichen, -litter, -soil, -rock, -'#Seedlings', -TotalGraminoids, -totalForbs, -totalBryophytes, -vegetationHeight, -mossHeight, -comment, -'ver seedl', -canum, -totalVascular, totalBryophytes__1, -acro, -pleuro, -totalLichen) %>% 
     gather(key = Taxon, value = Cover, -Site, -Block, -turfID, -subPlot, -year, -date, -Measure, -recorder) %>% 
     filter(!is.na(Cover)) %>% 
+    mutate(Taxon = gsub("_", " ", Taxon)) %>% 
+    left_join(sp, by = c("Taxon" = "Species")) %>% 
+    select(-Genus, -Family, -Order, -Taxon) %>% 
+    rename(Taxon = Full_name) %>% 
     mutate(Site = substr(Site, 1, 3)) %>% 
     mutate(Country = "NO") %>% 
     mutate(Gradient = case_when(Site %in% c("Fau", "Alr", "Ulv") ~ as.character(1),
@@ -177,6 +185,15 @@ CleanNorwayFlux <- function(dat){
   return(dat2)
 }
 
+
+# Cleaning Colorado meta
+CleanColoradoMeta <- function(dat){
+  dat2 <- dat %>% 
+    mutate(Country = "CO")
+  
+  return(dat2)
+}
+
 #Cleaning Colorado Community
 
 CleanColoradoCommunity <- function(dat){
@@ -198,6 +215,7 @@ CleanColoradoCommunity <- function(dat){
 
 CleanColoradoMetaCommunity <- function(dat){
   dat2 <- dat %>%
+    filter(!is.na(Site)) %>% 
     mutate(PlotID = recode(PlotID, "plot_3_pct" = "plot3_pct"),
            Gradient = as.character(1))
     return(dat2)
@@ -214,10 +232,11 @@ dat2 <- dat
 
 CleanColoradoTrait <- function(dat){
   dat2 <- dat %>% 
-    select(year, site, taxon_std, leaf_area, wet_mass, dry_mass, SLA, LDMC,  height_flower, height_leaf, height, height_2, thickness, pc_C, pc_N, pc_P, d13C, d15N,  C_N,  N_C,  N_P) %>% 
+    select(year, site, taxon_std, leaf_area, wet_mass, dry_mass, SLA, height_flower, height_leaf, height, height_2, thickness, pc_C, pc_N, pc_P, d13C, d15N,  C_N,  N_C,  N_P) %>% 
     rename(Year = year, Site = site, Taxon = taxon_std, Leaf_Area_cm2 = leaf_area, Wet_Mass_g = wet_mass, Dry_Mass_g = dry_mass, SLA_cm2_g = SLA, Plant_Height_cm = height_flower, Leaf_Thickness_Ave_mm = thickness, C_percent = pc_C, N_percent = pc_N, dC13_percent = d13C, dN15_percent = d15N, CN_ratio = C_N, NC_ratio = N_C, NP_ratio = N_P, P_AVG = pc_P) %>%
     filter(Site %in% c("Almont", "CBT", "Road", "Pfeiler", "PBM", "Monument")) %>%
-    mutate(Country = "CO")%>%
+    mutate(Country = "CO",
+           LDMC = Dry_Mass_g/Wet_Mass_g)%>%
     mutate(Gradient = as.character(1),
            BlockID = as.character(1),
            PlotID = as.character(1)) %>% 
@@ -229,3 +248,13 @@ CleanColoradoTrait <- function(dat){
   
   return(dat2)
 }  
+
+
+
+#Cleaning Meta Bioclim
+
+CleanMetaBioclim <- function(metaBioclim){
+  metaBioclim2 <- metaBioclim %>% 
+    mutate(Site = ifelse(Country == "SV", paste(Site, Gradient, sep = ""), Site))
+    return(metaBioclim2)
+}
