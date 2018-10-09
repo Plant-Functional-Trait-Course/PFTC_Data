@@ -1,20 +1,32 @@
 CommunityW_GlobalAndLocalMeans <- function(dat){
   meanTraits <- dat$trait %>% 
+    # Global means
     group_by(Taxon, Trait) %>% 
-    mutate(
-      TraitMean_global = mean(Value, na.rm = TRUE)
-    ) %>% 
+    mutate(TraitMean_global = mean(Value, na.rm = TRUE)) %>% 
+    
+    # Site means (site level)
     group_by(Site, Taxon, Trait) %>%
-    mutate(
-      TraitMean_local = mean(Value, na.rm = TRUE)
-    ) %>% 
-    select(-Year) %>% 
-    ungroup()
+    mutate(TraitMean_site = mean(Value, na.rm = TRUE)) %>% 
+    
+    # Plot means
+    group_by(PlotID, BlockID, Site, Taxon, Trait) %>%
+    mutate(TraitMean_plot = mean(Value, na.rm = TRUE)) %>% 
+    select(-Year, -Value) %>% 
+    ungroup() %>% 
+    distinct()
     
   dat2 <- dat$community %>% 
-    left_join(meanTraits %>% select(-TraitMean_global)) %>% 
-    left_join(meanTraits %>% select(-TraitMean_local, -Site) %>% distinct()) %>% 
-    mutate(TraitMean = coalesce(TraitMean_local, TraitMean_global))
+    
+    # join plot level means
+    left_join(meanTraits %>% select(-TraitMean_global, -TraitMean_site)) %>% 
+    # join site level means
+    left_join(meanTraits %>% select(-TraitMean_global, -TraitMean_plot, -BlockID, -PlotID) %>% distinct()) %>% 
+    
+    # join global means
+    left_join(meanTraits %>% select(-TraitMean_plot, -TraitMean_site, -Site, -BlockID, -PlotID) %>% distinct()) %>% 
+    
+    
+    mutate(TraitMean = coalesce(TraitMean_plot, TraitMean_site, TraitMean_global))
   
   return(dat2)
 }
