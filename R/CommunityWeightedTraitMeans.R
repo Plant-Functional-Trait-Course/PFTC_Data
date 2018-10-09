@@ -15,43 +15,53 @@ CommunityW_GlobalAndLocalMeans <- function(dat){
     ungroup() %>% 
     distinct()
     
-  dat2 <- dat$community %>% 
+  dat2 <- dat$community 
     
-    # join plot level means
-    left_join(meanTraits %>% select(-TraitMean_global, -TraitMean_site)) %>% 
+  if(!dat2$Country[1] %in% c("NO", "CO")) {
+    dat2 <- dat2 %>% 
+      # join plot level means
+      left_join(meanTraits %>% select(-TraitMean_global, -TraitMean_site))
+  }
+    
+  dat2 <- dat2 %>% 
     # join site level means
     left_join(meanTraits %>% select(-TraitMean_global, -TraitMean_plot, -BlockID, -PlotID) %>% distinct()) %>% 
     
     # join global means
-    left_join(meanTraits %>% select(-TraitMean_plot, -TraitMean_site, -Site, -BlockID, -PlotID) %>% distinct()) %>% 
+    left_join(meanTraits %>% select(-TraitMean_plot, -TraitMean_site, -Site, -BlockID, -PlotID) %>% distinct())
     
-    
-    mutate(TraitMean = coalesce(TraitMean_plot, TraitMean_site, TraitMean_global))
+  if(dat2$Country[1] %in% c("NO", "CO")) {
+    dat2 <- dat2 %>% 
+      mutate(TraitMean = coalesce(TraitMean_site, TraitMean_global))
+  } else{
+    dat2 <- dat2 %>% 
+      mutate(TraitMean = coalesce(TraitMean_plot, TraitMean_site, TraitMean_global))
+  }
+  
+  ### Calculate Community weighted means
+  dat2 <- dat2 %>% 
+    group_by(Trait, Site, PlotID) %>% 
+    mutate(CWTraitMean = weighted.mean(TraitMean, Cover, na.rm=TRUE))
   
   return(dat2)
 }
 
 
+MakeFigure <- function(TraitMeans){
+  myplot <- TraitMeans %>% 
+    filter(!is.na(Trait), !Trait %in% c("P_Co_Var", "P_Std_Dev", "NC_ratio", "NP_ratio")) %>% 
+    ungroup() %>% 
+    mutate(Trait = factor(Trait, level = c("Wet_Mass_g", "Dry_Mass_g", "Leaf_Area_cm2", "Leaf_Thickness_Ave_mm", "LDMC", "SLA_cm2_g", "Plant_Height_cm", "C_percent", "N_percent", "CN_ratio", "P_AVG", "dN15_percent", "dC13_percent"))) %>% 
+    mutate(CG = paste(Country, Gradient, sep = "")) %>% 
+    ggplot(aes(x = bio1, y = CWTraitMean, colour = CG)) +
+    geom_point() +
+    geom_smooth(method = "lm", se = FALSE) +
+    labs(x = "Mean annual Temperature °C", y = "Community weighted trait mean") +
+    facet_wrap(~ Trait, scales = "free_y")
+  return(myplot)
+}
 
-#### Weighting the traits data by the community ####
-group_by(PlotID, Site) %>%
-  mutate(
-    Wmean_Lth= weighted.mean(Lth_mean, Cover, na.rm=TRUE),
-    Wmean_LA= weighted.mean(LA_mean, Cover, na.rm=TRUE),
-    #Wmean_Height= weighted.mean(Height_mean, Cover, na.rm=TRUE),
-    Wmean_WetMass= weighted.mean(WetMass_mean, Cover, na.rm=TRUE)
-  ) %>% 
-  
-  mutate(
-    Wmean_global_Lth= weighted.mean(Lth_mean_global, Cover, na.rm=TRUE),
-    Wmean_global_LA= weighted.mean(LA_mean_global, Cover, na.rm=TRUE),
-    #Wmean_global_Height= weighted.mean(Height_mean_global, Cover, na.rm=TRUE),
-    Wmean_global_WetMass = weighted.mean(WetMass_mean_global, Cover, na.rm=TRUE)) %>%
-  
-  #group_by(functionalGroup, turfID, Site) %>%
-  #mutate(Wmean_Height= weighted.mean(Height_mean, cover, na.rm=TRUE),
-  #Wmean_global_Height = weighted.mean(Height_mean_global, cover, na.rm=TRUE)) %>%
-  ungroup()
+
 
 #### Filtering out turfs with less than 70% of the community present ###
 
