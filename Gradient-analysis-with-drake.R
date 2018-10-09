@@ -106,6 +106,11 @@ analyses <- drake_plan(
                       localpath = "data/funcab_composition_2016.xlsx"),
     trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/funcab_composition_2016.xlsx")$content_hash)
   ),
+  spNO = target(
+    drop_and_load.xlsx(myfile = "transplant/USE THIS DATA/Norway/systematics_species.xlsx",
+                       localpath = "data/fsystematics_species.xlsx"),
+    trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/systematics_species.xlsx")$content_hash)
+  ),
   fluxNO_raw = target(
     drop_and_load(myfile = "transplant/USE THIS DATA/Norway/standardControlFluxNO_2016.Rdata",
                   localpath = "data/standardControlFluxNO_2016.Rdata"),
@@ -114,7 +119,7 @@ analyses <- drake_plan(
   
   
   ## COLORADO
-  metaCO = load(file = "data/metaCO.Rdata"),
+  metaCO_raw = get(load(file = "data/metaCO.Rdata")),
   metaCommunityCO_raw = get(load(file = "data/metaCommunityCO_2016.Rdata")),
   communityCO_raw = target(
     drop_and_load.csv(myfile = "transplant/USE THIS DATA/Colorado/CO_gradient_2016_Species_Cover.csv",
@@ -132,7 +137,14 @@ analyses <- drake_plan(
     trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Colorado/standardControlFluxCO_2016.Rdata")$content_hash)
 ),
 
-  
+  ### META BIOCLIM ###
+  metaBioclim_raw = target(
+  drop_and_load(myfile = "transplant/USE THIS DATA/PFTC/MetaBioclimAllCountries.Rdata",
+                localpath = "data/MetaBioclimAllCountries.Rdata"),
+  trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC/MetaBioclimAllCountries.Rdata")$content_hash)
+),
+
+
   
   #### CLEAN DATA SETS
   traitCH = CleanChinaTrait(traitCH_raw),
@@ -147,14 +159,17 @@ analyses <- drake_plan(
   communitySV = CleanSvalbardCommunity(communitySV_raw),
 
   metaCommunityNO = CleanNorwayMetaCommunity(metaCommunityNO_raw),
-  communityNO = CleanNorwayCommunity(communityNO_raw),
+  communityNO = CleanNorwayCommunity(communityNO_raw, spNO),
   traitNO = CleanNorwayTrait(traitNO_raw),
   fluxNO = CleanNorwayFlux(fluxNO_raw),
 
+  metaCO  = CleanColoradoMeta(metaCO_raw),  
   communityCO = CleanColoradoCommunity(communityCO_raw),
   traitCO = CleanColoradoTrait(traitCO_raw),
   metaCommunityCO = CleanColoradoMetaCommunity(metaCommunityCO_raw),
   fluxCO = CleanColoradoFlux(fluxCO_raw),
+
+  metaBioclim = CleanMetaBioclim(metaBioclim_raw),
   
   # make a list with all data sets
   CountryList = MakeCountryList(metaCH, metaCommunityCH, communityCH, traitCH, fluxCH,
@@ -167,7 +182,8 @@ analyses <- drake_plan(
   
   #### CALCULATIONS, ANALYSES, FIGURES
   TraitMeans = CountryList %>% 
-    map_df(CommunityW_GlobalAndLocalMeans)
+    map_df(CommunityW_GlobalAndLocalMeans) %>% 
+    left_join(metaBioclim)
 
 
 )
