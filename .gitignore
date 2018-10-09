@@ -22,6 +22,10 @@ vignettes/*.pdf
 #markdown cache
 *_cache/
 
+#drake cache
+.drake/
+
+
 #data
 *.xls
 *.csv
@@ -47,6 +51,7 @@ vignettes/*.pdf
 *.sqlite
 *.dat
 *.RData.Tmp1
+*.rds
 
 #rasters & shapefiles
 *.bil
