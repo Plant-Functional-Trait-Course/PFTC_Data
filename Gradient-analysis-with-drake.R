@@ -139,7 +139,7 @@ analyses <- drake_plan(
   communityCH = CleanChinaCommunity(communityCH_raw),
   
   metaCommunityPE = CleanPeruMetaCommunity(metaCommunityPE_raw),
-  traitPE = CleanPeruTrait(traitSV_raw),
+  traitPE = CleanPeruTrait(traitPE_raw),
   communityPE = CleanPeruCommunity(communityPE_raw),
 
   metaSV = CleanSvalbardMeta(metaSV_raw),
