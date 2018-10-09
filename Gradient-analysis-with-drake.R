@@ -23,7 +23,9 @@ drop_acc()
 
 ### NEEDS DOING!!!
 # Colorado: trait and height
-
+# metaCOmmunityNO!!!
+#DryMass_g Svalbard!!!
+#CHina gradient comm
 
 
 #construct drake plan
@@ -53,7 +55,7 @@ analyses <- drake_plan(
   
   ## PERU
   metaPE = get(load(file = "data/metaPE.Rdata")),
-  metaCommunityPE = get(load(file = "data/metaCommunity_PE_2018.Rdata")),
+  metaCommunityPE_raw = get(load(file = "data/metaCommunity_PE_2018.Rdata")),
   traitPE_raw = target(
     drop_and_load(myfile = "transplant/USE THIS DATA/PFTC3_Peru/traits_2018_Peru_cleaned.Rdata",
                   localpath = "data/traits_2018_Peru_cleaned.Rdata"),
@@ -72,7 +74,7 @@ analyses <- drake_plan(
   
   
   ## SVALBARD
-  metaSV = get(load(file = "data/metaSV.Rdata")),
+  metaSV_raw = get(load(file = "data/metaSV.Rdata")),
   metaCommunitySV = get(load(file = "data/metaCommunitySV_2018.Rdata")),
   traitSV_raw = target(
     drop_and_load(myfile = "transplant/USE THIS DATA/PFTC4_Svalbard/traitsGradients_SV_2018.Rdata",
@@ -136,14 +138,19 @@ analyses <- drake_plan(
   traitCH = CleanChinaTrait(traitCH_raw),
   communityCH = CleanChinaCommunity(communityCH_raw),
   
+  metaCommunityPE = CleanPeruMetaCommunity(metaCommunityPE_raw),
   traitPE = CleanPeruTrait(traitSV_raw),
   communityPE = CleanPeruCommunity(communityPE_raw),
+
+  metaSV = CleanSvalbardMeta(metaSV_raw),
   traitSV = CleanSvalbardTrait(traitSV_raw),
   communitySV = CleanSvalbardCommunity(communitySV_raw),
+
   metaCommunityNO = CleanNorwayMetaCommunity(metaCommunityNO_raw),
   communityNO = CleanNorwayCommunity(communityNO_raw),
   traitNO = CleanNorwayTrait(traitNO_raw),
   fluxNO = CleanNorwayFlux(fluxNO_raw),
+
   communityCO = CleanColoradoCommunity(communityCO_raw),
   traitCO = CleanColoradoTrait(traitCO_raw),
   metaCommunityCO = CleanColoradoMetaCommunity(metaCommunityCO_raw),
@@ -154,18 +161,13 @@ analyses <- drake_plan(
                                 metaPE, metaCommunityPE, communityPE, traitPE, fluxPE,
                                 metaSV, metaCommunitySV, communitySV, traitSV, fluxSV,
                                 metaNO, metaCommunityNO, communityNO, traitNO, fluxNO,
-                                metaCO, metaCommunityCO, communityCO, traitCO, fluxCO)
+                                metaCO, metaCommunityCO, communityCO, traitCO, fluxCO),
   
   
   
   #### CALCULATIONS, ANALYSES, FIGURES
-  #DivIndex = CountryList %>% map("community") %>% map(CalculateDiversityIndices)
-  #TraitMeans = CountryList %>% map("trait") %>% map(GlobalAndLocalMeans),
-
-  #TraitCommunity = CountryList %>% 
-    #map_df(~left_join(.$trait, .$community, by = c("Site", "Taxon")), .id = "country"),
-  
-  #res = CommunityW_GlobalAndLocalMeans(TraitCommunity)
+  TraitMeans = CountryList %>% 
+    map_df(CommunityW_GlobalAndLocalMeans, .id = "Country")
 
 
 )
