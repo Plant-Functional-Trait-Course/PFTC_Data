@@ -38,21 +38,7 @@ species_i<-unique(data_i$Taxon)
 site_i<-as.character(unique(data_i$Site))
 country_i<-as.character(unique(data_i$Country))
 
-
-
-#traits_i<-select_traits(species = species_i,site = site_i,country = country_i,traits_dataframe = combined_trait)
-#traits_i<-traits_i[c("Taxon","Wet_Mass_g","Dry_Mass_g","Leaf_Thickness_Ave_mm","Leaf_Area_cm2","SLA_cm2_g","LDMC","C_percent",
-#           "N_percent","CN_ratio","dN15_percent","dC13_percent","P_AVG")]
-
 abd_i<-as.data.frame(data_i[c('Taxon',"Cover")])
-
-#Inputs:
-#Number of replicated outputs
-# Species abundance dataframe (2 columns, first column: species name, second column: abundance)
-# Trait data frame (2 or more columns: first column: species name, columns 2+ : traits)
-
-#Output
-#Matrix with nrows = number of replicates, ncols = total abundance
 
 dist_i<-trait_distributions(number_replicates = n_replicates,
                     abundance_data = abd_i,
@@ -69,7 +55,6 @@ for(f in 1:length(dist_i)){
   if(!is.null(dist_f)){#if there is distribution data, write it
   if(nrow(dist_f)!=n_replicates){stop("Number of rows in distribution does not equal number of replicates")}  
   
-  #print(trait_f)
   write.csv(x = dist_f,file = paste("trait_distributions/output_distributions_no_itv/",plot_i,".",year_i,".",trait_f,".csv",sep = ""),row.names = F  )
   }#if there is distribution data
   rm(trait_f,dist_f)  
