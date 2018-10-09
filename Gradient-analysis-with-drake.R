@@ -23,9 +23,10 @@ drop_acc()
 
 ### NEEDS DOING!!!
 # Colorado: trait and height
-# metaCOmmunityNO!!!
 #DryMass_g Svalbard!!!
 #CHina gradient comm
+# PE site and plot
+# CO site_plot (only a number)
 
 
 #construct drake plan
