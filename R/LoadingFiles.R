@@ -21,3 +21,10 @@ drop_and_load.xlsx <- function(myfile, localpath){
   dat <- read_excel(path = localpath, col_names = TRUE)
   return(dat)
 }
+
+
+drop_and_load.rds <- function(myfile, localpath){
+  drop_download(path = myfile, local_path = localpath, overwrite = TRUE)
+  dat <- readRDS(file = localpath)
+  return(dat)
+}
