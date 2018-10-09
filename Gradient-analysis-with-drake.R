@@ -167,7 +167,7 @@ analyses <- drake_plan(
   
   #### CALCULATIONS, ANALYSES, FIGURES
   TraitMeans = CountryList %>% 
-    map_df(CommunityW_GlobalAndLocalMeans, .id = "Country")
+    map_df(CommunityW_GlobalAndLocalMeans)
 
 
 )
@@ -177,7 +177,8 @@ analyses <- drake_plan(
 config <- drake_config(analyses)
 # outdated(config)        # Which targets need to be (re)built?
 make(analyses)          # Build the right things.
-
 loadd()
+
+TraitMeans %>% filter(!is.na(Trait)) %>% count(Country)
 #voew dependency graph
 vis_drake_graph(config, targets_only = TRUE)
