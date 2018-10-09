@@ -6,13 +6,14 @@
 CleanChinaTrait <- function(dat){
   dat2 <- dat %>% 
     filter(Project %in% c("LOCAL", "0", "C")) %>% 
-    mutate(Treatment = plyr::mapvalues(Project, c("C", "0", "LOCAL"), c("control", "local", "gradient"))) %>% 
+    mutate(Treatment = plyr::mapvalues(Project, c("C", "0", "LOCAL"), c("C", "O", "Gradient"))) %>% 
+    mutate(Taxon = trimws(Taxon)) %>% 
     mutate(Year = year(Date),
            Country = "CH",
            Gradient = as.character(1),
            Project = "T") %>% 
     rename(BlockID = Location) %>%
-    mutate(PlotID = paste(BlockID, Treatment, sep = "_"),
+    mutate(PlotID = paste(BlockID, Treatment, sep = "-"),
            ID = paste(Site, Treatment, Taxon, Individual_number, Leaf_number, sep = "_")) %>% 
     select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC, C_percent, N_percent , CN_ratio, dN15_percent, dC13_percent, P_AVG, P_Std_Dev, P_Co_Var) %>% 
     gather(key = Trait, value = Value, -Country, -Year, -Site, -Gradient, -BlockID, -PlotID, -Taxon) %>% 
@@ -50,8 +51,9 @@ CleanSvalbardCommunity <- function(dat){
   rename(Latitude = Latitude_N, Longitude = Longitude_E, Elevation = Elevation_m)%>%
   mutate(Site = paste(Site, Gradient, sep =""),
          PlotID = paste(Site, Gradient, PlotID, sep=""),
+         BlockID = as.character(1),
          Cover = as.numeric(Cover)) %>% 
-    select(Country, Year, Site, Gradient, PlotID, Taxon, Cover)
+    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover)
   
   return(dat2)
 }
@@ -61,9 +63,10 @@ CleanSvalbardTrait <- function(dat){
   dat2 <- dat %>% 
     rename(Latitude = Latitude_N, Longitude = Longitude_E, Elevation = Elevation_m)%>%
     mutate(Site = paste(Site, Gradient, sep =""),
-           PlotID = paste(Site, Gradient, PlotID, sep=""))%>%
-    select(Country, Year, Site, Gradient, PlotID, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC) %>% 
-    gather(key = Trait, value = Value, -Country, -Year, -Site, -Gradient, -PlotID, -Taxon) %>% 
+           BlockID = as.character(1),
+           PlotID = paste(Site, Gradient, PlotID, sep="")) %>%
+    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC) %>% 
+    gather(key = Trait, value = Value, -Country, -Year, -Site, -Gradient, -BlockID, -PlotID, -Taxon) %>% 
     filter(!is.na(Value))
   
   return(dat2)
@@ -84,9 +87,10 @@ CleanPeruMetaCommunity <- function(dat){
 CleanPeruCommunity <- function(dat){
   dat2 <- dat %>% 
     mutate(Country = "PE", 
+           BlockID = as.character(1),
            PlotID = paste(PlotID, Treatment, sep=""),
            Gradient = as.character(1)) %>% 
-    select(Country, Year, Site, Gradient, PlotID, Taxon, Cover)
+    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover)
   return(dat2)
 }
 
@@ -94,10 +98,11 @@ CleanPeruCommunity <- function(dat){
 
 CleanPeruTrait <- function(dat){
   dat2 <- dat %>%
-    mutate(PlotID = paste(PlotID, Treatment, sep=""),
+    mutate(BlockID = as.character(1),
+           PlotID = paste(PlotID, Treatment, sep=""),
            Gradient = as.character(1)) %>%
-  select(Country, Year, Site, Gradient, PlotID, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC) %>% 
-    gather(key = Trait, value = Value, -Country, -Year, -Site, -Gradient, -PlotID, -Taxon) %>% 
+  select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC) %>% 
+    gather(key = Trait, value = Value, -Country, -Year, -Site, -BlockID, -PlotID, -Gradient, -Taxon) %>% 
     filter(!is.na(Value))
   return(dat2)
 }  
@@ -147,9 +152,11 @@ CleanNorwayTrait <- function(dat){
                                 Site %in% c("Vik", "Hog", "Lav") ~ as.character(2),
                                 Site %in% c("Arh", "Ram", "Gud") ~ as.character(3),
                                 Site %in% c("Ovs", "Ves", "Skj") ~ as.character(4)
-    ))%>%
-    select(Country, Year, Site, Gradient, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC, N_percent, C_percent, CN_ratio) %>% 
-    gather(key = Trait, value = Value, -Country, -Year, -Site, -Gradient, -Taxon) %>% 
+    )) %>%
+    mutate(BlockID = as.character(1),
+           PlotID = as.character(1)) %>% 
+    select(Country, Year, Site, BlockID, PlotID, Gradient, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC, N_percent, C_percent, CN_ratio) %>% 
+    gather(key = Trait, value = Value, -Country, -Year, -Site, -BlockID, -PlotID, -Gradient, -Taxon) %>% 
     filter(!is.na(Value))
   
   return(dat2)
@@ -181,8 +188,9 @@ CleanColoradoCommunity <- function(dat){
            Year = 2016) %>% 
     rename(Site = site, Taxon = species_or_ground_cover, functionalGroup = growth_habit) %>%
     mutate(PlotID = recode(PlotID, "plot_3_pct" = "plot3_pct"),
-           Gradient = as.character(1)) %>% 
-    select(Country, Year, Site, Gradient, PlotID, Taxon, Cover)
+           Gradient = as.character(1),
+           BlockID = as.character(1)) %>% 
+    select(Country, Year, Site, BlockID, PlotID, Gradient, Taxon, Cover)
   return(dat2)
 }
 
@@ -210,9 +218,11 @@ CleanColoradoTrait <- function(dat){
     rename(Year = year, Site = site, Taxon = taxon_std, Leaf_Area_cm2 = leaf_area, Wet_Mass_g = wet_mass, Dry_Mass_g = dry_mass, SLA_cm2_g = SLA, Plant_Height_cm = height_flower, Leaf_Thickness_Ave_mm = thickness, C_percent = pc_C, N_percent = pc_N, dC13_percent = d13C, dN15_percent = d15N, CN_ratio = C_N, NC_ratio = N_C, NP_ratio = N_P, P_AVG = pc_P) %>%
     filter(Site %in% c("Almont", "CBT", "Road", "Pfeiler", "PBM", "Monument")) %>%
     mutate(Country = "CO")%>%
-    mutate(Gradient = as.character(1)) %>% 
-    select(Country, Year, Site, Gradient, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC, C_percent, N_percent, dC13_percent, dN15_percent, CN_ratio, NC_ratio, NP_ratio, P_AVG) %>% 
-    gather(key = Trait, value = Value, -Country, -Year, -Site, -Gradient, -Taxon) %>% 
+    mutate(Gradient = as.character(1),
+           BlockID = as.character(1),
+           PlotID = as.character(1)) %>% 
+    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC, C_percent, N_percent, dC13_percent, dN15_percent, CN_ratio, NC_ratio, NP_ratio, P_AVG) %>% 
+    gather(key = Trait, value = Value, -Country, -Year, -Site, -BlockID, -PlotID, -Gradient, -Taxon) %>% 
     filter(!is.na(Value)) %>% 
     mutate(Value = as.numeric(Value)) %>% 
     filter(!is.na(Value))
