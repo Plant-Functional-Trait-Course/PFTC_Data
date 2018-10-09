@@ -7,6 +7,8 @@ source("trait_distributions/r_functions/misc.R")
 source("trait_distributions/r_functions/prep_trait_and_comm_objects.R")
 source("trait_distributions/r_functions/trait_distribution_fx.R")
 source("trait_distributions/r_functions/trait_selecting_fx.R")
+source("trait_distributions/r_functions/summarize_moments.R")
+
 
 #Minor fixes
 combined_community$Cover<-gsub(pattern = " ",replacement = "",x = combined_community$Cover)
@@ -27,7 +29,7 @@ n_replicates=200
 trait_means<-species_trait_means(trait_data_frame = as.data.frame(combined_trait[,c("Taxon","Wet_Mass_g","Dry_Mass_g","Leaf_Thickness_Ave_mm","Leaf_Area_cm2","SLA_cm2_g",
                                                                                     "LDMC","C_percent","N_percent","CN_ratio","dN15_percent","dC13_percent","P_AVG" )]))
 
-for( i in 321:nrow(unique(combined_community[c('globalplotID',"Year")]))){
+for( i in 1:nrow(unique(combined_community[c('globalplotID',"Year")]))){
 
 plot_i<-as.character(unique(combined_community[c('globalplotID',"Year")])[i,1])
 year_i<-as.character(unique(combined_community[c('globalplotID',"Year")])[i,2])
@@ -69,3 +71,10 @@ print(paste(round(i/nrow(unique(combined_community[c('globalplotID',"Year")]))*1
 }#end i loop
 
 rm(country_i,f,i,n_replicates,plot_i,site_i,species_i)
+
+###########################
+
+file_directory<-"trait_distributions/output_distributions_no_itv//"
+pftc_bootstrapped_moments_no_itv<-extract_moments(file_directory = file_directory)
+saveRDS(object = pftc_bootstrapped_moments_no_itv,file = "trait_distributions/pftc_bootstrapped_moments_no_itv.RDS")
+

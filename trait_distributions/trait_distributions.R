@@ -7,7 +7,7 @@ source("trait_distributions/r_functions/misc.R")
 source("trait_distributions/r_functions/prep_trait_and_comm_objects.R")
 source("trait_distributions/r_functions/trait_distribution_fx.R")
 source("trait_distributions/r_functions/trait_selecting_fx.R")
-
+source("trait_distributions/r_functions/summarize_moments.R")
 
 #Minor fixes
 combined_community$Cover<-gsub(pattern = " ",replacement = "",x = combined_community$Cover)

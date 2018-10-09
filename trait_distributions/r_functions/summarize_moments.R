@@ -1,6 +1,5 @@
 #Extract moments summary stats from trait distributions
 
-source("trait_distributions/r_scripts/calc_ci.R")
 library(moments)
 
 extract_moments<-function(file_directory){
