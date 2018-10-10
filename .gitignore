@@ -35,6 +35,7 @@ vignettes/*.pdf
 !metaSV.Rdata
 !metaNO.Rdata
 !metaCO.Rdata
+!metaAll.Rdata
 !metaCommunity_CH_2012_2016.Rdata
 !metaCommunity_PE_2018.Rdata
 !metaCommunitySV_2018.Rdata
