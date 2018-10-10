@@ -50,7 +50,7 @@ CommunityW_GlobalAndLocalMeans <- function(dat){
 
 # Reduce to only CWMeans
 CommunityW_Means <- function(TraitMeans_All){
-  CWTraitMeans <- TraitMeans %>% 
+  CWTraitMeans <- TraitMeans_All %>% 
     filter(!is.na(Trait)) %>% 
     select(-Taxon, -Cover, -TraitMean_plot, -TraitMean_site, -TraitMean_global, -TraitMean) %>% 
     distinct()
