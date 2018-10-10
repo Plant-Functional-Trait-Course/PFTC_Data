@@ -32,7 +32,8 @@ CleanChinaCommunity <- function(dat){
     rename(Year = year, Site = originSiteID, BlockID = originBlockID, PlotID = turfID, Treatment = TTtreat, Taxon = speciesName, Cover = cover) %>% 
     mutate(Country = "CH",
            Gradient = as.character(1)) %>% 
-    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover)
+    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
+    mutate(Taxon = recode(Taxon, "Potentilla stenophylla var. emergens" = "Potentilla stenophylla"))
 
   return(dat2)
 }
@@ -108,6 +109,7 @@ CleanPeruTrait <- function(dat){
     gather(key = Trait, value = Value, -Country, -Year, -Site, -BlockID, -PlotID, -Gradient, -Taxon) %>% 
     filter(!is.na(Value))
   return(dat2)
+  mutate(Taxon = recode(Taxon, "Agrostis 2" = "Agrostis sp2"))
 }  
   
 #Cleaning Norway Meta Community 
