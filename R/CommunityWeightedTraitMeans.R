@@ -59,21 +59,6 @@ CommunityW_Means <- function(TraitMeans_All){
 
 
 
-MakeFigure <- function(TraitMeans){
-  myplot <- TraitMeans %>% 
-    filter(!is.na(Trait), !Trait %in% c("P_Co_Var", "P_Std_Dev", "NC_ratio", "NP_ratio")) %>% 
-    ungroup() %>% 
-    mutate(Trait = factor(Trait, level = c("Wet_Mass_g", "Dry_Mass_g", "Leaf_Area_cm2", "Leaf_Thickness_Ave_mm", "LDMC", "SLA_cm2_g", "Plant_Height_cm", "C_percent", "N_percent", "CN_ratio", "P_AVG", "dN15_percent", "dC13_percent"))) %>% 
-    mutate(CG = paste(Country, Gradient, sep = "")) %>% 
-    ggplot(aes(x = bio1, y = CWTraitMean, colour = CG)) +
-    geom_point() +
-    geom_smooth(method = "lm", se = FALSE) +
-    labs(x = "Mean annual Temperature °C", y = "Community weighted trait mean") +
-    facet_wrap(~ Trait, scales = "free_y")
-  return(myplot)
-}
-
-
 
 #### Filtering out turfs with less than 70% of the community present ###
 
