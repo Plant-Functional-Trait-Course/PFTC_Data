@@ -123,17 +123,43 @@ CleanNorwayMetaCommunity <- function(dat){
 }  
 
 #Cleaning Norway Community
+
+#Dictionary to make names in the community data speak with the names in the trait data
+Dictionary_communityNO <- read.table(header = TRUE, stringsAsFactors = FALSE, text = 
+                         "old new
+                       Nar_stri Nar_str
+                       Tarax Tar_sp
+                       Euph_sp Eup_sp
+                       Phle_alp Phl_alp
+                       Rhin_min Rhi_min
+                       Rum_ac-la Rum_acl
+                       Trien_eur Tri_eur
+                       Rub_idae Rub_ida
+                       Saus_alp Sau_alp
+                       Ave__pub Ave_pub
+                       Car_atra Car_atr
+                       Hypo_rad Hyp_rad
+                       Bart_alp Bar_alp
+                       Car_pulic Car_pul
+                       Carex_sp Car_sp
+                       Hier_sp Hie_sp
+                       Salix_sp Sal_sp
+                       Emp_her Emp_nig
+                       Emp Emp_nig
+                       Hie_vulg Hie_vul
+                       Vio_can Vio_riv")
     
 CleanNorwayCommunity <- function(dat, sp){
   sp <- sp %>% 
-    mutate(Species = gsub("_", " ", Species))
+    mutate(Species = gsub(" ", "_", Species))
   
   dat2 <- dat %>% 
     filter(Measure == "Cover") %>%
     select(-Treatment, -'Nid herb', 'Nid gram', -'Nid rosett', -'Nid seedling', -liver, -lichen, -litter, -soil, -rock, -'#Seedlings', -TotalGraminoids, -totalForbs, -totalBryophytes, -vegetationHeight, -mossHeight, -comment, -'ver seedl', -canum, -totalVascular, totalBryophytes__1, -acro, -pleuro, -totalLichen) %>% 
     gather(key = Taxon, value = Cover, -Site, -Block, -turfID, -subPlot, -year, -date, -Measure, -recorder) %>% 
     filter(!is.na(Cover)) %>% 
-    mutate(Taxon = gsub("_", " ", Taxon)) %>% 
+    mutate(Taxon = gsub(" ", "_", Taxon))%>%
+    mutate(Taxon = plyr::mapvalues(Taxon, from = Dictionary_communityNO$old, to = Dictionary_communityNO$new)) %>%
     left_join(sp, by = c("Taxon" = "Species")) %>% 
     select(-Genus, -Family, -Order, -Taxon) %>% 
     rename(Taxon = Full_name) %>% 
@@ -166,7 +192,8 @@ CleanNorwayTrait <- function(dat){
            PlotID = as.character(1)) %>% 
     select(Country, Year, Site, BlockID, PlotID, Gradient, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC, N_percent, C_percent, CN_ratio) %>% 
     gather(key = Trait, value = Value, -Country, -Year, -Site, -BlockID, -PlotID, -Gradient, -Taxon) %>% 
-    filter(!is.na(Value))
+    filter(!is.na(Value)) %>% 
+    mutate(Taxon = recode(Taxon, "Empetrum nigrum subsp. Hermaphroditum" = "Empetrum nigrum"))
   
   return(dat2)
 }
@@ -241,7 +268,7 @@ CleanColoradoTrait <- function(dat){
     filter(!is.na(site)) %>% 
     select(year, site, block, taxon_std, leaf_area, wet_mass, dry_mass, SLA, height_flower, height_leaf, height, height_2, thickness, pc_C, pc_N, pc_P, d13C, d15N,  C_N,  N_C,  N_P) %>% 
     rename(Year = year, Site = site, PlotID = block, Taxon = taxon_std, Leaf_Area_cm2 = leaf_area, Wet_Mass_g = wet_mass, Dry_Mass_g = dry_mass, SLA_cm2_g = SLA, Plant_Height_cm = height_flower, Leaf_Thickness_Ave_mm = thickness, C_percent = pc_C, N_percent = pc_N, dC13_percent = d13C, dN15_percent = d15N, CN_ratio = C_N, NC_ratio = N_C, NP_ratio = N_P, P_AVG = pc_P) %>%
-    filter(Site %in% c("Almont", "CBT", "Road", "Pfeiler", "PBM", "Monument")) %>%
+    filter(Site %in% c("Almont", "CBT", "Road", "Pfeiler", "PBM", "Cinnamon")) %>%
     mutate(Country = "CO",
            LDMC = Dry_Mass_g/Wet_Mass_g) %>%
     mutate(Gradient = as.character(1),
