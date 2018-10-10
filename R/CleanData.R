@@ -301,11 +301,12 @@ CleanCWMeansBoot <- function(CW_Means_Bootstrapped_raw){
     as.tibble() %>% 
     mutate(turf = gsub("plot|plot_|_pct", "", turf)) %>%
     mutate(Country = substr(turf, 1, 2),
-           PlotID = gsub("^\\w{2}_", "", as.character(turf))) %>% 
-    
+           PlotID = gsub("^\\w{2}_", "", turf)) %>% 
+    mutate(PlotID = ifelse(Country == "SV", 
+                           paste0(substr(PlotID, 3, 3), substr(PlotID, 1, 1), substr(PlotID, 5, 5)),
+                           PlotID)) %>% 
     rename(Year = year, Trait = trait, turfID = turf) %>% 
     select(Country, PlotID, turfID, Year, Trait, mean_lower:kurt_upper)
-  
   
   return(CW_Means_Bootstrapped)
 }
