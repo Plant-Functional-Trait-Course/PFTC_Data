@@ -296,7 +296,26 @@ CleanMetaBioclim <- function(metaBioclim_raw){
     left_join(metaSV, by = c("Country", "Gradient", "Elevation", "Latitude", "Longitude")) %>% 
     mutate(Site = ifelse(Country == "SV", Site.y, Site.x)) %>% 
     select(-Site.x, Site.y) %>% 
-    select(Country, Site, Elevation:bio9)
+    select(Country, Site, Elevation:bio9) %>% 
+    rename(AnnMeanTemp = "bio1",
+           MeanDiurnalRange = "bio2",
+           Isothermal = "bio3",
+           TempSeasonal = "bio4",
+           MaxTempWarmMonth = "bio5",
+           MaxTempColdMonth = "bio6",
+           TempAnnRange = "bio7",
+           MeanTempWetQuart = "bio8",
+           MeanTempDryQuart = "bio9",
+           MeanTempWarmQuart = "bio10",
+           MeanTempColdQuart = "bio11",
+           AnnPrecip = "bio12",
+           PrecipWetMonth = "bio13",
+           PrecipDryMonth = "bio14",
+           PrecipSeasonal = "bio15",
+           PrecipWetQuart = "bio16",
+           PrecipDryQuart = "bio17",
+           PrecipWarmQuart = "bio18",
+           PrecipColdQuart = "bio19")
     return(metaBioclim2)
 }
 
@@ -312,7 +331,8 @@ CleanCWMeansBoot <- function(CW_Means_Bootstrapped_raw){
                            paste0(substr(PlotID, 3, 3), substr(PlotID, 1, 1), substr(PlotID, 5, 5)),
                            PlotID)) %>% 
     rename(Year = year, Trait = trait, turfID = turf) %>% 
-    select(Country, PlotID, turfID, Year, Trait, mean_lower:kurt_upper)
+    select(Country, PlotID, turfID, Year, Trait, mean_lower:kurt_upper) %>% 
+    mutate_at(vars(mean_lower:kurt_upper), ~as.numeric(as.character(.)))
   
   return(CW_Means_Bootstrapped)
 }
