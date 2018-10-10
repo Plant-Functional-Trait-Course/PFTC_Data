@@ -290,9 +290,13 @@ CleanColoradoTrait <- function(dat){
 
 #Cleaning Meta Bioclim
 
-CleanMetaBioclim <- function(metaBioclim){
-  metaBioclim2 <- metaBioclim %>% 
-    mutate(Site = ifelse(Country == "SV", paste(Site, Gradient, sep = ""), Site))
+CleanMetaBioclim <- function(metaBioclim_raw){
+  metaBioclim2 <- metaBioclim_raw %>% 
+    mutate(Site = ifelse(Country == "SV", paste(Site, Gradient, sep = ""), Site)) %>% 
+    left_join(metaSV, by = c("Country", "Gradient", "Elevation", "Latitude", "Longitude")) %>% 
+    mutate(Site = ifelse(Country == "SV", Site.y, Site.x)) %>% 
+    select(-Site.x, Site.y) %>% 
+    select(Country, Site, Elevation:bio9)
     return(metaBioclim2)
 }
 
