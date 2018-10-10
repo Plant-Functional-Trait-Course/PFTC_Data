@@ -41,12 +41,14 @@ CommunityW_GlobalAndLocalMeans <- function(dat){
   ### Calculate Community weighted means
   dat2 <- dat2 %>% 
     group_by(Trait, Site, PlotID) %>% 
-    mutate(CWTraitMean = weighted.mean(TraitMean, Cover, na.rm=TRUE))
+    mutate(CWTraitMean = weighted.mean(TraitMean, Cover, na.rm=TRUE)) %>% 
+    ungroup()
   
   return(dat2)
 }
 
 
+# Reduce to only CWMeans
 CommunityW_Means <- function(TraitMeans_All){
   CWTraitMeans <- TraitMeans %>% 
     filter(!is.na(Trait)) %>% 
@@ -54,6 +56,7 @@ CommunityW_Means <- function(TraitMeans_All){
     distinct()
   return(CWTraitMeans)
 }
+
 
 
 MakeFigure <- function(TraitMeans){
