@@ -292,3 +292,19 @@ CleanMetaBioclim <- function(metaBioclim){
     mutate(Site = ifelse(Country == "SV", paste(Site, Gradient, sep = ""), Site))
     return(metaBioclim2)
 }
+
+
+#Cleaning CWMeans Bootstrapping
+CleanCWMeansBoot <- function(CW_Means_Bootstrapped_raw){
+  CW_Means_Bootstrapped <- CW_Means_Bootstrapped_raw %>% 
+    as.tibble() %>% 
+    mutate(turf = gsub("plot|plot_|_pct", "", turf)) %>%
+    mutate(Country = substr(turf, 1, 2),
+           PlotID = gsub("^\\w{2}_", "", as.character(turf))) %>% 
+    
+    rename(Year = year, Trait = trait, turfID = turf) %>% 
+    select(Country, PlotID, turfID, Year, Trait, mean_lower:kurt_upper)
+  
+  
+  return(CW_Means_Bootstrapped)
+}
