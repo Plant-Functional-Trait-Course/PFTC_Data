@@ -54,7 +54,8 @@ CleanSvalbardCommunity <- function(dat){
          Site = paste(Site, Gradient, sep =""),
          BlockID = as.character(1),
          Cover = as.numeric(Cover)) %>% 
-    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover)
+    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
+    mutate(Taxon = recode(Taxon, "micranthes hieracifolia" = "micranthes hieraciifolia"))
   
   return(dat2)
 }
