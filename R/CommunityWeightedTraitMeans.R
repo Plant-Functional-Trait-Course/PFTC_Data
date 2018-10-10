@@ -47,6 +47,15 @@ CommunityW_GlobalAndLocalMeans <- function(dat){
 }
 
 
+CommunityW_Means <- function(TraitMeans_All){
+  CWTraitMeans <- TraitMeans %>% 
+    filter(!is.na(Trait)) %>% 
+    select(-Taxon, -Cover, -TraitMean_plot, -TraitMean_site, -TraitMean_global, -TraitMean) %>% 
+    distinct()
+  return(CWTraitMeans)
+}
+
+
 MakeFigure <- function(TraitMeans){
   myplot <- TraitMeans %>% 
     filter(!is.na(Trait), !Trait %in% c("P_Co_Var", "P_Std_Dev", "NC_ratio", "NP_ratio")) %>% 

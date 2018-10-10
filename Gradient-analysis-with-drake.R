@@ -146,6 +146,12 @@ analyses <- drake_plan(
 ),
 
 
+  ### CW-TRAIT MEANS BOOTSTRAPPING ###
+  CW_Means_Bootstrapped = target(
+  drop_and_load.rds(myfile = "transplant/USE THIS DATA/PFTC/trait_distribution_output/pftc_bootstrapped_moments.RDS",
+                localpath = "data/pftc_bootstrapped_moments.RDS"),
+  trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC/trait_distribution_output/pftc_bootstrapped_moments.RDS")$content_hash)
+),
   
   #### CLEAN DATA SETS
   traitCH = CleanChinaTrait(traitCH_raw),
@@ -182,10 +188,11 @@ analyses <- drake_plan(
   
   
   #### CALCULATIONS, ANALYSES, FIGURES
-  TraitMeans = CountryList %>% 
+  TraitMeans_All = CountryList %>% 
     map_df(CommunityW_GlobalAndLocalMeans) %>% 
     left_join(metaBioclim),
     
+  CWTraitMeans = CommunityW_Means(TraitMeans_All),
   GradientPlot = MakeFigure(TraitMeans)
 
 )
@@ -199,5 +206,5 @@ loadd()
 readd(GradientPlot)
 
 TraitMeans %>% filter(!is.na(Trait)) %>% count(Country)
-#voew dependency graph
+#view dependency graph
 vis_drake_graph(config, targets_only = TRUE)
