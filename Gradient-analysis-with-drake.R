@@ -147,7 +147,7 @@ analyses <- drake_plan(
 
 
   ### CW-TRAIT MEANS BOOTSTRAPPING ###
-  CW_Means_Bootstrapped = target(
+  CW_Means_Bootstrapped_raw = target(
   drop_and_load.rds(myfile = "transplant/USE THIS DATA/PFTC/trait_distribution_output/pftc_bootstrapped_moments.RDS",
                 localpath = "data/pftc_bootstrapped_moments.RDS"),
   trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC/trait_distribution_output/pftc_bootstrapped_moments.RDS")$content_hash)
@@ -177,6 +177,9 @@ analyses <- drake_plan(
   fluxCO = CleanColoradoFlux(fluxCO_raw),
 
   metaBioclim = CleanMetaBioclim(metaBioclim_raw),
+
+  CW_Means_Bootstrapped = CleanCWMeansBoot(CW_Means_Bootstrapped_raw),
+
   
   # make a list with all data sets
   CountryList = MakeCountryList(metaCH, metaCommunityCH, communityCH, traitCH, fluxCH,
@@ -193,6 +196,10 @@ analyses <- drake_plan(
     left_join(metaBioclim),
     
   CWTraitMeans = CommunityW_Means(TraitMeans_All),
+  
+  CW_Means_Bootstrapped_Bio = CW_Means_Bootstrapped %>% 
+    left_join(metaBioclim, by = c("Country", "PlotID")),
+
   GradientPlot = MakeFigure(TraitMeans)
 
 )
