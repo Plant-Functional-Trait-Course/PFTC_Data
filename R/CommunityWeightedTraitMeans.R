@@ -1,3 +1,6 @@
+### CALCULATE COMMUNITY WEIGHTED MEANS ###
+
+# NORMAL WAY WITHOUT BOOTSTRAPPING
 CommunityW_GlobalAndLocalMeans <- function(dat){
   meanTraits <- dat$trait %>% 
     # Global means
@@ -60,6 +63,62 @@ CommunityW_Means <- function(TraitMeans_All){
 
 
 
+# WITH BOOTSTRAPPING
+CWM_Bootstrapping <- function(dat, nrep = 100, samplesize = 200){
+  comm <- dat$community %>% 
+    filter(!is.na(Cover)) %>% 
+    group_by(Country, Year, Site, Gradient, BlockID, PlotID) %>% 
+    mutate(sumCover = sum(Cover))
+  trait <- dat$trait %>% filter(!is.na(Value))
+  
+  TraitWeights_plot <- comm %>% 
+    left_join(traitSV %>% select(-Year), by = c("Country", "Site", "Gradient", "BlockID", "PlotID", "Taxon")) %>% 
+    group_by(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Trait) %>% 
+    mutate(weight = Cover/n()) %>% 
+    group_by(Country, Year, Site, Gradient, BlockID, PlotID, Trait) 
+  
+  
+  # Site level weights and traits
+  TraitWeights_site <- comm %>%
+    left_join(trait %>% select(-Year, -BlockID, -PlotID), by = c("Country", "Site", "Gradient", "Taxon")) %>% 
+    group_by(Country, Year, Site, Gradient, Taxon, Trait) %>% 
+    mutate(weight = Cover/n()) %>% 
+    group_by(Country, Year, Site, Gradient, Trait) 
+  
+  
+  # Global level weights and traits
+  TraitWeights_global <- comm %>% 
+    left_join(trait %>% select(-Year, -BlockID, -PlotID, Site), by = c("Country", "Gradient", "Taxon")) %>% 
+    group_by(Country, Year, Gradient, Taxon, Trait) %>% 
+    mutate(weight = Cover/n()) %>% 
+    group_by(Country, Year, Gradient, Trait) 
+  
+  
+  TraitWeights_all <- bind_rows(plot = TraitWeights_plot, site = TraitWeights_site, global = TraitWeights_global, .id = "level") %>% 
+    mutate(level = factor(level, levels = c("plot", "site", "global"), ordered = TRUE)) %>%
+    filter(!is.na(Value)) %>% 
+    group_by(Country, Year, Site, Gradient, BlockID, PlotID, Trait, Taxon) %>% 
+    filter(level == min(level)) %>% 
+    group_by(Country, Year, Site, Gradient, BlockID, PlotID, Trait)
+  
+  
+  BootstrapMoments <- rerun(.n = nrep, sample_n(TraitWeights_all, size = samplesize,  replace = TRUE, weight = TraitWeights_all$weight)) %>%
+    bind_rows(.id = "n") %>% 
+    group_by(n, add = TRUE) %>% 
+    # get all the happy moments
+    summarize(Mean = mean(Value), Variance = var(Value), Skewness = skewness(Value), Kurtosis = kurtosis(Value))
+  
+  return(BootstrapMoments)
+}
+
+
+
+TraitWeights_all %>% 
+  group_by(Country, Year, Site, Gradient, BlockID, PlotID, Trait, Taxon) %>% 
+  slice(1) %>% 
+  group_by(Country, Year, Site, Gradient, BlockID, PlotID, Trait) %>% summarise(covered = sum(Cover)) %>% mutate(percent_cover = covered/sumCover * 100) %>% arrange(percent_cover) %>% pn
+
+
 #### Filtering out turfs with less than 70% of the community present ###
 
 #check_community_df <- wcommunity %>%
@@ -79,3 +138,7 @@ CommunityW_Means <- function(TraitMeans_All){
 #Complete_turfs<-as.vector(complete_turf$turfID)
 
 #wcommunity_df <- filter(wcommunity, turfID %in% Complete_turfs)
+
+
+
+
