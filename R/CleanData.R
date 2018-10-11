@@ -82,7 +82,11 @@ CleanPeruMetaCommunity <- function(dat){
   dat2 <- dat %>% 
     mutate(Treatment = recode(Treatment, "burned" = "B", "control" = "C", "double_burned" = "BB"),
            PlotID = paste(Site, PlotID, Treatment, sep="_"),
-           Gradient = as.character(1))
+           Gradient = as.character(1),
+           Vascular =  Forbs + Graminoids + Shrub + Ferns,
+           Treatment = as.factor(Treatment),
+           cover.shrub.layer = as.numeric(cover.shrub.layer),
+           cover.field.layer = as.numeric (cover.field.layer))
   return(dat2)
 }
 
@@ -121,7 +125,11 @@ CleanNorwayMetaCommunity <- function(dat){
                                 Site %in% c("Vik", "Hog", "Lav") ~ as.character(2),
                                 Site %in% c("Arh", "Ram", "Gud") ~ as.character(3),
                                 Site %in% c("Ovs", "Ves", "Skj") ~ as.character(4))) %>% 
-    mutate(BlockID = as.numeric(BlockID))
+    mutate(BlockID = as.numeric(BlockID),
+           Treatment = as.factor(Treatment),
+           Rock = as.numeric(Rock),
+           Bryophytes = Liver + Bryophytes) %>%
+    filter(!is.na(MedianHeight_cm))
   return(dat2)
 }  
 
