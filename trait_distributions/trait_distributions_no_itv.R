@@ -77,4 +77,5 @@ rm(country_i,f,i,n_replicates,plot_i,site_i,species_i)
 file_directory<-"trait_distributions/output_distributions_no_itv//"
 pftc_bootstrapped_moments_no_itv<-extract_moments(file_directory = file_directory)
 saveRDS(object = pftc_bootstrapped_moments_no_itv,file = "trait_distributions/pftc_bootstrapped_moments_no_itv.RDS")
+saveRDS(object = pftc_bootstrapped_moments_no_itv,file = "C:/Users/Brian/Dropbox/transplant/USE THIS DATA/PFTC/trait_distribution_output/pftc_bootstrapped_moments_no_itv.RDS")
 

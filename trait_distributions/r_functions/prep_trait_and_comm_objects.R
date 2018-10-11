@@ -11,7 +11,7 @@ CountryList$China$community$globalplotID<-paste(CountryList$China$community$Coun
 combined_community<-CountryList$China$community[c("globalplotID","PlotID","Country","Year","Site","Treatment","Taxon","Cover")]
 
 #Add peru data
-CountryList$Peru$community$globalplotID<-paste(CountryList$Peru$community$Country,"_",CountryList$Peru$community$PlotID,"_",CountryList$Peru$community$Treatment,sep="")
+CountryList$Peru$community$globalplotID<-paste(CountryList$Peru$community$Country,"_",CountryList$Peru$community$Site,"_",CountryList$Peru$community$PlotID,"_",CountryList$Peru$community$Treatment,sep="")
 #peruco<-CountryList$Peru$community
 combined_community<-
   rbind(combined_community,
