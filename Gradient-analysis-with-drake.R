@@ -27,6 +27,10 @@ drop_acc()
 ### Check turfs with low cover of traits:
 # communitySV %>% filter(PlotID %in% c("3BC", "6CD", "5BB")) %>% arrange(PlotID) %>% pn
 ### Check 3BC ranunculus nivalis 43% Cover
+# CH remove high nitrogen values
+# scale before CWM
+
+# check PE sp names sp2 sp_2
 
 
 # make an analysis drake plan
@@ -41,8 +45,12 @@ analyses_plan <- drake_plan(
     #left_join(metaBioclim),
   #CWTraitMeans = CommunityW_Means(TraitMeans_All),
   
+  # Transformation
+  CountryList_trans = CountryList %>% 
+    map(LogTranformation),
+  
   # Bootstrapped CWM
-  CW_Moments_Bootstrapped = CountryList %>% 
+  CW_Moments_Bootstrapped = CountryList_trans %>% 
     map_df(CWM_Bootstrapping)
     
 
