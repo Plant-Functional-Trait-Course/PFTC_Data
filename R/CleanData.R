@@ -41,6 +41,13 @@ CleanChinaCommunity <- function(dat){
   return(dat2)
 }
 
+# Cleaning China meta community data
+CleanChinaMetaCommunity <- function(dat){
+  dat2 <- dat %>% 
+    select(PlotID, Year, Moss, Lichen2, Litter, BareGround, Rock, Vascular, Bryophyte, Lichen, MedianHeight_cm, MedianMossHeight_cm)
+    return(dat2)
+}
+
 #____________________________________________________________________
 ### SVALBARD
 # Cleaning Svalbard meta
@@ -64,6 +71,17 @@ CleanSvalbardCommunity <- function(dat){
     filter(is.na(Cover), !Cover == 0)
   
   return(dat2)
+}
+
+# Cleaning Svalbard meta community
+CleanSvalbardMetaCommunity <- function(dat){
+  dat2 <- dat %>%
+    mutate(Lichen_rock = gsub("_", ".", Lichen_rock),
+           Lichen_rock = as.numeric(Lichen_rock)) %>% 
+    mutate(Lichen = rowSums(select(., Lichen_soil, Lichen_rock), na.rm = TRUE)) %>% 
+    rename(Bryophyte = Bryophytes) %>% 
+    select(Gradient, Site, PlotID, MedianHeight_cm, Vascular, Bryophyte, Lichen, Rock, BareGround, BioCrust, Litter, Country, Year, Project)
+    return(dat2)
 }
 
 # Cleaning Svalbard trait
@@ -90,10 +108,12 @@ CleanPeruMetaCommunity <- function(dat){
     mutate(Treatment = recode(Treatment, "burned" = "B", "control" = "C", "double_burned" = "BB"),
            PlotID = paste(Site, PlotID, Treatment, sep="_"),
            Gradient = as.character(1),
-           Vascular =  Forbs + Graminoids + Shrub + Ferns,
+           Vascular =  rowSums(select(., Forbs, Graminoids, Shrub, Ferns), na.rm = TRUE),
            Treatment = as.factor(Treatment),
            cover.shrub.layer = as.numeric(cover.shrub.layer),
-           cover.field.layer = as.numeric (cover.field.layer))
+           cover.field.layer = as.numeric (cover.field.layer)) %>% 
+    rename(Forb = Forbs, Graminoid = Graminoids, Fern = Ferns) %>% 
+    select(Site, Year, PlotID, Treatment, cover.shrub.layer, cover.field.layer, BottomLayer, Forb, Graminoid, Shrub, Fern, BareGround, Rock, Litter, MedianHeight_cm, Vascular, Gradient)
   return(dat2)
 }
 
@@ -139,8 +159,9 @@ CleanNorwayMetaCommunity <- function(dat){
     mutate(BlockID = as.numeric(BlockID),
            Treatment = as.factor(Treatment),
            Rock = as.numeric(Rock),
-           Bryophytes = Liver + Bryophytes) %>%
-    filter(!is.na(MedianHeight_cm))
+           Bryophyte = rowSums(select(., Liver, Bryophytes), na.rm = TRUE)) %>% 
+    filter(!is.na(MedianHeight_cm)) %>%
+    select(Site, BlockID, Treatment, PlotID, Year, Lichen, Litter, BareGround, Rock, Graminoid, Forb, Bryophyte, MedianHeight_cm, MedianMossHeight_cm, Vascular, Gradient, Country)
   return(dat2)
 }  
 
@@ -276,7 +297,11 @@ CleanColoradoMetaCommunity <- function(dat){
     mutate(PlotID = recode(PlotID, "plot_3_pct" = "plot3_pct"),
            Gradient = as.character(1)) %>% 
     mutate(PlotID = recode(PlotID, "plot1_pct" = "1", "plot2_pct" = "2", "plot3_pct" = "3", "plot4_pct" = "4", "plot5_pct" = "5"),
-           PlotID = paste(Site, PlotID, sep = "_"))
+           PlotID = paste(Site, PlotID, sep = "_")) %>% 
+  spread(key = Group, value = Cover) %>%
+    select(-Date.y, -MeanHeight_cm.y) %>% 
+    rename(Date = Date.x, MeanHeight_cm = MeanHeight_cm.x, Graminoid = 'Total Graminoid', Herb = 'Total Herb', Shrub = 'Total Shrub', Bare_soil_litter_dead = 'Bare (Bare soil + Litter + Dead)', BareSoil = 'Bare soil')
+    
     return(dat2)
 }
 
