@@ -14,7 +14,7 @@ dataImport_plan <- drake_plan(
   
   ## CHINA
   metaCH = get(load(file = file_in("data/metaCH.Rdata"))),
-  metaCommunityCH = get(load(file = file_in("data/metaCommunity_CH_2012_2016.Rdata"))),
+  metaCommunityCH_raw = get(load(file = file_in("data/metaCommunity_CH_2012_2016.Rdata"))),
   traitCH_raw = target(
     drop_and_load(myfile = "transplant/USE THIS DATA/traits.Rdata",
                   localpath = "data/traits_2015_2016_China.Rdata"),
@@ -53,7 +53,7 @@ dataImport_plan <- drake_plan(
   
   ## SVALBARD
   metaSV_raw = get(load(file = file_in("data/metaSV.Rdata"))),
-  metaCommunitySV = get(load(file = file_in("data/metaCommunitySV_2018.Rdata"))),
+  metaCommunitySV_raw = get(load(file = file_in("data/metaCommunitySV_2018.Rdata"))),
   traitSV_raw = target(
     drop_and_load(myfile = "transplant/USE THIS DATA/PFTC4_Svalbard/traitsGradients_SV_2018.Rdata",
                   localpath = "data/traitsGradients_SV_2018.Rdata"),
@@ -116,11 +116,11 @@ dataImport_plan <- drake_plan(
   ),
   
   ### META BIOCLIM ###
-  metaAll = get(load(file = file_in("data/metaAllC.Rdata"))),
+  #metaAll = get(load(file = file_in("data/metaAllC.Rdata"))),
   metaBioclim_raw = target(
-    drop_and_load(myfile = "transplant/USE THIS DATA/PFTC/MetaBioclimAllCountries.Rdata",
-                  localpath = "data/MetaBioclimAllCountries.Rdata"),
-    trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC/MetaBioclimAllCountries.Rdata")$content_hash)
+    drop_and_load(myfile = "transplant/USE THIS DATA/PFTC/MetaAllCountriesVPD_PET.RData",
+                  localpath = "data/MetaAllCountriesVPD_PET.RData"),
+    trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC/MetaAllCountriesVPD_PET.RData")$content_hash)
   ),
   
   
@@ -134,12 +134,14 @@ dataImport_plan <- drake_plan(
   #### CLEAN DATA SETS
   traitCH = CleanChinaTrait(traitCH_raw),
   communityCH = CleanChinaCommunity(communityCH_raw),
+  metaCommunityCH = CleanChinaMetaCommunity(metaCommunityCH_raw),
   
   metaCommunityPE = CleanPeruMetaCommunity(metaCommunityPE_raw),
   traitPE = CleanPeruTrait(traitPE_raw),
   communityPE = CleanPeruCommunity(communityPE_raw),
   
   metaSV = CleanSvalbardMeta(metaSV_raw),
+  metaCommunitySV = CleanSvalbardMetaCommunity(metaCommunitySV_raw),
   traitSV = CleanSvalbardTrait(traitSV_raw),
   communitySV = CleanSvalbardCommunity(communitySV_raw),
   
@@ -154,7 +156,7 @@ dataImport_plan <- drake_plan(
   metaCommunityCO = CleanColoradoMetaCommunity(metaCommunityCO_raw),
   fluxCO = CleanColoradoFlux(fluxCO_raw),
   
-  metaBioclim = CleanMetaBioclim(metaBioclim_raw),
+  #metaBioclim = CleanMetaBioclim(metaBioclim_raw),
   
   CW_Means_Bootstrapped = CleanCWMeansBoot(CW_Means_Bootstrapped_raw),
   
@@ -169,9 +171,9 @@ dataImport_plan <- drake_plan(
   
  ## Combine meta data
  metaAll <- metaCH %>% 
-   bind_rows(metaPE, metaSV, metaNO, metaCO)
+   bind_rows(metaPE, metaSV, metaNO, metaCO),
  
- #metaCommunityAll <- metaCommunityCH %>% 
-   #bind_rows(metaCommunityPE, metaCommunitySV, metaCommunityNO, metaCommunityCO)
+ metaCommunityAll <- metaCommunityCH %>% 
+   bind_rows(metaCommunityPE, metaCommunitySV, metaCommunityNO, metaCommunityCO)
   
 )
