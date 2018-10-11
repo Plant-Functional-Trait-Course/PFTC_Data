@@ -2,6 +2,8 @@
 ### CODE FOR CLEANING DATA ###
 ##############################
 
+
+### CHINA
 # Clean China trait data
 CleanChinaTrait <- function(dat){
   dat2 <- dat %>% 
@@ -33,12 +35,14 @@ CleanChinaCommunity <- function(dat){
     mutate(Country = "CH",
            Gradient = as.character(1)) %>% 
     select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
-    mutate(Taxon = recode(Taxon, "Potentilla stenophylla var. emergens" = "Potentilla stenophylla"))
+    mutate(Taxon = recode(Taxon, "Potentilla stenophylla var. emergens" = "Potentilla stenophylla")) %>% 
+    filter(is.na(Cover), !Cover == 0)
 
   return(dat2)
 }
 
-
+#____________________________________________________________________
+### SVALBARD
 # Cleaning Svalbard meta
 CleanSvalbardMeta <- function(dat){
   dat2 <- dat %>% 
@@ -56,7 +60,8 @@ CleanSvalbardCommunity <- function(dat){
          BlockID = as.character(1),
          Cover = as.numeric(Cover)) %>% 
     select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
-    mutate(Taxon = recode(Taxon, "micranthes hieracifolia" = "micranthes hieraciifolia"))
+    mutate(Taxon = recode(Taxon, "micranthes hieracifolia" = "micranthes hieraciifolia")) %>% 
+    filter(is.na(Cover), !Cover == 0)
   
   return(dat2)
 }
@@ -76,6 +81,8 @@ CleanSvalbardTrait <- function(dat){
   return(dat2)
 }
 
+#___________________________________________________________________________
+### PERU
 # Cleaning Peru metaCommunity
 
 CleanPeruMetaCommunity <- function(dat){
@@ -107,11 +114,15 @@ CleanPeruTrait <- function(dat){
            Gradient = as.character(1)) %>%
   select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC) %>% 
     gather(key = Trait, value = Value, -Country, -Year, -Site, -BlockID, -PlotID, -Gradient, -Taxon) %>% 
+    mutate(Taxon = recode(Taxon, "Agrostis 2" = "Agrostis sp2")) %>% 
     filter(!is.na(Value))
-  return(dat2)
-  mutate(Taxon = recode(Taxon, "Agrostis 2" = "Agrostis sp2"))
-}  
   
+  return(dat2)
+  
+}  
+
+#____________________________________________________________________
+### NORWAY
 #Cleaning Norway Meta Community 
 
 CleanNorwayMetaCommunity <- function(dat){
@@ -176,7 +187,8 @@ CleanNorwayCommunity <- function(dat, sp){
     rename(Year = year, BlockID = Block, PlotID = turfID) %>% 
     mutate(Cover = as.numeric(Cover),
            BlockID = as.character(BlockID)) %>% 
-    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover)
+    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
+    filter(is.na(Cover), !Cover == 0)
   
   return(dat2)
 }
@@ -196,7 +208,8 @@ CleanNorwayTrait <- function(dat){
     select(Country, Year, Site, BlockID, PlotID, Gradient, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC, N_percent, C_percent, CN_ratio) %>% 
     gather(key = Trait, value = Value, -Country, -Year, -Site, -BlockID, -PlotID, -Gradient, -Taxon) %>% 
     filter(!is.na(Value)) %>% 
-    mutate(Taxon = recode(Taxon, "Empetrum nigrum subsp. Hermaphroditum" = "Empetrum nigrum"))
+    mutate(Taxon = recode(Taxon, "Empetrum nigrum subsp. Hermaphroditum" = "Empetrum nigrum")) %>% 
+    filter(!is.na(Value))
   
   return(dat2)
 }
@@ -216,7 +229,8 @@ CleanNorwayFlux <- function(dat){
   return(dat2)
 }
 
-
+#____________________________________________________________________
+### COLORADO
 # Cleaning Colorado meta
 CleanColoradoMeta <- function(dat){
   dat2 <- dat %>% 
@@ -241,7 +255,8 @@ CleanColoradoCommunity <- function(dat){
            BlockID = as.character(1)) %>% 
     mutate(PlotID = recode(PlotID, "plot1_pct" = "1", "plot2_pct" = "2", "plot3_pct" = "3", "plot4_pct" = "4", "plot5_pct" = "5"),
            PlotID = paste(Site, PlotID, sep = "_")) %>% 
-    select(Country, Year, Site, BlockID, PlotID, Gradient, Taxon, Cover)
+    select(Country, Year, Site, BlockID, PlotID, Gradient, Taxon, Cover) %>% 
+    filter(is.na(Cover), !Cover == 0)
   return(dat2)
 }
 
@@ -287,7 +302,7 @@ CleanColoradoTrait <- function(dat){
 }  
 
 
-
+#____________________________________________________________________
 #Cleaning Meta Bioclim
 
 CleanMetaBioclim <- function(metaBioclim_raw){
