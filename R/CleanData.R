@@ -36,7 +36,7 @@ CleanChinaCommunity <- function(dat){
            Gradient = as.character(1)) %>% 
     select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
     mutate(Taxon = recode(Taxon, "Potentilla stenophylla var. emergens" = "Potentilla stenophylla")) %>% 
-    filter(is.na(Cover), !Cover == 0)
+    filter(!is.na(Cover), !Cover == 0)
 
   return(dat2)
 }
@@ -80,7 +80,7 @@ CleanSvalbardCommunity <- function(dat){
          Cover = as.numeric(Cover)) %>% 
     select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
     mutate(Taxon = recode(Taxon, "micranthes hieracifolia" = "micranthes hieraciifolia")) %>% 
-    filter(is.na(Cover), !Cover == 0)
+    filter(!is.na(Cover), !Cover == 0)
   
   return(dat2)
 }
@@ -230,7 +230,7 @@ CleanNorwayCommunity <- function(dat, sp){
     mutate(Cover = as.numeric(Cover),
            BlockID = as.character(BlockID)) %>% 
     select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
-    filter(is.na(Cover), !Cover == 0)
+    filter(!is.na(Cover), !Cover == 0)
   
   return(dat2)
 }
@@ -276,7 +276,8 @@ CleanNorwayFlux <- function(dat){
 # Cleaning Colorado meta
 CleanColoradoMeta <- function(dat){
   dat2 <- dat %>% 
-    mutate(Country = "CO")
+    mutate(Country = "CO",
+           Gradient = "1")
   
   return(dat2)
 }
@@ -298,7 +299,7 @@ CleanColoradoCommunity <- function(dat){
     mutate(PlotID = recode(PlotID, "plot1_pct" = "1", "plot2_pct" = "2", "plot3_pct" = "3", "plot4_pct" = "4", "plot5_pct" = "5"),
            PlotID = paste(Site, PlotID, sep = "_")) %>% 
     select(Country, Year, Site, BlockID, PlotID, Gradient, Taxon, Cover) %>% 
-    filter(is.na(Cover), !Cover == 0)
+    filter(!is.na(Cover), !Cover == 0)
   return(dat2)
 }
 
