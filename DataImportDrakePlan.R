@@ -132,7 +132,7 @@ dataImport_plan = drake_plan(
  # ),
   
   #### CLEAN DATA SETS
-  metaCH = CleanSvalbardMeta(metaCH_raw),
+  metaCH = CleanChinaMeta(metaCH_raw),
   traitCH = CleanChinaTrait(traitCH_raw),
   communityCH = CleanChinaCommunity(communityCH_raw),
   metaCommunityCH = CleanChinaMetaCommunity(metaCommunityCH_raw),
