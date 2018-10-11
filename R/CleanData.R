@@ -51,7 +51,7 @@ CleanChinaMetaCommunity <- function(dat){
     return(dat2)
 }
 
-CleanSvalbardMeta <- function(dat){
+CleanChinaMeta <- function(dat){
   dat2 <- dat %>% 
     mutate(Elevation = as.numeric(as.character(Elevation)),
            Gradient = "1")
