@@ -50,7 +50,6 @@ CommunityW_GlobalAndLocalMeans <- function(dat){
   return(dat2)
 }
 
-
 # Reduce to only CWMeans
 CommunityW_Means <- function(TraitMeans_All){
   CWTraitMeans <- TraitMeans_All %>% 
@@ -61,18 +60,25 @@ CommunityW_Means <- function(TraitMeans_All){
 }
 
 
+# TRANSFORMING THE TRAITS
+LogTranformation <- function(dat){
+  dat$trait_trans <- dat$trait %>% 
+    mutate(Value = ifelse(Trait %in% c("Plant_Height_cm", "Wet_Mass_g", "Dry_Mass_g", "Leaf_Area_cm2"), log(Value), Value),
+           Trait = recode(Trait, "Plant_Height_cm" = "Plant_Height_cm_log", "Wet_Mass_g" = "Wet_Mass_g_log", "Dry_Mass_g" = "Dry_Mass_g_log", "Leaf_Area_cm2" = "Leaf_Area_cm2_log"))
+}
 
 
 # WITH BOOTSTRAPPING
 CWM_Bootstrapping <- function(dat, nrep = 100, samplesize = 200){
   comm <- dat$community %>% 
-    filter(!is.na(Cover)) %>% 
+    filter(!Cover == 0) %>% 
     group_by(Country, Year, Site, Gradient, BlockID, PlotID) %>% 
     mutate(sumCover = sum(Cover))
-  trait <- dat$trait %>% filter(!is.na(Value))
+  
+  trait <- dat$trait_trans %>% filter(!is.na(Value))
   
   TraitWeights_plot <- comm %>% 
-    left_join(traitSV %>% select(-Year), by = c("Country", "Site", "Gradient", "BlockID", "PlotID", "Taxon")) %>% 
+    left_join(trait %>% select(-Year), by = c("Country", "Site", "Gradient", "BlockID", "PlotID", "Taxon")) %>% 
     group_by(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Trait) %>% 
     mutate(weight = Cover/n()) %>% 
     group_by(Country, Year, Site, Gradient, BlockID, PlotID, Trait) 
@@ -88,7 +94,7 @@ CWM_Bootstrapping <- function(dat, nrep = 100, samplesize = 200){
   
   # Global level weights and traits
   TraitWeights_global <- comm %>% 
-    left_join(trait %>% select(-Year, -BlockID, -PlotID, Site), by = c("Country", "Gradient", "Taxon")) %>% 
+    left_join(trait %>% select(-Year, -BlockID, -PlotID, -Site), by = c("Country", "Gradient", "Taxon")) %>% 
     group_by(Country, Year, Gradient, Taxon, Trait) %>% 
     mutate(weight = Cover/n()) %>% 
     group_by(Country, Year, Gradient, Trait) 
