@@ -22,34 +22,40 @@ drop_acc()
 
 ### NEEDS DOING!!!
 # Colorado: trait and height
-#DryMass_g Svalbard!!!
-#CHina gradient comm
-# PE site and plot
-# CO site_plot (only a number)
+#China gradient comm
+
+### Check turfs with low cover of traits:
+# communitySV %>% filter(PlotID %in% c("3BC", "6CD", "5BB")) %>% arrange(PlotID) %>% pn
+### Check 3BC ranunculus nivalis 43% Cover
 
 
 # make an analysis drake plan
-analysis_plan <- drake_plan(
+analyses_plan <- drake_plan(
   strings_in_dots = "literals",
   
   
   #### CALCULATIONS, ANALYSES, FIGURES
-  TraitMeans_All = CountryList %>% 
-    map_df(CommunityW_GlobalAndLocalMeans) %>% 
-    left_join(metaBioclim),
-
-    
-  CWTraitMeans = CommunityW_Means(TraitMeans_All),
+  # Simple CWM
+  #TraitMeans_All = CountryList %>% 
+    #map_df(CommunityW_GlobalAndLocalMeans) %>% 
+    #left_join(metaBioclim),
+  #CWTraitMeans = CommunityW_Means(TraitMeans_All),
   
-  CW_Means_Bootstrapped_Bio = CW_Means_Bootstrapped %>% 
-    left_join(metaAll, by = c("Country", "PlotID")) %>% 
-    left_join(metaBioclim, by = c("Country", "Site")),
+  # Bootstrapped CWM
+  CWTraitMeans_Bootstrapped = CountryList %>% 
+    map_df(CWM_Bootstrapping)
+    
+
+  
+  #CW_Means_Bootstrapped_Bio = CW_Means_Bootstrapped %>% 
+    #left_join(metaAll, by = c("Country", "PlotID")) %>% 
+    #left_join(metaBioclim, by = c("Country", "Site")),
 
   #GradientPlot = MakeFigure(TraitMeans),
-  GradientMeanPlot = MakeMeanFigure(CW_Means_Bootstrapped_Bio),
-  GradientVarPlot = MakeVarFigure(CW_Means_Bootstrapped_Bio),
-  GradientSkewPlot = MakeSkewFigure(CW_Means_Bootstrapped_Bio),
-  GradientKurtPlot = MakeKurtFigure(CW_Means_Bootstrapped_Bio)
+  #GradientMeanPlot = MakeMeanFigure(CW_Means_Bootstrapped_Bio),
+  #GradientVarPlot = MakeVarFigure(CW_Means_Bootstrapped_Bio),
+  #GradientSkewPlot = MakeSkewFigure(CW_Means_Bootstrapped_Bio),
+  #GradientKurtPlot = MakeKurtFigure(CW_Means_Bootstrapped_Bio)
 
 )
 
@@ -59,9 +65,9 @@ MasterDrakePlan <- dataImport_plan %>%
   bind_rows(analyses_plan)
 
 #configure and make drake plan
-config <- drake_config(analyses)
+config <- drake_config(MasterDrakePlan)
 # outdated(config)        # Which targets need to be (re)built?
-make(analyses)          # Build the right things.
+make(MasterDrakePlan)          # Build the right things.
 loadd()
 readd(GradientMeanPlot)
 readd(GradientVarPlot)
