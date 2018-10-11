@@ -137,6 +137,7 @@ dataImport_plan = drake_plan(
   communityCH = CleanChinaCommunity(communityCH_raw),
   metaCommunityCH = CleanChinaMetaCommunity(metaCommunityCH_raw),
   
+  metaPE = CleanSvalbardMeta(metaPE_raw),
   metaCommunityPE = CleanPeruMetaCommunity(metaCommunityPE_raw),
   traitPE = CleanPeruTrait(traitPE_raw),
   communityPE = CleanPeruCommunity(communityPE_raw),
@@ -146,6 +147,7 @@ dataImport_plan = drake_plan(
   traitSV = CleanSvalbardTrait(traitSV_raw),
   communitySV = CleanSvalbardCommunity(communitySV_raw),
   
+  metaNO = CleanSvalbardMeta(metaNO_raw), 
   metaCommunityNO = CleanNorwayMetaCommunity(metaCommunityNO_raw),
   communityNO = CleanNorwayCommunity(communityNO_raw, spNO),
   traitNO = CleanNorwayTrait(traitNO_raw),
