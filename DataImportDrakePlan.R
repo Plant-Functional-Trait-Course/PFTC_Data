@@ -164,5 +164,14 @@ dataImport_plan <- drake_plan(
                                 metaPE, metaCommunityPE, communityPE, traitPE, fluxPE,
                                 metaSV, metaCommunitySV, communitySV, traitSV, fluxSV,
                                 metaNO, metaCommunityNO, communityNO, traitNO, fluxNO,
-                                metaCO, metaCommunityCO, communityCO, traitCO, fluxCO)
+                                metaCO, metaCommunityCO, communityCO, traitCO, fluxCO),
+
+  
+ ## Combine meta data
+ metaAll <- metaCH %>% 
+   bind_rows(metaPE, metaSV, metaNO, metaCO)
+ 
+ #metaCommunityAll <- metaCommunityCH %>% 
+   #bind_rows(metaCommunityPE, metaCommunitySV, metaCommunityNO, metaCommunityCO)
+  
 )
