@@ -174,7 +174,7 @@ CleanPeruTrait <- function(dat){
 ### NORWAY
 #Cleaning Norway Meta Community 
 
-CleanNorwayMetaCommunity <- function(dat){
+CleanNorwayMeta <- function(dat){
   dat2 <- dat %>%
     mutate(Gradient = case_when(Site %in% c("Fau", "Alr", "Ulv") ~ as.character(1),
                             Site %in% c("Vik", "Hog", "Lav") ~ as.character(2),
