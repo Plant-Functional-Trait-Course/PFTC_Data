@@ -7,7 +7,7 @@ source("R/LoadingFiles.R")
 source("R/sync_from_dropbox.R")
 
 # make an import drake plan
-dataImport_plan <- drake_plan(
+dataImport_plan = drake_plan(
   strings_in_dots = "literals",
   
   #### IMPORT & CLEAN DATA
