@@ -63,8 +63,11 @@ CommunityW_Means <- function(TraitMeans_All){
 # TRANSFORMING THE TRAITS
 LogTranformation <- function(dat){
   dat$trait_trans <- dat$trait %>% 
+    
+    # log transform
     mutate(Value = ifelse(Trait %in% c("Plant_Height_cm", "Wet_Mass_g", "Dry_Mass_g", "Leaf_Area_cm2"), log(Value), Value),
            Trait = recode(Trait, "Plant_Height_cm" = "Plant_Height_cm_log", "Wet_Mass_g" = "Wet_Mass_g_log", "Dry_Mass_g" = "Dry_Mass_g_log", "Leaf_Area_cm2" = "Leaf_Area_cm2_log"))
+  return(dat)
 }
 
 
