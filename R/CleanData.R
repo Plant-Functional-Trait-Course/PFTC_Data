@@ -54,7 +54,9 @@ CleanChinaMetaCommunity <- function(dat){
 CleanChinaMeta <- function(dat){
   dat2 <- dat %>% 
     mutate(Elevation = as.numeric(as.character(Elevation)),
-           Gradient = "1")
+           Gradient = "1",
+           Country = as.character(Country),
+           Site = as.character(Site)) %>% str()
   
   return(dat2)
 }
@@ -90,7 +92,8 @@ CleanSvalbardMetaCommunity <- function(dat){
   dat2 <- dat %>%
     mutate(Lichen_rock = gsub("_", ".", Lichen_rock),
            Lichen_rock = as.numeric(Lichen_rock)) %>% 
-    mutate(Lichen = rowSums(select(., Lichen_soil, Lichen_rock), na.rm = TRUE)) %>% 
+    mutate(Lichen = rowSums(select(., Lichen_soil, Lichen_rock), na.rm = TRUE),
+           Site = paste(Site, PlotID, sep="")) %>% 
     rename(Bryophyte = Bryophytes) %>% 
     select(Gradient, Site, PlotID, MedianHeight_cm, Vascular, Bryophyte, Lichen, Rock, BareGround, BioCrust, Litter, Country, Year, Project)
     return(dat2)
@@ -113,6 +116,15 @@ CleanSvalbardTrait <- function(dat){
 
 #___________________________________________________________________________
 ### PERU
+# Cleaning Peru metaCommunity
+
+CleanPeruMeta <- function(dat){
+  dat2 <- dat %>%
+    mutate(Gradient = "1")
+  
+  return(dat2)
+}
+  
 # Cleaning Peru metaCommunity
 
 CleanPeruMetaCommunity <- function(dat){
@@ -160,6 +172,18 @@ CleanPeruTrait <- function(dat){
 
 #____________________________________________________________________
 ### NORWAY
+#Cleaning Norway Meta Community 
+
+CleanNorwayMetaCommunity <- function(dat){
+  dat2 <- dat %>%
+    mutate(Gradient = case_when(Site %in% c("Fau", "Alr", "Ulv") ~ as.character(1),
+                            Site %in% c("Vik", "Hog", "Lav") ~ as.character(2),
+                            Site %in% c("Arh", "Ram", "Gud") ~ as.character(3),
+                            Site %in% c("Ovs", "Ves", "Skj") ~ as.character(4)))
+  return(dat2)
+}  
+  
+    
 #Cleaning Norway Meta Community 
 
 CleanNorwayMetaCommunity <- function(dat){
@@ -277,7 +301,8 @@ CleanNorwayFlux <- function(dat){
 CleanColoradoMeta <- function(dat){
   dat2 <- dat %>% 
     mutate(Country = "CO",
-           Gradient = "1")
+           Gradient = "1",
+           Site = as.character(Site))
   
   return(dat2)
 }
