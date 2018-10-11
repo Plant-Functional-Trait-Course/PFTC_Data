@@ -382,8 +382,8 @@ CleanMetaBioclim <- function(metaBioclim_raw){
     mutate(Site = ifelse(Country == "SV", paste(Site, Gradient, sep = ""), Site)) %>% 
     left_join(metaSV, by = c("Country", "Gradient", "Elevation", "Latitude", "Longitude")) %>% 
     mutate(Site = ifelse(Country == "SV", Site.y, Site.x)) %>% 
-    select(-Site.x, Site.y) %>% 
-    select(Country, Site, Elevation:bio9) %>% 
+    select(-Site.x, -Site.y) %>% 
+    select(Country, Site, Elevation:PET) %>% 
     rename(AnnMeanTemp = "bio1",
            MeanDiurnalRange = "bio2",
            Isothermal = "bio3",
