@@ -13,7 +13,7 @@ dataImport_plan = drake_plan(
   #### IMPORT & CLEAN DATA
   
   ## CHINA
-  metaCH = get(load(file = file_in("data/metaCH.Rdata"))),
+  metaCH_raw = get(load(file = file_in("data/metaCH.Rdata"))),
   metaCommunityCH_raw = get(load(file = file_in("data/metaCommunity_CH_2012_2016.Rdata"))),
   traitCH_raw = target(
     drop_and_load(myfile = "transplant/USE THIS DATA/traits.Rdata",
@@ -125,13 +125,14 @@ dataImport_plan = drake_plan(
   
   
   ### CW-TRAIT MEANS BOOTSTRAPPING ###
-  CW_Means_Bootstrapped_raw = target(
-    drop_and_load.rds(myfile = "transplant/USE THIS DATA/PFTC/trait_distribution_output/pftc_bootstrapped_moments.RDS",
-                      localpath = "data/pftc_bootstrapped_moments.RDS"),
-    trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC/trait_distribution_output/pftc_bootstrapped_moments.RDS")$content_hash)
-  ),
+  #CW_Means_Bootstrapped_raw = target(
+    #drop_and_load.rds(myfile = "transplant/USE THIS DATA/PFTC/trait_distribution_output/pftc_bootstrapped_moments.RDS",
+    #                  localpath = "data/pftc_bootstrapped_moments.RDS"),
+    #trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC/trait_distribution_output/pftc_bootstrapped_moments.RDS")$content_hash)
+ # ),
   
   #### CLEAN DATA SETS
+  metaCH = CleanSvalbardMeta(metaCH_raw),
   traitCH = CleanChinaTrait(traitCH_raw),
   communityCH = CleanChinaCommunity(communityCH_raw),
   metaCommunityCH = CleanChinaMetaCommunity(metaCommunityCH_raw),
@@ -156,9 +157,9 @@ dataImport_plan = drake_plan(
   metaCommunityCO = CleanColoradoMetaCommunity(metaCommunityCO_raw),
   fluxCO = CleanColoradoFlux(fluxCO_raw),
   
-  #metaBioclim = CleanMetaBioclim(metaBioclim_raw),
+  metaBioclim = CleanMetaBioclim(metaBioclim_raw),
   
-  CW_Means_Bootstrapped = CleanCWMeansBoot(CW_Means_Bootstrapped_raw),
+  #CW_Means_Bootstrapped = CleanCWMeansBoot(CW_Means_Bootstrapped_raw),
   
   
   # make a list with all data sets
