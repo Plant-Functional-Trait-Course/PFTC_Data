@@ -42,7 +42,7 @@ analyses_plan <- drake_plan(
   #CWTraitMeans = CommunityW_Means(TraitMeans_All),
   
   # Bootstrapped CWM
-  CWTraitMeans_Bootstrapped = CountryList %>% 
+  CW_Moments_Bootstrapped = CountryList %>% 
     map_df(CWM_Bootstrapping)
     
 
