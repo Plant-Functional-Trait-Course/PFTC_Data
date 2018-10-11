@@ -170,10 +170,10 @@ dataImport_plan = drake_plan(
 
   
  ## Combine meta data
- metaAll <- metaCH %>% 
+ metaAll = metaCH %>% 
    bind_rows(metaPE, metaSV, metaNO, metaCO),
  
- metaCommunityAll <- metaCommunityCH %>% 
+ metaCommunityAll = metaCommunityCH %>% 
    bind_rows(metaCommunityPE, metaCommunitySV, metaCommunityNO, metaCommunityCO)
   
 )
