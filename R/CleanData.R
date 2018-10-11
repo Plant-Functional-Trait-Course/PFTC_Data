@@ -44,9 +44,20 @@ CleanChinaCommunity <- function(dat){
 # Cleaning China meta community data
 CleanChinaMetaCommunity <- function(dat){
   dat2 <- dat %>% 
-    select(PlotID, Year, Moss, Lichen2, Litter, BareGround, Rock, Vascular, Bryophyte, Lichen, MedianHeight_cm, MedianMossHeight_cm)
+    select(PlotID, Year, Moss, Lichen2, Litter, BareGround, Rock, Vascular, Bryophyte, Lichen, MedianHeight_cm, MedianMossHeight_cm) %>% 
+    mutate(Country = "CH",
+           Site = substr(PlotID, 1,1),
+           Gradient = "1")
     return(dat2)
 }
+
+CleanSvalbardMeta <- function(dat){
+  dat2 <- dat %>% 
+    mutate(Elevation = as.numeric(as.character(Elevation)))
+  
+  return(dat2)
+}
+
 
 #____________________________________________________________________
 ### SVALBARD
@@ -111,9 +122,10 @@ CleanPeruMetaCommunity <- function(dat){
            Vascular =  rowSums(select(., Forbs, Graminoids, Shrub, Ferns), na.rm = TRUE),
            Treatment = as.factor(Treatment),
            cover.shrub.layer = as.numeric(cover.shrub.layer),
-           cover.field.layer = as.numeric (cover.field.layer)) %>% 
+           cover.field.layer = as.numeric (cover.field.layer),
+           Country = "PE") %>% 
     rename(Forb = Forbs, Graminoid = Graminoids, Fern = Ferns) %>% 
-    select(Site, Year, PlotID, Treatment, cover.shrub.layer, cover.field.layer, BottomLayer, Forb, Graminoid, Shrub, Fern, BareGround, Rock, Litter, MedianHeight_cm, Vascular, Gradient)
+    select(Site, Year, PlotID, Treatment, Forb, Graminoid, Shrub, Fern, BareGround, Rock, Litter, MedianHeight_cm, Vascular, Gradient, Country)
   return(dat2)
 }
 
