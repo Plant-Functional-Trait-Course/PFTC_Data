@@ -32,7 +32,7 @@ dataImport_plan = drake_plan(
   ),
   
   ## PERU
-  metaPE = get(load(file = file_in("data/metaPE.Rdata"))),
+  metaPE_raw = get(load(file = file_in("data/metaPE.Rdata"))),
   metaCommunityPE_raw = get(load(file = file_in("data/metaCommunity_PE_2018.Rdata"))),
   traitPE_raw = target(
     drop_and_load(myfile = "transplant/USE THIS DATA/PFTC3_Peru/traits_2018_Peru_cleaned.Rdata",
@@ -72,7 +72,7 @@ dataImport_plan = drake_plan(
   
   
   ## NORWAY
-  metaNO = get(load(file = file_in("data/metaNO.Rdata"))),
+  metaNO_raw = get(load(file = file_in("data/metaNO.Rdata"))),
   metaCommunityNO_raw = get(load(file = file_in("data/metaCommunityNO_2016.Rdata"))),
   traitNO_raw = target(
     drop_and_load.csv(myfile = "transplant/USE THIS DATA/Norway/traitdata_NO.csv",
