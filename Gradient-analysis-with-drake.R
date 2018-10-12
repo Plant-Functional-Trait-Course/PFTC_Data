@@ -49,12 +49,11 @@ analyses_plan <- drake_plan(
     map_df(CWM_Bootstrapping),
     
   # Summarize Bootstrap Moments
-  BootstrapMoments = SummarizeBootMoments(BootstrapMoments_All)
+  BootstrapMoments = SummarizeBootMoments(BootstrapMoments_All),
 
   
-  #CW_Means_Bootstrapped_Bio = CW_Means_Bootstrapped %>% 
-    #left_join(metaCommunityAll, by = c("Country", "PlotID")) %>% 
-    #left_join(metaBioclim, by = c("Country", "Site")),
+  BootstrapMoments_Bio = BootstrapMoments %>% 
+    left_join(metaBioclim, by = c("Country", "Site"))
 
   #GradientPlot = MakeFigure(TraitMeans),
   #GradientMeanPlot = MakeMeanFigure(CW_Means_Bootstrapped_Bio),
