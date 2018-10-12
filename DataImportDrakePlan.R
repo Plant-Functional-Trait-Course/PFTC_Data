@@ -118,18 +118,11 @@ dataImport_plan = drake_plan(
   ### META BIOCLIM ###
   #metaAll = get(load(file = file_in("data/metaAllC.Rdata"))),
   metaBioclim_raw = target(
-    drop_and_load(myfile = "transplant/USE THIS DATA/PFTC/MetaAllCountriesVPD_PET.RData",
-                  localpath = "data/MetaAllCountriesVPD_PET.RData"),
-    trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC/MetaAllCountriesVPD_PET.RData")$content_hash)
+    drop_and_load.xlsx(myfile = "transplant/USE THIS DATA/PFTC/MetaBioclimAllCountriesVPD_PET.xlsx",
+                  localpath = "data/MetaBioclimAllCountriesVPD_PET.xlsx"),
+    trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC/MetaBioclimAllCountriesVPD_PET.xlsx")$content_hash)
   ),
   
-  
-  ### CW-TRAIT MEANS BOOTSTRAPPING ###
-  #CW_Means_Bootstrapped_raw = target(
-    #drop_and_load.rds(myfile = "transplant/USE THIS DATA/PFTC/trait_distribution_output/pftc_bootstrapped_moments.RDS",
-    #                  localpath = "data/pftc_bootstrapped_moments.RDS"),
-    #trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC/trait_distribution_output/pftc_bootstrapped_moments.RDS")$content_hash)
- # ),
   
   #### CLEAN DATA SETS
   metaCH = CleanChinaMeta(metaCH_raw),
@@ -160,8 +153,6 @@ dataImport_plan = drake_plan(
   fluxCO = CleanColoradoFlux(fluxCO_raw),
   
   metaBioclim = CleanMetaBioclim(metaBioclim_raw),
-  
-  #CW_Means_Bootstrapped = CleanCWMeansBoot(CW_Means_Bootstrapped_raw),
   
   
   # make a list with all data sets
