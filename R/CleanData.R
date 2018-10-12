@@ -379,11 +379,6 @@ CleanColoradoTrait <- function(dat){
 
 CleanMetaBioclim <- function(metaBioclim_raw){
   metaBioclim2 <- metaBioclim_raw %>% 
-    mutate(Site = ifelse(Country == "SV", paste(Site, Gradient, sep = ""), Site)) %>% 
-    left_join(metaSV, by = c("Country", "Gradient", "Elevation", "Latitude", "Longitude")) %>% 
-    mutate(Site = ifelse(Country == "SV", Site.y, Site.x)) %>% 
-    select(-Site.x, -Site.y) %>% 
-    select(Country, Site, Elevation:PET) %>% 
     rename(AnnMeanTemp = "bio1",
            MeanDiurnalRange = "bio2",
            Isothermal = "bio3",
@@ -402,7 +397,8 @@ CleanMetaBioclim <- function(metaBioclim_raw){
            PrecipWetQuart = "bio16",
            PrecipDryQuart = "bio17",
            PrecipWarmQuart = "bio18",
-           PrecipColdQuart = "bio19")
+           PrecipColdQuart = "bio19") %>% 
+    as.tibble()
     return(metaBioclim2)
 }
 
