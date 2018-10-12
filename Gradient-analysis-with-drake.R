@@ -49,7 +49,7 @@ analyses_plan <- drake_plan(
     map_df(CWM_Bootstrapping),
     
   # Summarize Bootstrap Moments
-  BootstrapMoments <- SummarizeBootMoments(BootstrapMoments_All)
+  BootstrapMoments = SummarizeBootMoments(BootstrapMoments_All)
 
   
   #CW_Means_Bootstrapped_Bio = CW_Means_Bootstrapped %>% 
