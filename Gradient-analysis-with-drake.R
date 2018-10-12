@@ -16,7 +16,7 @@ source("R/MakePrettyFigures.R")
 source("DataImportDrakePlan.R")
 
 # Functions to download and load data from dropbox and google drive
-drop_acc()
+#drop_acc()
 
 
 
@@ -39,24 +39,21 @@ analyses_plan <- drake_plan(
   
   
   #### CALCULATIONS, ANALYSES, FIGURES
-  # Simple CWM
-  #TraitMeans_All = CountryList %>% 
-    #map_df(CommunityW_GlobalAndLocalMeans) %>% 
-    #left_join(metaBioclim),
-  #CWTraitMeans = CommunityW_Means(TraitMeans_All),
   
   # Transformation
   CountryList_trans = CountryList %>% 
     map(LogTranformation),
   
   # Bootstrapped CWM
-  CW_Moments_Bootstrapped = CountryList_trans %>% 
-    map_df(CWM_Bootstrapping)
+  BootstrapMoments_All = CountryList_trans %>% 
+    map_df(CWM_Bootstrapping),
     
+  # Summarize Bootstrap Moments
+  BootstrapMoments <- SummarizeBootMoments(BootstrapMoments_All)
 
   
   #CW_Means_Bootstrapped_Bio = CW_Means_Bootstrapped %>% 
-    #left_join(metaAll, by = c("Country", "PlotID")) %>% 
+    #left_join(metaCommunityAll, by = c("Country", "PlotID")) %>% 
     #left_join(metaBioclim, by = c("Country", "Site")),
 
   #GradientPlot = MakeFigure(TraitMeans),
