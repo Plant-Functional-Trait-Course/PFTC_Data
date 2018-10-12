@@ -147,7 +147,7 @@ dataImport_plan = drake_plan(
   traitSV = CleanSvalbardTrait(traitSV_raw),
   communitySV = CleanSvalbardCommunity(communitySV_raw),
   
-  metaNO = CleanSvalbardMeta(metaNO_raw), 
+  metaNO = CleanNorwayMeta(metaNO_raw), 
   metaCommunityNO = CleanNorwayMetaCommunity(metaCommunityNO_raw),
   communityNO = CleanNorwayCommunity(communityNO_raw, spNO),
   traitNO = CleanNorwayTrait(traitNO_raw),
