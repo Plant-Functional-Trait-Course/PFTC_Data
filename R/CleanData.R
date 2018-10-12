@@ -56,7 +56,7 @@ CleanChinaMeta <- function(dat){
     mutate(Elevation = as.numeric(as.character(Elevation)),
            Gradient = "1",
            Country = as.character(Country),
-           Site = as.character(Site)) %>% str()
+           Site = as.character(Site))
   
   return(dat2)
 }
