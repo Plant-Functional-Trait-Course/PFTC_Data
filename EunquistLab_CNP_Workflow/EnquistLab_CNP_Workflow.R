@@ -263,4 +263,3 @@ make_report <- function(batch_nr, import_path_name, file_name = NULL){
   
   rmarkdown::run("EunquistLab_CNP_Workflow/EnquistLab_CNP_Workflow.Rmd", shiny_args = list(launch.browser = TRUE))
 }
-make_report(import_path_name = "isotope_data", file_name = "CNP_Results")
