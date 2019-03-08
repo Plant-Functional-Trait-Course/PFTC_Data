@@ -81,8 +81,12 @@ CleanSvalbardCommunity <- function(dat){
          BlockID = as.character(1),
          Cover = as.numeric(Cover)) %>% 
     select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
-    mutate(Taxon = recode(Taxon, "micranthes hieracifolia" = "micranthes hieraciifolia")) %>% 
-    filter(!is.na(Cover), !Cover == 0)
+    mutate(Taxon = recode(Taxon, "micranthes hieracifolia" = "micranthes hieraciifolia")) %>%
+    filter(!is.na(Cover), !Cover == 0) %>% 
+    group_by(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
+    mutate(n = n()) %>% 
+    slice(1)
+    
   
   return(dat2)
 }
@@ -323,7 +327,7 @@ CleanColoradoCommunity <- function(dat){
            BlockID = as.character(1)) %>% 
     mutate(PlotID = recode(PlotID, "plot1_pct" = "1", "plot2_pct" = "2", "plot3_pct" = "3", "plot4_pct" = "4", "plot5_pct" = "5"),
            PlotID = paste(Site, PlotID, sep = "_")) %>% 
-    select(Country, Year, Site, BlockID, PlotID, Gradient, Taxon, Cover) %>% 
+    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
     filter(!is.na(Cover), !Cover == 0)
   return(dat2)
 }
