@@ -106,11 +106,3 @@ ImportClean_Colorado <- function(){
   
   return(Data_CO)
 }
-
-
-
-
-
-config <- drake_config(ImportDrakePlan)
-make(ImportDrakePlan)          # Build the right things.
-loadd()
