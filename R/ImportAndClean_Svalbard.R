@@ -30,23 +30,16 @@ CleanSvalbardMetaCommunity <- function(metaCommunitySV_raw){
 CleanSvalbardCommunity <- function(communitySV_raw){
   communitySV <- communitySV_raw %>% 
     rename(Latitude = Latitude_N, Longitude = Longitude_E, Elevation = Elevation_m) %>%
-    mutate(Cover = ifelse(Project == "T" & Site == "2" & Gradient == "C" & PlotID == "B" & Taxon == "oxyria digyna", 0.1, Cover)) %>% 
     mutate(PlotID = paste(Site, Gradient, PlotID, sep=""),
            Site = paste(Site, Gradient, sep =""),
            BlockID = as.character(1),
            Cover = as.numeric(Cover)) %>% 
     select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
-    mutate(Taxon = recode(Taxon, "micranthes hieracifolia" = "micranthes hieraciifolia")) %>%
-    filter(!is.na(Cover), !Cover == 0) %>% 
-    group_by(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
-    mutate(n = n()) %>% 
-    # remove duplicates that are identical
-    slice(1) %>% 
-    filter(!(Gradient == "C" & PlotID == "5CD" & Taxon == "cerastium arcticum" & Cover == 0.1))
+    mutate(Taxon = recode(Taxon, "micranthes hieracifolia" = "micranthes hieraciifolia"))
 
   return(communitySV)
 }
-
+communitySV_raw %>% filter(Project == "T" & Site == "2" & Gradient == "C" & PlotID == "B" & Taxon == "oxyria digyna") %>% data.frame()
 
 
 # Cleaning Svalbard trait
