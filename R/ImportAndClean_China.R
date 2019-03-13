@@ -4,16 +4,6 @@
 
 
 #### CLEANING DATA ####
-# Clean meta data
-CleanChinaMeta <- function(metaCH_raw){
-  metaCH <- metaCH_raw %>% 
-    mutate(Elevation = as.numeric(as.character(Elevation)),
-           Gradient = "1",
-           Country = as.character(Country),
-           Site = as.character(Site))
-  
-  return(metaCH)
-}
 
 # Cleaning China meta community data
 CleanChinaMetaCommunity <- function(metaCommunityCH_raw){
@@ -69,7 +59,12 @@ ImportClean_China <- function(){
   
   ### IMPORT DATA
   # meta data
-  metaCH_raw = get(load(file = file_in("data/metaCH.Rdata")))
+  metaCH = data_frame(Country = "CH",
+                          Gradient == "1",
+                          Site = c("H", "A", "M", "L"),
+                          Elevation = c(4100, 3850, 3500, 3000),
+                          Latitude = c(29.90742, 29.88911, 29.86192, 29.84347),
+                          Longitude = c(102.0118, 102.0173, 102.0360, 102.0343))
   # meta community data
   metaCommunityCH_raw = get(load(file = file_in("data/metaCommunity_CH_2012_2016.Rdata")))
   # community data
@@ -85,7 +80,6 @@ ImportClean_China <- function(){
   
   ### CLEAN DATA SETS
   ## CN_Gongga
-  metaCH = CleanChinaMeta(metaCH_raw)
   metaCommunityCH = CleanChinaMetaCommunity(metaCommunityCH_raw)
   communityCH = CleanChinaCommunity(communityCH_raw)
   traitCH = CleanChinaTrait(traitCH_raw)
@@ -99,4 +93,3 @@ ImportClean_China <- function(){
   
   return(Data_CH)
 }
-
