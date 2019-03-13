@@ -1,0 +1,102 @@
+##################
+  ### CHINA  ###
+##################
+
+
+#### CLEANING DATA ####
+# Clean meta data
+CleanChinaMeta <- function(metaCH_raw){
+  metaCH <- metaCH_raw %>% 
+    mutate(Elevation = as.numeric(as.character(Elevation)),
+           Gradient = "1",
+           Country = as.character(Country),
+           Site = as.character(Site))
+  
+  return(metaCH)
+}
+
+# Cleaning China meta community data
+CleanChinaMetaCommunity <- function(metaCommunityCH_raw){
+  metaCommunityCH <- metaCommunityCH_raw %>% 
+    select(PlotID, Year, Moss, Lichen2, Litter, BareGround, Rock, Vascular, Bryophyte, Lichen, MedianHeight_cm, MedianMossHeight_cm) %>% 
+    mutate(Country = "CH",
+           Site = substr(PlotID, 1,1),
+           Gradient = "1")
+  return(metaCommunityCH)
+}
+
+
+# Cleaning China community data
+CleanChinaCommunity <- function(communityCH_raw){
+  communityCH <- communityCH_raw %>% 
+    filter(TTtreat %in% c("control", "local")) %>% 
+    filter(year == 2016) %>% 
+    rename(Year = year, Site = originSiteID, BlockID = originBlockID, PlotID = turfID, Treatment = TTtreat, Taxon = speciesName, Cover = cover) %>% 
+    mutate(Country = "CH",
+           Gradient = as.character(1)) %>% 
+    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
+    mutate(Taxon = recode(Taxon, "Potentilla stenophylla var. emergens" = "Potentilla stenophylla")) %>% 
+    filter(!is.na(Cover), !Cover == 0)
+  
+  return(communityCH)
+}
+
+
+# Clean China trait data
+CleanChinaTrait <- function(traitCH_raw){
+  traitCH <- traitCH_raw %>% 
+    filter(Project %in% c("LOCAL", "0", "C")) %>% 
+    mutate(Treatment = plyr::mapvalues(Project, c("C", "0", "LOCAL"), c("C", "O", "Gradient"))) %>% 
+    mutate(Taxon = trimws(Taxon)) %>% 
+    mutate(Year = year(Date),
+           Country = "CH",
+           Gradient = as.character(1),
+           Project = "T") %>% 
+    rename(BlockID = Location) %>%
+    mutate(PlotID = paste(BlockID, Treatment, sep = "-"),
+           ID = paste(Site, Treatment, Taxon, Individual_number, Leaf_number, sep = "_")) %>% 
+    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC, C_percent, N_percent , CN_ratio, dN15_percent, dC13_percent, P_AVG, P_Std_Dev, P_Co_Var) %>% 
+    gather(key = Trait, value = Value, -Country, -Year, -Site, -Gradient, -BlockID, -PlotID, -Taxon) %>% 
+    filter(!is.na(Value))
+  
+  return(traitCH)
+}
+
+
+
+#### IMPORT, CLEAN AND MAKE LIST #### 
+ImportClean_China <- function(){
+  
+  ### IMPORT DATA
+  # meta data
+  metaCH_raw = get(load(file = file_in("data/metaCH.Rdata")))
+  # meta community data
+  metaCommunityCH_raw = get(load(file = file_in("data/metaCommunity_CH_2012_2016.Rdata")))
+  # community data
+  communityCH_raw = get(load(file = file_in("data/cover_thin_CH_2012_2016.Rdata")))
+  #communityCH_raw = target(drop_and_load(myfile = "transplant/USE THIS DATA/cover_thin_CH_2012_2016.Rdata", localpath = "data/cover_thin_CH_2012_2016.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/cover_thin_CH_2012_2016.Rdata")$content_hash))
+  # trait data
+  traitCH_raw = get(load(file = file_in("data/traits_2015_2016_China.Rdata")))
+  #traitCH_raw = target(drop_and_load(myfile = "transplant/USE THIS DATA/traits.Rdata", localpath = "data/traits_2015_2016_China.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/traits.Rdata")$content_hash))
+  # flux data
+  fluxCH = get(load(file = file_in("data/standardControlFluxCH_2016.Rdata")))
+  #fluxCH = target(drop_and_load(myfile = "transplant/USE THIS DATA/standardControlFluxCH_2016.Rdata", localpath = "data/standardControlFluxCH_2016.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/standardControlFluxCH_2016.Rdata")$content_hash))
+
+  
+  ### CLEAN DATA SETS
+  ## CN_Gongga
+  metaCH = CleanChinaMeta(metaCH_raw)
+  metaCommunityCH = CleanChinaMetaCommunity(metaCommunityCH_raw)
+  communityCH = CleanChinaCommunity(communityCH_raw)
+  traitCH = CleanChinaTrait(traitCH_raw)
+  
+  # Make list
+  Data_CH = list(meta = metaCH,
+                 metaCommunity = metaCommunityCH,
+                 community = communityCH,
+                 trait = traitCH,
+                 flux = fluxCH)
+  
+  return(Data_CH)
+}
+
