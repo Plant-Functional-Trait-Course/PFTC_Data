@@ -112,8 +112,8 @@ CleanNorwayTrait <- function(traitNO_raw){
 
 
 #Cleaning Norway Flux
-CleanNorwayFlux <- function(dat){
-  dat2 <- dat %>% 
+CleanNorwayFlux <- function(fluxNO_raw){
+  fluxNO <- fluxNO_raw %>% 
     mutate(Site = tolower(Site)) %>% 
     mutate(Site = paste(toupper(substr(Site, 1, 1)), substr(Site, 2, 3), sep = "")) %>% 
     mutate(Gradient = case_when(Site %in% c("Fau", "Alr", "Ulv") ~ as.character(1),
@@ -122,7 +122,7 @@ CleanNorwayFlux <- function(dat){
                                 Site %in% c("Ovs", "Ves", "Skj") ~ as.character(4)
     )) 
   
-  return(dat2)
+  return(fluxNO)
 }
 
 
@@ -135,12 +135,12 @@ ImportClean_Norway <- function(){
   # meta community
   metaCommunityNO_raw = get(load(file = file_in("data/metaCommunityNO_2016.Rdata")))
   # community and sp data
-  communityNO_raw <- read_csv(file = "data/CO_gradient_2016_Species_Cover.csv", col_names = TRUE)
+  communityNO_raw <- read_excel("data/funcab_composition_2016.xlsx")
   #communityNO_raw = target(drop_and_load.xlsx(myfile = "transplant/USE THIS DATA/Norway/funcab_composition_2016.xlsx", localpath = "data/funcab_composition_2016.xlsx"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/funcab_composition_2016.xlsx")$content_hash))
   spNO = read_excel("data/fsystematics_species.xlsx")
   #spNO = target(drop_and_load.xlsx(myfile = "transplant/USE THIS DATA/Norway/systematics_species.xlsx", localpath = "data/fsystematics_species.xlsx"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/systematics_species.xlsx")$content_hash))
   # trait
-  traitNO_raw <- read_csv(file = "data/data/traitdata_NO.csv", col_names = TRUE)
+  traitNO_raw <- read_csv(file = "data/traitdata_NO.csv", col_names = TRUE)
   #traitNO_raw = target(drop_and_load.csv(myfile = "transplant/USE THIS DATA/Norway/traitdata_NO.csv", localpath = "data/traitdata_NO.csv"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/traitdata_NO.csv")$content_hash))
   # flux
   fluxNO <- load("data/standardControlFluxNO_2016.Rdata")
@@ -150,8 +150,9 @@ ImportClean_Norway <- function(){
   ### CLEAN DATA
   metaNO = CleanNorwayMeta(metaNO_raw)
   metaCommunityNO = CleanNorwayMetaCommunity(metaCommunityNO_raw)
-  communityNO = CleanNorwayCommunity(communityNO_raw)
+  communityNO = CleanNorwayCommunity(communityNO_raw, spNO)
   traitNO = CleanNorwayTrait(traitNO_raw)
+  fluxNO = CleanNorwayFlux(fluxNO_raw)
   
   # Make list
   Data_NO = list(meta = metaNO,
