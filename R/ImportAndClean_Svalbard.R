@@ -1,0 +1,103 @@
+##################
+### SVALBARD  ###
+##################
+
+
+#### CLEANING DATA ####
+# Cleaning Svalbard meta
+CleanSvalbardMeta <- function(metaSV_raw){
+  metaSV <- metaSV_raw %>% 
+    mutate(Site = paste(Site, Gradient, sep =""))
+  
+  return(metaSV)
+}
+
+
+# Cleaning Svalbard meta community
+CleanSvalbardMetaCommunity <- function(metaCommunitySV_raw){
+  metaCommunitySV <- metaCommunitySV_raw %>%
+    mutate(Lichen_rock = gsub("_", ".", Lichen_rock),
+           Lichen_rock = as.numeric(Lichen_rock)) %>% 
+    mutate(Lichen = rowSums(select(., Lichen_soil, Lichen_rock), na.rm = TRUE),
+           Site = paste(Site, PlotID, sep="")) %>% 
+    rename(Bryophyte = Bryophytes) %>% 
+    select(Gradient, Site, PlotID, MedianHeight_cm, Vascular, Bryophyte, Lichen, Rock, BareGround, BioCrust, Litter, Country, Year, Project)
+  return(metaCommunitySV)
+}
+
+
+# Cleaning Svalbard community
+CleanSvalbardCommunity <- function(communitySV_raw){
+  communitySV <- communitySV_raw %>% 
+    rename(Latitude = Latitude_N, Longitude = Longitude_E, Elevation = Elevation_m) %>%
+    mutate(Cover = ifelse(Project == "T" & Site == "2" & Gradient == "C" & PlotID == "B" & Taxon == "oxyria digyna", 0.1, Cover)) %>% 
+    mutate(PlotID = paste(Site, Gradient, PlotID, sep=""),
+           Site = paste(Site, Gradient, sep =""),
+           BlockID = as.character(1),
+           Cover = as.numeric(Cover)) %>% 
+    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
+    mutate(Taxon = recode(Taxon, "micranthes hieracifolia" = "micranthes hieraciifolia")) %>%
+    filter(!is.na(Cover), !Cover == 0) %>% 
+    group_by(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
+    mutate(n = n()) %>% 
+    # remove duplicates that are identical
+    slice(1) %>% 
+    filter(!(Gradient == "C" & PlotID == "5CD" & Taxon == "cerastium arcticum" & Cover == 0.1))
+
+  return(communitySV)
+}
+
+
+
+# Cleaning Svalbard trait
+CleanSvalbardTrait <- function(traitSV_raw){
+  traitSV <- traitSV_raw %>% 
+    rename(Latitude = Latitude_N, Longitude = Longitude_E, Elevation = Elevation_m)%>%
+    mutate(PlotID = paste(Site, Gradient, PlotID, sep=""),
+           BlockID = as.character(1),
+           Site = paste(Site, Gradient, sep ="")
+    ) %>%
+    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC) %>% 
+    gather(key = Trait, value = Value, -Country, -Year, -Site, -Gradient, -BlockID, -PlotID, -Taxon) %>% 
+    filter(!is.na(Value))
+  
+  return(traitSV)
+}
+
+
+#### IMPORT, CLEAN AND MAKE LIST #### 
+ImportClean_Svalbard <- function(){
+  
+  ### IMPORT DATA
+  # meta data
+  metaSV_raw = get(load(file = file_in("data/metaSV.Rdata")))
+  # meta community
+  metaCommunitySV_raw = get(load(file = file_in("data/metaCommunitySV_2018.Rdata")))
+  # community
+  communitySV_raw <- get(load(file = file_in("data/communitySV_2018.Rdata")))
+  #communitySV_raw = target(drop_and_load(myfile = "transplant/USE THIS DATA/PFTC4_Svalbard/communitySV_2018.Rdata", localpath = "data/communitySV_2018.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC4_Svalbard/communitySV_2018.Rdata")$content_hash))
+  # trait
+  traitSV_raw <- get(load(file = file_in("data/traitsGradients_SV_2018.Rdata")))
+  #traitSV_raw = target(drop_and_load(myfile = "transplant/USE THIS DATA/PFTC4_Svalbard/traitsGradients_SV_2018.Rdata", localpath = "data/traitsGradients_SV_2018.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC4_Svalbard/traitsGradients_SV_2018.Rdata")$content_hash))
+  # flux
+  fluxSV <- load("data/standardControlFluxSV_2016.Rdata")
+  #fluxSV = target(drop_and_load(myfile = "transplant/USE THIS DATA/PFTC4_Svalbard/standardControlFluxSV_2016.Rdata", localpath = "data/standardControlFluxSV_2016.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC4_Svalbard/standardControlFluxSV_2016.Rdata")$content_hash))
+  
+
+  
+  ### CLEAN DATA SETS
+  ## CN_Gongga
+  metaSV = CleanSvalbardMeta(metaSV_raw)
+  metaCommunitySV = CleanSvalbardMetaCommunity(metaCommunitySV_raw)
+  communitySV = CleanSvalbardCommunity(communitySV_raw)
+  traitSV = CleanSvalbardTrait(traitSV_raw)
+  
+  # Make list
+  Data_SV = list(meta = metaSV,
+                 metaCommunity = metaCommunitySV,
+                 community = communitySV,
+                 trait = traitSV,
+                 flux = fluxSV)
+  
+  return(Data_SV)
+}
