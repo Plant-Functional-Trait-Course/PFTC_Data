@@ -6,10 +6,18 @@
 #### CLEANING DATA ####
 # Cleaning Colorado meta
 CleanColoradoMeta <- function(metaCO_raw){
+  Almont <- data_frame(Site = "Almont",
+              Elevation = 2475,
+              Longitude = 107.0,
+              Latitude = 38.7,
+              Country = "CO",
+              Gradient = "1")
+  
   metaCO <- metaCO_raw %>% 
     mutate(Country = "CO",
            Gradient = "1",
-           Site = as.character(Site))
+           Site = as.character(Site)) %>% 
+    bind_rows(Almont)
   
   return(metaCO)
 }
@@ -87,7 +95,7 @@ ImportClean_Colorado <- function(){
   traitCO_raw <- read_csv(file = "data/rmbl_trait_data_master.csv", col_names = TRUE)
   #traitCO_raw = target(drop_and_load.csv(myfile = "transplant/USE THIS DATA/Colorado/rmbl_trait_data_master.csv", localpath = "data/rmbl_trait_data_master.csv"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Colorado/rmbl_trait_data_master.csv")$content_hash))
   # flux
-  fluxCO <- read_csv(file = "data/standardControlFluxCO_2016.Rdata", col_names = TRUE)
+  fluxCO <- load("data/standardControlFluxCO_2016.Rdata")
   #fluxCO = target(drop_and_load(myfile = "transplant/USE THIS DATA/Colorado/standardControlFluxCO_2016.Rdata", localpath = "data/standardControlFluxCO_2016.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Colorado/standardControlFluxCO_2016.Rdata")$content_hash))
   
   ### CLEAN DATA SETS
