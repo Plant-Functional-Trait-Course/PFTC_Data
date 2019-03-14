@@ -10,52 +10,98 @@ library("e1071")
 
 pn <- . %>% print(n = Inf)
 
+# drake configurations
+pkgconfig::set_config("drake::strings_in_dots" = "literals")
+
 #import scripts
+source("R/ImportAndClean_China.R")
+source("R/ImportAndClean_Peru.R")
+source("R/ImportAndClean_Svalbard.R")
+source("R/ImportAndClean_Norway.R")
+source("R/ImportAndClean_Colorado.R")
 source("R/CommunityWeightedTraitMeans.R")
 source("R/MakePrettyFigures.R")
-source("DataImportDrakePlan.R")
 
 # Functions to download and load data from dropbox and google drive
 #drop_acc()
 
+# Import codes from data base do not work!
+# some of the flux data is wrong
 
 
 ### NEEDS DOING!!!
-# Colorado: trait and height
-#China gradient comm
+# CH
+# China gradient comm
+# CH remove high nitrogen values
+# China data: Lichen2 and Lichen have different values...?
+# same for moss and bryophytes.
 
+# NO
+# NO: duplicate cover values -> Ragnhild har kontroll.
+
+# CO
+# Lorah CO species names
+
+# SV
 ### Check turfs with low cover of traits:
 # communitySV %>% filter(PlotID %in% c("3BC", "6CD", "5BB")) %>% arrange(PlotID) %>% pn
 ### Check 3BC ranunculus nivalis 43% Cover
-# CH remove high nitrogen values
+
+
+# GENERAL
 # scale before CWM
+# Small leaves and light leaves: set a threshold?
 
-# check PE sp names sp2 sp_2
+### Data checks that need to be done
+# do sp names match? comm and trait
+# check high trait values, and remove outliers
+# are there zeros in the comm data that need to be removed
+# do site, block, plot, etc. names match in all the different data sets?
+# is.na(Trait): trait name
+# NAs in trait data should be removed
+# Why are NaN after log transformation?
 
+
+
+
+### Import Data
+ImportDrakePlan <- drake_plan(
+
+  Data_CH = ImportClean_China(),
+  Data_PE = ImportClean_Peru(),
+  Data_SV = ImportClean_Svalbard(),
+  Data_NO = ImportClean_Norway(),
+  Data_CO = ImportClean_Colorado()
+)
 
 # make an analysis drake plan
-analyses_plan <- drake_plan(
-  strings_in_dots = "literals",
+AnalysesDrakePlan <- drake_plan(
   
+  # make a list with all data sets
+  CountryList = list(China = Data_CH,
+                     Peru = Data_PE,
+                     Svalbard = Data_SV,
+                     Norway = Data_NO,
+                     Colorado = Data_CO),
   
   #### CALCULATIONS, ANALYSES, FIGURES
   
   # Transformation
   CountryList_trans = CountryList %>% 
-    map(LogTranformation),
+    map(LogTranformation)
   
   # Bootstrapped CWM
-  BootstrapMoments_All = CountryList_trans %>% 
-    map_df(CWM_Bootstrapping),
+  #BootstrapMoments_All = CountryList_trans %>% 
+    #map_df(CWM_Bootstrapping),
     
   # Summarize Bootstrap Moments
-  BootstrapMoments = SummarizeBootMoments(BootstrapMoments_All),
+  #BootstrapMoments = SummarizeBootMoments(BootstrapMoments_All)
 
   
-  BootstrapMoments_Bio = BootstrapMoments %>% 
-    left_join(metaBioclim, by = c("Country", "Site"))
+  #BootstrapMoments_Bio = BootstrapMoments %>% 
+    #left_join(metaBioclim, by = c("Country", "Site"))
 
-  #GradientPlot = MakeFigure(TraitMeans),
+  #GradientPlot = MakeFigure(BootstrapMoments)
   #GradientMeanPlot = MakeMeanFigure(CW_Means_Bootstrapped_Bio),
   #GradientVarPlot = MakeVarFigure(CW_Means_Bootstrapped_Bio),
   #GradientSkewPlot = MakeSkewFigure(CW_Means_Bootstrapped_Bio),
@@ -65,8 +111,8 @@ analyses_plan <- drake_plan(
 
 
 # combine import and analysis to master drake plan
-MasterDrakePlan <- dataImport_plan %>% 
-  bind_rows(analyses_plan)
+MasterDrakePlan <- ImportDrakePlan %>% 
+  bind_rows(AnalysesDrakePlan)
 
 #configure and make drake plan
 config <- drake_config(MasterDrakePlan)
