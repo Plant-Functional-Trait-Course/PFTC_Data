@@ -66,14 +66,14 @@ standard <- function(p){
   
 # Plot 2 Standard curves
 plot_standards <- function(Standard){
-  p <- Standard %>% 
+  p1 <- Standard %>% 
     unnest() %>% 
     ggplot(aes(x = Sample_Absorbance, y = Concentration, colour = Individual_Nr)) +
     geom_point() +
     geom_smooth(method = "lm", se = FALSE) +
     labs(x = "Absorbance", y = expression(paste("Concentration ", mu, "g/ml")))
   
-  return(p)
+  return(p1)
 }
 
 
@@ -93,6 +93,7 @@ standard_model <- function(Standard){
 original_phosphor_data <- function(p){
   OriginalValues <- p %>% 
     filter(!Individual_Nr %in% c("Standard1", "Standard2"),
+           Batch != 20,
            # remove samples without mass
            !is.na(Sample_Mass)) %>% 
     group_by(Batch) %>% 
