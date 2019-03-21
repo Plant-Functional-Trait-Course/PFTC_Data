@@ -55,7 +55,9 @@ standard <- function(p){
   
   Standard <- p %>% 
     select(Batch, Individual_Nr, Sample_Absorbance) %>% 
-    filter(Individual_Nr %in% c("Standard1", "Standard2")) %>% 
+    filter(Individual_Nr %in% c("Standard1", "Standard2"),
+           # remove batch if Sample_Absorbance is NA; Sample has not been measured
+           !is.na(Sample_Absorbance)) %>% 
     group_by(Batch, Individual_Nr) %>% 
     nest(.key = "standard") %>% 
     mutate(standard = map(standard, bind_cols, standard_concentration)) 
@@ -91,16 +93,23 @@ standard_model <- function(Standard){
 
 # Calculate Mean, sd, coeficiant variability for each leaf and flag data
 original_phosphor_data <- function(p){
-  OriginalValues <- p %>% 
+  p2 <- p %>% 
     filter(!Individual_Nr %in% c("Standard1", "Standard2"),
-           Batch != 20,
            # remove samples without mass
            !is.na(Sample_Mass)) %>% 
     group_by(Batch) %>% 
     nest(.key = "data") %>% 
     # add estimate from model
-    left_join(ModelResult %>% select(-Individual_Nr), by = "Batch") %>% 
-    mutate(data = map2(.x = data, .y = fit, ~ mutate(.x, Sample_yg_ml = predict(.y, newdata = select(.x, Sample_Absorbance))))) %>% 
+    left_join(ModelResult %>% select(-Individual_Nr), by = "Batch")
+  
+    # remove if correlation is NA, but give warning
+    if(nrow(p2 %>% filter(is.na(correlation))) > 0){
+      p2 <- p2 %>% 
+        filter(!is.na(correlation))
+    }
+  
+  OriginalValues <- p2 %>% 
+      mutate(data = map2(.x = data, .y = fit, ~ mutate(.x, Sample_yg_ml = predict(.y, newdata = select(.x, Sample_Absorbance))))) %>% 
     unnest(data) %>% 
     mutate(Pmass = Sample_yg_ml * Volume_of_Sample_ml,
            Pconc = Pmass / Sample_Mass * 100) %>% 
@@ -196,7 +205,7 @@ import_cn_data <- function(import_path_name){
     map_df(~{select(.,-c(X__3:X__9)) %>% 
         slice(1:grep("Analytical precision, 1-sigma", X__1)-1) %>% 
         filter(!is.na(X__1)) %>% 
-        rename(Samples_Nr = X__1, Individual_Nr = `Sample ID`, Site = X__2, Row = R, Column = C, C_percent = `C%`, N_percent = `N%`, CN_ratio = `C/N`, dN15_percent = `δ15N ‰(ATM)`, dC13_percent = `δ13C ‰(PDB)`)
+        rename(Samples_Nr = X__1, Individual_Nr = `Sample ID`, Site = X__2, Row = R, Column = C, C_percent = `C%`, N_percent = `N%`, CN_ratio = `C/N`, dN15_percent = `δ15N ‰(ATM)`, dC13_percent = `δ13C ‰(PDB)`, Remark_CN = Remark)
       })
   
   cn_data <- cn_mass %>% 
