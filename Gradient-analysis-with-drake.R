@@ -82,26 +82,24 @@ AnalysesDrakePlan <- drake_plan(
                      Peru = Data_PE,
                      Svalbard = Data_SV,
                      Norway = Data_NO,
-                     Colorado = Data_CO),
+                     Colorado = Data_CO) %>% 
+    map(LogTranformation)  #Log transforming trait data (height, mass and area)
+  
   
   #### CALCULATIONS, ANALYSES, FIGURES
   
-  # Transformation
-  CountryList_trans = CountryList %>% 
-    map(LogTranformation)
-  
   # Bootstrapped CWM
   #BootstrapMoments_All = CountryList_trans %>% 
-    #map_df(CWM_Bootstrapping),
+   # map_df(CWM_Bootstrapping),
     
   # Summarize Bootstrap Moments
-  #BootstrapMoments = SummarizeBootMoments(BootstrapMoments_All)
+  #BootstrapMoments = SummarizeBootMoments(BootstrapMoments_All),
 
   
   #BootstrapMoments_Bio = BootstrapMoments %>% 
-    #left_join(metaBioclim, by = c("Country", "Site"))
+   # left_join(metaBioclim, by = c("Country", "Site")),
 
-  #GradientPlot = MakeFigure(BootstrapMoments)
+  #GradientPlot = MakeFigure(BootstrapMoments),
   #GradientMeanPlot = MakeMeanFigure(CW_Means_Bootstrapped_Bio),
   #GradientVarPlot = MakeVarFigure(CW_Means_Bootstrapped_Bio),
   #GradientSkewPlot = MakeSkewFigure(CW_Means_Bootstrapped_Bio),
