@@ -14,6 +14,8 @@ CleanChinaMetaCommunity <- function(metaCommunityCH_raw){
            Gradient = "1")
   return(metaCommunityCH)
 }
+#Moss and bryophyte columns are not the same.
+#Lichen and Lichen2 columns are not the same.
 
 
 # Cleaning China community data
