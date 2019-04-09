@@ -39,7 +39,7 @@ CleanSvalbardCommunity <- function(communitySV_raw){
 
   return(communitySV)
 }
-communitySV_raw %>% filter(Project == "T" & Site == "2" & Gradient == "C" & PlotID == "B" & Taxon == "oxyria digyna") %>% data.frame()
+#communitySV_raw %>% filter(Project == "T" & Site == "2" & Gradient == "C" & PlotID == "B" & Taxon == "oxyria digyna") %>% data.frame()
 
 
 # Cleaning Svalbard trait
