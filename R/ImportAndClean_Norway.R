@@ -152,14 +152,14 @@ ImportClean_Norway <- function(){
   metaCommunityNO = CleanNorwayMetaCommunity(metaCommunityNO_raw)
   communityNO = CleanNorwayCommunity(communityNO_raw, spNO)
   traitNO = CleanNorwayTrait(traitNO_raw)
-  fluxNO = CleanNorwayFlux(fluxNO_raw)
+  #fluxNO = CleanNorwayFlux(fluxNO_raw)
   
   # Make list
   Data_NO = list(meta = metaNO,
                  metaCommunity = metaCommunityNO,
                  community = communityNO,
-                 trait = traitNO,
-                 flux = fluxNO)
+                 trait = traitNO)
+                 #flux = fluxNO)
   
   return(Data_NO)
 }
