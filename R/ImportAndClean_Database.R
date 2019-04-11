@@ -86,7 +86,9 @@ traitdict <- tribble(~Trait, ~unit, ~transform,
 StandardiseDatabase <- function(Database, traitdict){
   ModifiedDatabase <- Database %>% 
   left_join(traitdict, by = c("Trait", "unit")) %>%
-  mutate(value_2 = Value * transform)
+  mutate(value_2 = Value * transform) %>% 
+  select(-Value) %>% 
+  rename(Value = value_2)
 
 return(ModifiedDatabase)
 }
