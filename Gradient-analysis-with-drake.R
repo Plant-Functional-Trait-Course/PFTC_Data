@@ -73,6 +73,35 @@ ImportDrakePlan <- drake_plan(
   Data_SV = ImportClean_Svalbard(),
   Data_NO = ImportClean_Norway(),
   Data_CO = ImportClean_Colorado()
+  
+  bien = fun1(),
+  bien_clean = fun2(bien)
+  
+  bien = ImportClean_BIEN() %>% StandardiseDatabase(traitdict)
+  TRY = 
+  Database = bind_rows(bien, TRY)
+)
+
+#Make dictionary for unit transformation
+traitdict <- tribble(~Trait, ~unit, ~transform,
+                     "CN_ratio", "ratio", 1,
+                     "CN_ratio", "g/g", 1,
+                     "dC13_percent", "parts per thousand", 1, 
+                     "dN15_percent", "parts per thousand", 1, 
+                     "Dry_Mass_g", "g", 1,
+                     "Dry_Mass_g", "mg", 0.001,
+                     "LDMC", " ", 1,
+                     "LDMC", "g/g", 1,
+                     "LDMC", "mg.g-1", 0.001,
+                     "Leaf_Area_cm2", "cm2", 1,
+                     "Leaf_Area_cm2", "mm2", 0.001,
+                     "Leaf_Thickness_Ave_mm", "mm", 1,
+                     "N_percent", "mg/g", 0.001,
+                     "Plant_Height_cm", "m", 100,
+                     "SLA_cm2_g", "m2.kg-1", 10,
+                     "SLA_cm2_g", "cm2_g", 1,
+                     "SLA_cm2_g", "mm2 mg-1", 10,
+                     "Wet_Mass_g", "g", 1
 )
 
 # make an analysis drake plan
