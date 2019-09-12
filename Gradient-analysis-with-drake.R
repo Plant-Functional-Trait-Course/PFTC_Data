@@ -7,6 +7,7 @@ library("readxl")
 library("lubridate")
 library("rdrop2")
 library("e1071")
+library("readr")
 
 pn <- . %>% print(n = Inf)
 
@@ -19,6 +20,7 @@ source("R/ImportAndClean_Peru.R")
 source("R/ImportAndClean_Svalbard.R")
 source("R/ImportAndClean_Norway.R")
 source("R/ImportAndClean_Colorado.R")
+source("R/ImportAndClean_Database.R")
 source("R/CommunityWeightedTraitMeans.R")
 source("R/MakePrettyFigures.R")
 
@@ -71,7 +73,9 @@ ImportDrakePlan <- drake_plan(
   Data_PE = ImportClean_Peru(),
   Data_SV = ImportClean_Svalbard(),
   Data_NO = ImportClean_Norway(),
-  Data_CO = ImportClean_Colorado()
+  Data_CO = ImportClean_Colorado(),
+  Database = ImportClean_Database()
+  
 )
 
 # make an analysis drake plan
@@ -82,26 +86,25 @@ AnalysesDrakePlan <- drake_plan(
                      Peru = Data_PE,
                      Svalbard = Data_SV,
                      Norway = Data_NO,
-                     Colorado = Data_CO),
+                     Colorado = Data_CO,
+                     Database = Database) %>% 
+    map(LogTranformation)  #Log transforming trait data (height, mass and area)
+  
   
   #### CALCULATIONS, ANALYSES, FIGURES
   
-  # Transformation
-  CountryList_trans = CountryList %>% 
-    map(LogTranformation)
-  
   # Bootstrapped CWM
   #BootstrapMoments_All = CountryList_trans %>% 
-    #map_df(CWM_Bootstrapping),
+   # map_df(CWM_Bootstrapping),
     
   # Summarize Bootstrap Moments
-  #BootstrapMoments = SummarizeBootMoments(BootstrapMoments_All)
+  #BootstrapMoments = SummarizeBootMoments(BootstrapMoments_All),
 
   
   #BootstrapMoments_Bio = BootstrapMoments %>% 
-    #left_join(metaBioclim, by = c("Country", "Site"))
+   # left_join(metaBioclim, by = c("Country", "Site")),
 
-  #GradientPlot = MakeFigure(BootstrapMoments)
+  #GradientPlot = MakeFigure(BootstrapMoments),
   #GradientMeanPlot = MakeMeanFigure(CW_Means_Bootstrapped_Bio),
   #GradientVarPlot = MakeVarFigure(CW_Means_Bootstrapped_Bio),
   #GradientSkewPlot = MakeSkewFigure(CW_Means_Bootstrapped_Bio),
