@@ -14,12 +14,12 @@ GlobalAndLocalMeans <- function(dat, database){
     mutate(TraitMean_site = mean(Value_trans, na.rm = TRUE)) 
     
   #If the dataset has plot level trait data: calculate the plot level trait mean
-  if("plotID" %in% names(meanTraits)){
-  meanTraits <- meanTraits 
+  if("PlotID" %in% names(meanTraits)){
+  meanTraits <- meanTraits %>% 
     # Plot means
     group_by(PlotID, BlockID, Site, Taxon, Trait_trans) %>%
     mutate(TraitMean_plot = mean(Value_trans, na.rm = TRUE)) 
-  }
+  } 
     
   meanTraits <- meanTraits %>% 
     select(-Year, -Value_trans, -Value) %>% 
@@ -28,7 +28,7 @@ GlobalAndLocalMeans <- function(dat, database){
   
   #global
   meanTraits <-meanTraits %>%
-    left_join(database, by = c("Taxon", "Trait_trans"))
+    left_join(Database, by = c("Taxon", "Trait_trans"))
   
   return(meanTraits)
 }
