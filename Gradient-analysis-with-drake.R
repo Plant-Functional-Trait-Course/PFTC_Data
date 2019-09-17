@@ -74,7 +74,7 @@ ImportDrakePlan <- drake_plan(
   Data_SV = ImportClean_Svalbard(),
   Data_NO = ImportClean_Norway(),
   Data_CO = ImportClean_Colorado(),
-  Database = ImportClean_Database()
+  Database0 = ImportClean_Database()
   
 )
 
@@ -86,12 +86,26 @@ AnalysesDrakePlan <- drake_plan(
                      Peru = Data_PE,
                      Svalbard = Data_SV,
                      Norway = Data_NO,
-                     Colorado = Data_CO,
-                     Database = Database) %>% 
-    map(LogTranformation)  #Log transforming trait data (height, mass and area)
+                     Colorado = Data_CO) %>%
+    map(LogTransformation),  #Log transforming trait data (height, mass and area)
   
   
   #### CALCULATIONS, ANALYSES, FIGURES
+  
+  #Calculating trait means
+  Database = Database0 %>% 
+    LogTransformation() %>% 
+    group_by(Taxon, Trait_trans) %>% 
+    summarise(TraitMean_global = mean(Value_trans)),
+
+  TraitMeans = CountryList %>% map(GlobalAndLocalMeans, Database),
+  
+  #Calculating community weighted trait means
+
+  CWTraitMeans = map2(CountryList, TraitMeans, CommunityW_TraitMeans)
+  )
+  
+  
   
   # Bootstrapped CWM
   #BootstrapMoments_All = CountryList_trans %>% 
@@ -110,7 +124,7 @@ AnalysesDrakePlan <- drake_plan(
   #GradientSkewPlot = MakeSkewFigure(CW_Means_Bootstrapped_Bio),
   #GradientKurtPlot = MakeKurtFigure(CW_Means_Bootstrapped_Bio)
 
-)
+#)
 
 
 # combine import and analysis to master drake plan
@@ -121,7 +135,7 @@ MasterDrakePlan <- ImportDrakePlan %>%
 config <- drake_config(MasterDrakePlan)
 # outdated(config)        # Which targets need to be (re)built?
 make(MasterDrakePlan)          # Build the right things.
-loadd()
+diagloadd()
 readd(GradientMeanPlot)
 readd(GradientVarPlot)
 readd(GradientSkewPlot)
