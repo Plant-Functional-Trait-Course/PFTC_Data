@@ -11,6 +11,7 @@ CleanDatabase_BIEN_TTT_Trait <- function(Database_BIEN_TTT_raw){
   Database_BIEN_TTT_trait <- Database_BIEN_TTT_raw %>% 
     filter(trait_name %in% c("leaf area", "leaf area per leaf dry mass", "leaf carbon content per leaf nitrogen content", "leaf delta 13c", "leaf delta 15n", "leaf dry mass", "leaf fresh mass", "leaf thickness", "whole plant height", "whole plant height vegetative", "leaf dry mass per leaf fresh mass")) %>% 
     rename(Taxon = taxon, Trait = trait_name, Value = trait_value) %>%
+    filter(!Value == "*") %>% 
     mutate(unit = as.character(unit),
            comment = as.character(comment),
            Value = as.numeric(Value),
@@ -120,10 +121,7 @@ ImportClean_Database <- function(){
     StandardiseDatabase(traitdict)
   
   #Combine datasets
-  traitDatabase = bind_rows(traitDatabase_BIEN_TTT, traitDatabase_TRY)
-  
-  # Make list
-  Database = list(trait = traitDatabase)
+  Database = bind_rows(traitDatabase_BIEN_TTT, traitDatabase_TRY)
   
   return(Database)
 }

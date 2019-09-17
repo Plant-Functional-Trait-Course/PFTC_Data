@@ -65,11 +65,11 @@ CleanNorwayCommunity <- function(communityNO_raw, spNO){
   
   communityNO <- communityNO_raw %>% 
     filter(Measure == "Cover") %>%
-    select(-Treatment, -'Nid herb', 'Nid gram', -'Nid rosett', -'Nid seedling', -liver, -lichen, -litter, -soil, -rock, -'#Seedlings', -TotalGraminoids, -totalForbs, -totalBryophytes, -vegetationHeight, -mossHeight, -comment, -'ver seedl', -canum, -totalVascular, totalBryophytes__1, -acro, -pleuro, -totalLichen) %>% 
+    select(-Treatment, -'Nid herb', 'Nid gram', -'Nid rosett', -'Nid seedling', -liver, -lichen, -litter, -soil, -rock, -'#Seedlings', -TotalGraminoids, -totalForbs, -totalBryophytes...285, -vegetationHeight, -mossHeight, -comment, -'ver seedl', -canum, -totalVascular, -totalBryophytes...292, -acro, -pleuro, -totalLichen) %>% 
     gather(key = Taxon, value = Cover, -Site, -Block, -turfID, -subPlot, -year, -date, -Measure, -recorder) %>% 
     filter(!is.na(Cover)) %>% 
     mutate(Taxon = gsub(" ", "_", Taxon))%>%
-    mutate(Taxon = plyr::mapvalues(Taxon, from = Dictionary_communityNO$old, to = Dictionary_communityNO$new)) %>%
+    mutate(Taxon = plyr::mapvalues(Taxon, from = Dictionary_communityNO$old, to = Dictionary_communityNO$new, warn_missing = FALSE)) %>%
     left_join(spNO, by = c("Taxon" = "Species")) %>% 
     select(-Genus, -Family, -Order, -Taxon) %>% 
     rename(Taxon = Full_name) %>% 
@@ -140,10 +140,10 @@ ImportClean_Norway <- function(){
   spNO = read_excel("data/fsystematics_species.xlsx")
   #spNO = target(drop_and_load.xlsx(myfile = "transplant/USE THIS DATA/Norway/systematics_species.xlsx", localpath = "data/fsystematics_species.xlsx"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/systematics_species.xlsx")$content_hash))
   # trait
-  traitNO_raw <- read_csv(file = "data/traitdata_NO.csv", col_names = TRUE)
+  traitNO_raw <- read_delim(file = "data/traitdata_NO.csv", col_names = TRUE, delim = ";")
   #traitNO_raw = target(drop_and_load.csv(myfile = "transplant/USE THIS DATA/Norway/traitdata_NO.csv", localpath = "data/traitdata_NO.csv"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/traitdata_NO.csv")$content_hash))
   # flux
-  fluxNO <- load("data/standardControlFluxNO_2016.Rdata")
+  fluxNO <- get(load("data/standardControlFluxNO_2016.Rdata"))
   #fluxNO_raw = target(drop_and_load(myfile = "transplant/USE THIS DATA/Norway/standardControlFluxNO_2016.Rdata", localpath = "data/standardControlFluxNO_2016.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/standardControlFluxNO_2016.Rdata")$content_hash))
   
   

@@ -1,49 +1,64 @@
 ### CALCULATE COMMUNITY WEIGHTED MEANS ###
 
 # NORMAL WAY WITHOUT BOOTSTRAPPING
-CommunityW_GlobalAndLocalMeans <- function(dat){
+GlobalAndLocalMeans <- function(dat, database){
   meanTraits <- dat$trait %>% 
-    # Global means
-    group_by(Taxon, Trait) %>% 
-    mutate(TraitMean_global = mean(Value, na.rm = TRUE)) %>% 
+    
+    
+    # Regional means
+    group_by(Taxon, Trait_trans) %>% 
+    mutate(TraitMean_regional = mean(Value_trans, na.rm = TRUE)) %>% 
     
     # Site means (site level)
-    group_by(Site, Taxon, Trait) %>%
-    mutate(TraitMean_site = mean(Value, na.rm = TRUE)) %>% 
+    group_by(Site, Taxon, Trait_trans) %>%
+    mutate(TraitMean_site = mean(Value_trans, na.rm = TRUE)) 
     
+  #If the dataset has plot level trait data: calculate the plot level trait mean
+  if("plotID" %in% names(meanTraits)){
+  meanTraits <- meanTraits 
     # Plot means
-    group_by(PlotID, BlockID, Site, Taxon, Trait) %>%
-    mutate(TraitMean_plot = mean(Value, na.rm = TRUE)) %>% 
-    select(-Year, -Value) %>% 
+    group_by(PlotID, BlockID, Site, Taxon, Trait_trans) %>%
+    mutate(TraitMean_plot = mean(Value_trans, na.rm = TRUE)) 
+  }
+    
+  meanTraits <- meanTraits %>% 
+    select(-Year, -Value_trans, -Value) %>% 
     ungroup() %>% 
     distinct()
+  
+  #global
+  meanTraits <-meanTraits %>%
+    left_join(database, by = c("Taxon", "Trait_trans"))
+  
+  return(meanTraits)
+}
+
+country <- CountryList[[1]]
+trait <- TraitMeans
+CommunityW_TraitMeans <- function(country, trait) {    
     
-  dat2 <- dat$community 
-    
-  if(!dat2$Country[1] %in% c("NO", "CO")) {
-    dat2 <- dat2 %>% 
+  if(!country$meta$Country[1] %in% c("NO", "CO")) {
+    dat2 <- country$community %>% 
       # join plot level means
-      left_join(meanTraits %>% select(-TraitMean_global, -TraitMean_site))
+      left_join(select(trait, -TraitMean_global, -TraitMean_regional -TraitMean_site),
+        by = c("Taxon", "Site", "BlockID", "PlotID"))
   }
     
   dat2 <- dat2 %>% 
     # join site level means
-    left_join(meanTraits %>% select(-TraitMean_global, -TraitMean_plot, -BlockID, -PlotID) %>% distinct()) %>% 
+    left_join(
+      distinct(select(trait, -TraitMean_global, -TraitMean_regional -TraitMean_plot, -BlockID, -PlotID)), 
+              by = c("Taxon", "Site")) %>% 
     
-    # join global means
-    left_join(meanTraits %>% select(-TraitMean_plot, -TraitMean_site, -Site, -BlockID, -PlotID) %>% distinct())
-    
-  if(dat2$Country[1] %in% c("NO", "CO")) {
-    dat2 <- dat2 %>% 
-      mutate(TraitMean = coalesce(TraitMean_site, TraitMean_global))
-  } else{
-    dat2 <- dat2 %>% 
-      mutate(TraitMean = coalesce(TraitMean_plot, TraitMean_site, TraitMean_global))
-  }
+    # join regional means
+    left_join(
+      distinct(select(trait, -TraitMean_plot, -TraitMean_site, -TraitMean_global, -Site, -BlockID, -PlotID)))
   
   ### Calculate Community weighted means
-  dat2 <- dat2 %>% 
-    group_by(Trait, Site, PlotID) %>% 
+  dat2 <- dat2 %>%
+    gather(key = TraitLevel, value = TraitMean, -Country, -Site, -BlockID, -PlotID, -Gradient, -Taxon, -Trait, -Trait_trans) %>% 
+    left_join(community, by = c("Country", "Site", "BlockID", "PlotID", "Taxon", "Gradient")) %>% 
+    group_by(Trait, Site, BlockID, PlotID, Taxon, Trait, TraitLevel) %>% 
     mutate(CWTraitMean = weighted.mean(TraitMean, Cover, na.rm=TRUE)) %>% 
     ungroup()
   
@@ -61,12 +76,23 @@ CommunityW_Means <- function(TraitMeans_All){
 
 
 # TRANSFORMING THE TRAITS
-LogTranformation <- function(Country){
-  Country$trait_trans <- Country$trait %>% 
+LogTransformation <- function(Country){
+
+#Making a function to log transform some traits in a new column of the previous trait dataset  
+  fun <- . %>%  
+    mutate(Value_trans = ifelse(Trait %in% c("Plant_Height_cm", "Wet_Mass_g", "Dry_Mass_g", "Leaf_Area_cm2"), suppressWarnings(log(Value)), Value),
+    Trait_trans = recode(Trait, "Plant_Height_cm" = "Plant_Height_cm_log", "Wet_Mass_g" = "Wet_Mass_g_log", "Dry_Mass_g" = "Dry_Mass_g_log", "Leaf_Area_cm2" = "Leaf_Area_cm2_log"))
+  
+#If the dataset is a data frame it will rund the function on that, if it is a list it will run the function on the trait list
+  
+  if(inherits(Country, "data.frame")){
+    Country <- Country %>% fun()
     
-    # log transform
-    mutate(Value = ifelse(Trait %in% c("Plant_Height_cm", "Wet_Mass_g", "Dry_Mass_g", "Leaf_Area_cm2"), log(Value), Value),
-           Trait = recode(Trait, "Plant_Height_cm" = "Plant_Height_cm_log", "Wet_Mass_g" = "Wet_Mass_g_log", "Dry_Mass_g" = "Dry_Mass_g_log", "Leaf_Area_cm2" = "Leaf_Area_cm2_log"))
+  } else{
+    Country$trait <- Country$trait %>% fun()
+  }
+  
+
   return(Country)
 }
 
