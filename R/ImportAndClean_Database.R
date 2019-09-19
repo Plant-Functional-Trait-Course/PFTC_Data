@@ -121,7 +121,8 @@ ImportClean_Database <- function(){
     StandardiseDatabase(traitdict)
   
   #Combine datasets
-  Database = bind_rows(traitDatabase_BIEN_TTT, traitDatabase_TRY)
+  traitDatabase = bind_rows(traitDatabase_BIEN_TTT, traitDatabase_TRY)
+  Database = list(trait = traitDatabase)
   
   return(Database)
 }
