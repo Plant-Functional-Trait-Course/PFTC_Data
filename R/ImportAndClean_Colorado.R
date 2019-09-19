@@ -6,7 +6,7 @@
 #### CLEANING DATA ####
 # Cleaning Colorado meta
 CleanColoradoMeta <- function(metaCO_raw){
-  Almont <- data_frame(Site = "Almont",
+  Almont <- tibble(Site = "Almont",
               Elevation = 2475,
               Longitude = 107.0,
               Latitude = 38.7,

@@ -61,7 +61,7 @@ ImportClean_China <- function(){
   
   ### IMPORT DATA
   # meta data
-  metaCH = data_frame(Country = "CH",
+  metaCH = tibble(Country = "CH",
                           Gradient = "1",
                           Site = c("H", "A", "M", "L"),
                           Elevation = c(4100, 3850, 3500, 3000),
