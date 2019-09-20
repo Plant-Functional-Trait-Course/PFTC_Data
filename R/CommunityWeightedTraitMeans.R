@@ -1,7 +1,7 @@
 ### CALCULATE COMMUNITY WEIGHTED MEANS ###
 
 # NORMAL WAY WITHOUT BOOTSTRAPPING
-RegionalAndLocalMeans <- function(countrylist){
+CalculateTraitMeans <- function(countrylist){
   
     meanTraits <- countrylist$trait %>% 
       select(-matches("Year")) %>% 

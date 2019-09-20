@@ -94,13 +94,7 @@ AnalysesDrakePlan <- drake_plan(
   #### CALCULATIONS, ANALYSES, FIGURES
   #Calculating trait means
   # Countries
-  TraitMeans = map_df(CountryList, RegionalAndLocalMeans),
-
-  # Database
-  #G_TraitMeans = map(CountryList[names(CountryList) == "Database"], GlobalMeans),
-  
-  #Conbine regional and global traits
-  #TraitMeans = map2(RL_TraitMeans, G_TraitMeans, left_join),
+  TraitMeans = map_df(CountryList, CalculateTraitMeans),
   
   
   #Calculating community weighted trait means
