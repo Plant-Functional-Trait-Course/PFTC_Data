@@ -57,9 +57,14 @@ CommunityW_TraitMeans <- function(country, meantrait) {
       distinct(select(meantrait, -TraitMean_global, -TraitMean_site, -TraitMean_plot, -Site, -BlockID, -PlotID)),
       by = c("Country", "Gradient", "Trait", "Trait_trans", "Taxon"))
   
+    # join global means
+    left_join(
+      distinct(select(meantrait, -TraitMean_regional, -TraitMean_site, -TraitMean_plot, -Site, -BlockID, -PlotID)),
+      by = c("Country", "Gradient", "Trait", "Trait_trans", "Taxon"))
+  
+    # join plot level means (without Norway and Colorado)
   if(!country$meta$Country[1] %in% c("NO", "CO")) {
     dat2 <- dat2 %>% 
-      # join plot level means
       left_join(select(meantrait, -TraitMean_global, -TraitMean_regional, -TraitMean_site),
                 by = c("Country", "Gradient", "Trait", "Trait_trans", "Taxon", "Site", "BlockID", "PlotID"))
   }
