@@ -88,22 +88,21 @@ AnalysesDrakePlan <- drake_plan(
                      Norway = Data_NO,
                      Colorado = Data_CO,
                      Database = Database0) %>%
-    map(LogTransformation))  #Log transforming trait data (height, mass and area)
+    map(LogTransformation),  #Log transforming trait data (height, mass and area)
 
   
   #### CALCULATIONS, ANALYSES, FIGURES
   
   #Calculating trait means
-  Database = Database0 %>%
-    LogTransformation() %>% 
-    group_by(Taxon, Trait_trans) %>%
-    summarise(TraitMean_global = mean(Value_trans)),
+  # Countries
+  RL_TraitMeans = map(CountryList[1:5], RegionalAndLocalMeans),
 
-  TraitMeans = CountryList %>% map(GlobalAndLocalMeans, Database),
-
+  # Database
+  G_TraitMeans = map(CountryList[6], GlobalMeans)
+  
   #Calculating community weighted trait means
 
-  CWTraitMeans = map2(CountryList, TraitMeans, CommunityW_TraitMeans)
+  #CWTraitMeans = map2(CountryList, TraitMeans, CommunityW_TraitMeans)
   )
   
   
@@ -133,9 +132,14 @@ MasterDrakePlan <- ImportDrakePlan %>%
   bind_rows(AnalysesDrakePlan)
 
 #configure and make drake plan
-config <- drake_config(MasterDrakePlan)
+#config <- drake_config(MasterDrakePlan)
 # outdated(config)        # Which targets need to be (re)built?
 make(MasterDrakePlan)          # Build the right things.
+
+loadd(CountryList)
+loadd(RL_TraitMeans)
+loadd(G_TraitMeans)
+
 diagloadd()
 readd(GradientMeanPlot)
 readd(GradientVarPlot)

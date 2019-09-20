@@ -95,13 +95,13 @@ return(ModifiedDatabase)
 }
 
 
-# Combining datasets
-
-Combine_trait_database <- function(Database_BIEN_TTT_trait, Database_TRY_trait){
-  Database_trait <- Database_BIEN_TTT_trait %>% 
-    #bind_rows()
- return(Database_trait) 
-}
+# # Combining datasets
+# 
+# Combine_trait_database <- function(Database_BIEN_TTT_trait, Database_TRY_trait){
+#   Database_trait <- Database_BIEN_TTT_trait %>% 
+#     bind_rows(Database_TRY_trait)
+#  return(Database_trait) 
+# }
 
 
 #### IMPORT, CLEAN AND MAKE LIST #### 
@@ -121,7 +121,8 @@ ImportClean_Database <- function(){
     StandardiseDatabase(traitdict)
   
   #Combine datasets
-  traitDatabase = bind_rows(traitDatabase_BIEN_TTT, traitDatabase_TRY)
+  traitDatabase = bind_rows(traitDatabase_BIEN_TTT, traitDatabase_TRY) %>% 
+    mutate(Country = "Database")
   Database = list(trait = traitDatabase)
   
   return(Database)

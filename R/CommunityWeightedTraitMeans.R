@@ -1,37 +1,44 @@
 ### CALCULATE COMMUNITY WEIGHTED MEANS ###
 
 # NORMAL WAY WITHOUT BOOTSTRAPPING
-GlobalAndLocalMeans <- function(dat, database){
-  meanTraits <- dat$trait %>% 
-    
-    
-    # Regional means
-    group_by(Taxon, Trait_trans) %>% 
-    mutate(TraitMean_regional = mean(Value_trans, na.rm = TRUE)) %>% 
-    
-    # Site means (site level)
-    group_by(Site, Taxon, Trait_trans) %>%
-    mutate(TraitMean_site = mean(Value_trans, na.rm = TRUE)) 
-    
-  #If the dataset has plot level trait data: calculate the plot level trait mean
-  if("PlotID" %in% names(meanTraits)){
-  meanTraits <- meanTraits %>% 
-    # Plot means
-    group_by(PlotID, BlockID, Site, Taxon, Trait_trans) %>%
-    mutate(TraitMean_plot = mean(Value_trans, na.rm = TRUE)) 
-  } 
-    
-  meanTraits <- meanTraits %>% 
-    select(-Year, -Value_trans, -Value) %>% 
-    ungroup() %>% 
-    distinct()
+RegionalAndLocalMeans <- function(countrylist){
   
-  #global
-  meanTraits <-meanTraits %>%
-    left_join(Database, by = c("Taxon", "Trait_trans"))
-  
+    meanTraits <- countrylist$trait %>% 
+      
+      # Regional means
+      group_by(Taxon, Trait_trans) %>% 
+      mutate(TraitMean_regional = mean(Value_trans, na.rm = TRUE)) %>% 
+      
+      # Site means (site level)
+      group_by(Site, Taxon, Trait_trans) %>%
+      mutate(TraitMean_site = mean(Value_trans, na.rm = TRUE)) 
+    
+    #If the dataset has plot level trait data: calculate the plot level trait mean
+    if("PlotID" %in% names(meanTraits)){
+      meanTraits <- meanTraits %>% 
+        # Plot means
+        group_by(PlotID, BlockID, Site, Taxon, Trait_trans) %>%
+        mutate(TraitMean_plot = mean(Value_trans, na.rm = TRUE)) 
+    } 
+    
+    meanTraits <- meanTraits %>% 
+      select(-Year, -Value_trans, -Value) %>% 
+      ungroup() %>% 
+      distinct()
+
   return(meanTraits)
 }
+
+
+# # Calculate global
+GlobalMeans <- function(countrylist){
+  meanTraits <- countrylist$trait %>% 
+    group_by(Taxon, Trait_trans) %>%
+    summarise(TraitMean_global = mean(Value_trans))
+
+  return(meanTraits)
+}
+
 
 #country <- CountryList[[1]]
 #trait <- TraitMeans
