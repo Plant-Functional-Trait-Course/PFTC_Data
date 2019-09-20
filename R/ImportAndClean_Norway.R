@@ -105,7 +105,8 @@ CleanNorwayTrait <- function(traitNO_raw){
     gather(key = Trait, value = Value, -Country, -Year, -Site, -BlockID, -PlotID, -Gradient, -Taxon) %>% 
     filter(!is.na(Value)) %>% 
     mutate(Taxon = recode(Taxon, "Empetrum nigrum subsp. Hermaphroditum" = "Empetrum nigrum")) %>% 
-    filter(!is.na(Value))
+    filter(!is.na(Value)) %>% 
+    mutate(Country = "NO") #Overwrite junk...
   
   return(traitNO)
 }
@@ -135,15 +136,15 @@ ImportClean_Norway <- function(){
   # meta community
   metaCommunityNO_raw = get(load(file = file_in("data/metaCommunityNO_2016.Rdata")))
   # community and sp data
-  communityNO_raw <- read_excel("data/funcab_composition_2016.xlsx")
+  communityNO_raw <- read_excel(file_in("data/funcab_composition_2016.xlsx"))
   #communityNO_raw = target(drop_and_load.xlsx(myfile = "transplant/USE THIS DATA/Norway/funcab_composition_2016.xlsx", localpath = "data/funcab_composition_2016.xlsx"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/funcab_composition_2016.xlsx")$content_hash))
-  spNO = read_excel("data/fsystematics_species.xlsx")
+  spNO = read_excel(file_in("data/fsystematics_species.xlsx"))
   #spNO = target(drop_and_load.xlsx(myfile = "transplant/USE THIS DATA/Norway/systematics_species.xlsx", localpath = "data/fsystematics_species.xlsx"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/systematics_species.xlsx")$content_hash))
   # trait
-  traitNO_raw <- read_delim(file = "data/traitdata_NO.csv", col_names = TRUE, delim = ";")
+  traitNO_raw <- read_delim(file = file_in("data/traitdata_NO.csv"), col_names = TRUE, delim = ";")
   #traitNO_raw = target(drop_and_load.csv(myfile = "transplant/USE THIS DATA/Norway/traitdata_NO.csv", localpath = "data/traitdata_NO.csv"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/traitdata_NO.csv")$content_hash))
   # flux
-  fluxNO <- get(load("data/standardControlFluxNO_2016.Rdata"))
+  fluxNO <- get(load(file_in("data/standardControlFluxNO_2016.Rdata")))
   #fluxNO_raw = target(drop_and_load(myfile = "transplant/USE THIS DATA/Norway/standardControlFluxNO_2016.Rdata", localpath = "data/standardControlFluxNO_2016.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/standardControlFluxNO_2016.Rdata")$content_hash))
   
   
