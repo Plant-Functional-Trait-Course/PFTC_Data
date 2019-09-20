@@ -86,20 +86,21 @@ AnalysesDrakePlan <- drake_plan(
                      Peru = Data_PE,
                      Svalbard = Data_SV,
                      Norway = Data_NO,
-                     Colorado = Data_CO) %>%
-    map(LogTransformation),  #Log transforming trait data (height, mass and area)
-  
+                     Colorado = Data_CO,
+                     Database = Database0) %>%
+    map(LogTransformation))  #Log transforming trait data (height, mass and area)
+
   
   #### CALCULATIONS, ANALYSES, FIGURES
   
   #Calculating trait means
-  Database = Database0 %>% 
+  Database = Database0 %>%
     LogTransformation() %>% 
-    group_by(Taxon, Trait_trans) %>% 
+    group_by(Taxon, Trait_trans) %>%
     summarise(TraitMean_global = mean(Value_trans)),
 
   TraitMeans = CountryList %>% map(GlobalAndLocalMeans, Database),
-  
+
   #Calculating community weighted trait means
 
   CWTraitMeans = map2(CountryList, TraitMeans, CommunityW_TraitMeans)
