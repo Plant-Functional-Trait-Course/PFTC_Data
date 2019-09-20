@@ -35,7 +35,10 @@ CleanSvalbardCommunity <- function(communitySV_raw){
            BlockID = as.character(1),
            Cover = as.numeric(Cover)) %>% 
     select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
-    mutate(Taxon = recode(Taxon, "micranthes hieracifolia" = "micranthes hieraciifolia"))
+    mutate(Taxon = recode(Taxon, "micranthes hieracifolia" = "micranthes hieraciifolia"),
+           Taxon = stringi::stri_trans_totitle(
+             Taxon, 
+             opts_brkiter = stringi::stri_opts_brkiter(type = "sentence")))
 
   return(communitySV)
 }
@@ -52,7 +55,10 @@ CleanSvalbardTrait <- function(traitSV_raw){
     ) %>%
     select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC) %>% 
     gather(key = Trait, value = Value, -Country, -Year, -Site, -Gradient, -BlockID, -PlotID, -Taxon) %>% 
-    filter(!is.na(Value))
+    filter(!is.na(Value)) %>% 
+    mutate(Taxon = stringi::stri_trans_totitle(
+      Taxon, 
+      opts_brkiter = stringi::stri_opts_brkiter(type = "sentence")))
   
   return(traitSV)
 }
