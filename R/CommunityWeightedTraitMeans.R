@@ -42,32 +42,35 @@ GlobalMeans <- function(countrylist){
 
 #country <- CountryList[[1]]
 #trait <- TraitMeans
-CommunityW_TraitMeans <- function(country, trait) {    
+CommunityW_TraitMeans <- function(country, meantrait) {    
     
-  if(!country$meta$Country[1] %in% c("NO", "CO")) {
-    dat2 <- country$community %>% 
-      # join plot level means
-      left_join(select(trait, -TraitMean_global, -TraitMean_regional -TraitMean_site),
-        by = c("Taxon", "Site", "BlockID", "PlotID"))
-  }
-    
-  dat2 <- dat2 %>% 
+  #dat2 <- CountryList$Svalbard$community
+  
+  dat2 <- country$community %>% 
     # join site level means
     left_join(
-      distinct(select(trait, -TraitMean_global, -TraitMean_regional -TraitMean_plot, -BlockID, -PlotID)), 
-              by = c("Taxon", "Site")) %>% 
+      distinct(select(meantrait, -TraitMean_global, -TraitMean_regional ,-TraitMean_plot, -BlockID, -PlotID)), 
+              by = c("Country", "Gradient", "Taxon", "Site")) %>% 
     
     # join regional means
     left_join(
-      distinct(select(trait, -TraitMean_plot, -TraitMean_site, -TraitMean_global, -Site, -BlockID, -PlotID)))
+      distinct(select(meantrait, -TraitMean_global, -TraitMean_site, -TraitMean_plot, -Site, -BlockID, -PlotID)),
+      by = c("Country", "Gradient", "Trait", "Trait_trans", "Taxon"))
+  
+  if(!country$meta$Country[1] %in% c("NO", "CO")) {
+    dat2 <- dat2 %>% 
+      # join plot level means
+      left_join(select(meantrait, -TraitMean_global, -TraitMean_regional, -TraitMean_site),
+                by = c("Country", "Gradient", "Trait", "Trait_trans", "Taxon", "Site", "BlockID", "PlotID"))
+  }
   
   ### Calculate Community weighted means
-  dat2 <- dat2 %>%
-    gather(key = TraitLevel, value = TraitMean, -Country, -Site, -BlockID, -PlotID, -Gradient, -Taxon, -Trait, -Trait_trans) %>% 
-    left_join(community, by = c("Country", "Site", "BlockID", "PlotID", "Taxon", "Gradient")) %>% 
-    group_by(Trait, Site, BlockID, PlotID, Taxon, Trait, TraitLevel) %>% 
-    mutate(CWTraitMean = weighted.mean(TraitMean, Cover, na.rm=TRUE)) %>% 
-    ungroup()
+  # dat2 <- dat2 %>%
+  #   gather(key = TraitLevel, value = TraitMean, -Country, -Site, -BlockID, -PlotID, -Gradient, -Taxon, -Trait, -Trait_trans) %>% 
+  #   left_join(community, by = c("Country", "Site", "BlockID", "PlotID", "Taxon", "Gradient")) %>% 
+  #   group_by(Trait, Site, BlockID, PlotID, Taxon, Trait, TraitLevel) %>% 
+  #   mutate(CWTraitMean = weighted.mean(TraitMean, Cover, na.rm=TRUE)) %>% 
+  #   ungroup()
   
   return(dat2)
 }

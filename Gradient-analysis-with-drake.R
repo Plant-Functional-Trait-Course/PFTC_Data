@@ -92,17 +92,19 @@ AnalysesDrakePlan <- drake_plan(
 
   
   #### CALCULATIONS, ANALYSES, FIGURES
-  
   #Calculating trait means
   # Countries
   RL_TraitMeans = map(CountryList[1:5], RegionalAndLocalMeans),
 
   # Database
-  G_TraitMeans = map(CountryList[6], GlobalMeans)
+  G_TraitMeans = map(CountryList[6], GlobalMeans),
+  
+  #Conbine regional and global traits
+  TraitMeans = map2(RL_TraitMeans, G_TraitMeans, left_join),
+  
   
   #Calculating community weighted trait means
-
-  #CWTraitMeans = map2(CountryList, TraitMeans, CommunityW_TraitMeans)
+  CWTraitMeans = map2(CountryList[-6], TraitMeans, CommunityW_TraitMeans)
   )
   
   
@@ -137,8 +139,8 @@ MasterDrakePlan <- ImportDrakePlan %>%
 make(MasterDrakePlan)          # Build the right things.
 
 loadd(CountryList)
-loadd(RL_TraitMeans)
-loadd(G_TraitMeans)
+loadd(TraitMeans)
+loadd(CWTraitMeans)
 
 diagloadd()
 readd(GradientMeanPlot)
