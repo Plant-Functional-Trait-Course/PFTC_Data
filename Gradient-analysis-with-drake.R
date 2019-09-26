@@ -32,36 +32,55 @@ source("R/MakePrettyFigures.R")
 
 
 ### NEEDS DOING!!!
+
+### RAW DATA
 # CH
-# China gradient comm
-# CH remove high nitrogen values
+# Check taxon between comm and trait: Aud
+# CH remove high nitrogen values: CountryList$China$trait %>% filter(Trait == "N_percent", Value > 7) %>% pn: Aud
 # China data: Lichen2 and Lichen have different values...?
 # same for moss and bryophytes.
 
 # NO
-# NO: duplicate cover values -> Ragnhild har kontroll.
+# NO: duplicate cover values -> group_by and distinct: Ragnhild, make comment to remove when we get new comm data.
 
 # CO
+# Check species name in comm and trait if they are the same. Some sp1, need to get real names.
+# Check plot and block and site id, if that matches in comm and trait
 # Lorah CO species names
+# -> Ragnhild
 
 # SV
 ### Check turfs with low cover of traits:
 # communitySV %>% filter(PlotID %in% c("3BC", "6CD", "5BB")) %>% arrange(PlotID) %>% pn
 ### Check 3BC ranunculus nivalis 43% Cover
+# -> Aud
 
 
 # GENERAL
-# scale before CWM
+# Put in thresholds for traits: SLA > xxx etc.
 # Small leaves and light leaves: set a threshold?
+# graphical checks and with literature
+
+
+# scale before CWM, before log, before calculate mean?
+# Talk to Richard
+
 
 ### Data checks that need to be done
 # do sp names match? comm and trait
-# check high trait values, and remove outliers
 # are there zeros in the comm data that need to be removed
 # do site, block, plot, etc. names match in all the different data sets?
 # is.na(Trait): trait name
-# NAs in trait data should be removed
-# Why are NaN after log transformation?
+# Check if there are 0 or NAs in trait. NA should be removed, 0 should be NA. Then no NaN in log transformation.
+
+
+# CHECK CODE
+# Check if remove NA after CWM is necessary.
+# Calc CWM for some species to check if code is working
+
+# NEW THINGS
+# Bootstraping
+# 80% of commnity
 
 
 
