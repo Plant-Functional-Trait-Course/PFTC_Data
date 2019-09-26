@@ -57,10 +57,13 @@ CalculateTraitMeans <- function(countrylist){
 
 #country <- CountryList[[1]]
 #trait <- TraitMeans
-CommunityW_TraitMeans <- function(country, meantrait) {  
+CommunityW_TraitMeans <- function(countrylist, meantrait) {  
   
-  dat2 <- country[names(country) != "Database"] %>% 
+  dat2 <- countrylist[names(countrylist) != "Database"] %>% 
     map_df("community") %>% 
+    # Calculate total sum of cover for each plot and percent cover per species per plot
+    group_by(Country, Site, Gradient, BlockID, PlotID) %>% 
+    mutate(SumCover = sum(Cover), PercentCover = Cover / SumCover * 100) %>% 
     
     # join site level means
     left_join(meantrait %>% 
@@ -85,9 +88,18 @@ CommunityW_TraitMeans <- function(country, meantrait) {
       left_join(meantrait %>% 
                   select(TraitMean_plot, Country, Taxon, Site, Trait_trans, BlockID, PlotID),
                 by = c("Country", "Trait_trans", "Taxon", "Site", "BlockID", "PlotID"))
-  
-  
 
+# close function here!!!
+  
+  # make new function for selecting 80% on different levels (plot, site, ...)
+  CommunityCover_PlotLevel <- dat2 %>% 
+    group_by(Country, Site, Gradient, BlockID, PlotID, Trait_trans) %>% 
+    mutate(PercentCover2 = ifelse(!is.na(TraitMean_plot), PercentCover, NA),
+           CommCover_plot = sum(PercentCover2, na.rm = TRUE))
+  
+  # filter < 80%
+  
+# new function or in the selection funtion
   ### Calculate Community weighted means
   dat2 <- dat2 %>%
   gather(key = TraitLevel, value = TraitMean, TraitMean_plot, TraitMean_site, TraitMean_regional, TraitMean_global) %>% 
