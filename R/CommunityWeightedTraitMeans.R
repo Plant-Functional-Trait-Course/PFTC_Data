@@ -99,11 +99,12 @@ CommunityW_TraitMeans <- function(country, meantrait) {
 }
 
 # Reduce to only CWMeans
-CommunityW_Means <- function(TraitMeans_All){
-  CWTraitMeans <- TraitMeans_All %>% 
-    filter(!is.na(Trait)) %>% 
-    select(-Taxon, -Cover, -TraitMean_plot, -TraitMean_site, -TraitMean_global, -TraitMean) %>% 
+CommunityW_Means <- function(Full_CWTraitMeans){
+  CWTraitMeans <- Full_CWTraitMeans %>% 
+    filter(!is.na(Trait_trans)) %>% 
+    select(-Taxon, -Cover, -TraitMean) %>% 
     distinct()
+  
   return(CWTraitMeans)
 }
 
