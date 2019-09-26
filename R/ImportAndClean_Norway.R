@@ -99,8 +99,8 @@ CleanNorwayTrait <- function(traitNO_raw){
                                 Site %in% c("Arh", "Ram", "Gud") ~ as.character(3),
                                 Site %in% c("Ovs", "Ves", "Skj") ~ as.character(4)
     )) %>%
-    mutate(BlockID = as.character(1),
-           PlotID = as.character(1)) %>% 
+    # mutate(BlockID = as.character(1),
+    #        PlotID = as.character(1)) %>% 
     select(Country, Year, Site, BlockID, PlotID, Gradient, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC, N_percent, C_percent, CN_ratio) %>% 
     gather(key = Trait, value = Value, -Country, -Year, -Site, -BlockID, -PlotID, -Gradient, -Taxon) %>% 
     filter(!is.na(Value)) %>% 
