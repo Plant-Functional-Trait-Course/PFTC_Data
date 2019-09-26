@@ -89,12 +89,11 @@ CommunityW_TraitMeans <- function(country, meantrait) {
   
 
   ### Calculate Community weighted means
-  # dat2 <- dat2 %>%
-  #   gather(key = TraitLevel, value = TraitMean, -Country, -Site, -BlockID, -PlotID, -Gradient, -Taxon, -Trait, -Trait_trans) %>% 
-  #   left_join(community, by = c("Country", "Site", "BlockID", "PlotID", "Taxon", "Gradient")) %>% 
-  #   group_by(Trait, Site, BlockID, PlotID, Taxon, Trait, TraitLevel) %>% 
-  #   mutate(CWTraitMean = weighted.mean(TraitMean, Cover, na.rm=TRUE)) %>% 
-  #   ungroup()
+  dat2 <- dat2 %>%
+  gather(key = TraitLevel, value = TraitMean, TraitMean_plot, TraitMean_site, TraitMean_regional, TraitMean_global) %>% 
+  group_by(Country, Site, BlockID, PlotID, Trait_trans, TraitLevel) %>% 
+  mutate(CWTraitMean = weighted.mean(TraitMean, Cover, na.rm=TRUE)) %>% 
+  ungroup()
 
   return(dat2)
 }
