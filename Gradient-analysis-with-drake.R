@@ -98,7 +98,7 @@ AnalysesDrakePlan <- drake_plan(
   
   
   #Calculating community weighted trait means
-  CWTraitMeans = CommunityW_TraitMeans(CountryList, TraitMeans)
+  Full_CWTraitMeans = CommunityW_TraitMeans(CountryList, TraitMeans)
 )
   
   
