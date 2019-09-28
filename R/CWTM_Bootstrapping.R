@@ -1,55 +1,76 @@
 ### BOOTSTRAPPING METHOD FOR CWM
 
-#countrylist <- CountryList
+#countrylist <- CountryList_WD
 
 CWM_Bootstrapping <- function(countrylist, nrep = 100, samplesize = 200){
-  comm <- countrylist$China$community %>% 
+  comm <- countrylist$community %>% 
     filter(!Cover == 0) %>% # can be removed when SV is fixed
     group_by(Country, Year, Site, Gradient, BlockID, PlotID) %>% 
     mutate(sumCover = sum(Cover))
   
-  trait <- countrylist$China$trait
+  trait <- countrylist$trait
   
+  # add block and plot id to Norway data
+  if("NO" %in% trait$Country[1]){
   TraitWeights_plot <- comm %>% 
-    left_join(trait %>% select(-Year), by = c("Country", "Site", "Gradient", "BlockID", "PlotID", "Taxon")) %>% 
-    group_by(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Trait) %>% 
+    left_join(trait %>% select(-Year), by = c("Country", "Site", "Gradient", "Taxon")) %>% 
+    group_by(Country, Year, Site, Gradient, Taxon, Trait_trans) %>% 
     mutate(weight = Cover/n()) %>% 
-    group_by(Country, Year, Site, Gradient, BlockID, PlotID, Trait) 
+    group_by(Country, Year, Site, Gradient, BlockID, PlotID, Trait_trans)
   
+  trait <- trait %>% 
+    mutate(BlockID = as.numeric(1),
+           PlotID = as.numeric(1))
+  }
   
+  else {
+    TraitWeights_plot <- comm %>% 
+      left_join(trait %>% select(-Year), by = c("Country", "Site", "Gradient", "BlockID", "PlotID", "Taxon")) %>% 
+      group_by(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Trait_trans) %>% 
+      mutate(weight = Cover/n()) %>% 
+      group_by(Country, Year, Site, Gradient, BlockID, PlotID, Trait_trans)
+  
+  }
+ 
+
   # Site level weights and traits
   TraitWeights_site <- comm %>%
     left_join(trait %>% select(-Year, -BlockID, -PlotID), by = c("Country", "Site", "Gradient", "Taxon")) %>% 
-    group_by(Country, Year, Site, Gradient, Taxon, Trait) %>% 
+    group_by(Country, Year, Site, Gradient, Taxon, Trait_trans) %>% 
     mutate(weight = Cover/n()) %>% 
-    group_by(Country, Year, Site, Gradient, Trait) 
+    group_by(Country, Year, Site, Gradient, Trait_trans) 
   
   
-  # Global level weights and traits
-  TraitWeights_global <- comm %>% 
+  # Regional level weights and traits
+  TraitWeights_regional <- comm %>% 
     left_join(trait %>% select(-Year, -BlockID, -PlotID, -Site), by = c("Country", "Gradient", "Taxon")) %>% 
-    group_by(Country, Year, Gradient, Taxon, Trait) %>% 
+    group_by(Country, Year, Gradient, Taxon, Trait_trans) %>% 
     mutate(weight = Cover/n()) %>% 
-    group_by(Country, Year, Gradient, Trait) 
+    group_by(Country, Year, Gradient, Trait_trans) 
   
   
-  TraitWeights_all <- bind_rows(plot = TraitWeights_plot, site = TraitWeights_site, global = TraitWeights_global, .id = "level") %>% 
-    mutate(level = factor(level, levels = c("plot", "site", "global"), ordered = TRUE)) %>%
-    filter(!is.na(Value)) %>% 
-    group_by(Country, Year, Site, Gradient, BlockID, PlotID, Trait, Taxon) %>% 
-    filter(level == min(level)) %>% 
-    group_by(Country, Year, Site, Gradient, BlockID, PlotID, Trait)
+  TraitWeights_all <- bind_rows(plot = TraitWeights_plot, 
+                                site = TraitWeights_site, 
+                                regional = TraitWeights_regional, 
+                                .id = "level") %>% 
+    mutate(level = factor(level, levels = c("plot", "site", "regional"), ordered = TRUE)) %>%
+    filter(!is.na(Value_trans)) %>% 
+    group_by(Country, Year, Site, Gradient, BlockID, PlotID, Trait_trans, Taxon) %>% 
+    filter(level == min(level))
   
   
-  BootstrapMoments_All <- rerun(.n = nrep, sample_n(TraitWeights_all, size = samplesize,  replace = TRUE, weight = TraitWeights_all$weight)) %>%
-    bind_rows(.id = "n") %>% 
-    group_by(n, add = TRUE) %>% 
+  BootstrapMoments_All <- rerun(.n = 10, TraitWeights_all %>% 
+                     group_by(Country, Year, Site, Gradient, BlockID, PlotID, Trait_trans) %>% 
+                     sample_n(size = 3, replace = TRUE, weight = weight)) %>% 
+    bind_rows(.id = "n") %>%
+    group_by(n, add = TRUE) %>%
     # get all the happy moments
     summarise(Mean = mean(Value), Variance = var(Value), Skewness = skewness(Value), Kurtosis = kurtosis(Value))
-  
-  
+
   return(BootstrapMoments_All)
 }
+
+
 
 SummarizeBootMoments <- function(BootstrapMoments_All){
   # calculate means and 
