@@ -1,6 +1,6 @@
 library(drake)
 
-r_make(source = "R/Gradient-analysis-with-drake.R")
+r_make(source = "R/AudsDrakePlan.R")
 
 failed()
 
@@ -9,8 +9,12 @@ r_vis_drake_graph(source = "R/Gradient-analysis-with-drake.R", targets_only = TR
 
 
 
-
+### TODO
 # !!! SV: NA       SV           NA       NA   NANA     NANANA
+
+# Country  Year Site  Gradient BlockID PlotID Taxon     Cover
+# <chr>   <dbl> <chr> <chr>    <chr>   <chr>  <chr>     <dbl>
+#   1 SV       2018 3C    C        1       3CA    Trisetum…     0
 
 loadd(CountryList)
 loadd(TraitMeans)
