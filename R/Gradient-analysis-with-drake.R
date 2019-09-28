@@ -98,7 +98,7 @@ ImportDrakePlan <- drake_plan(
 )
 
 # make an analysis drake plan
-AnalysesDrakePlan <- drake_plan(
+CountryListAndTraitMeanDrakePlan <- drake_plan(
   
   # make a list with all data sets
   CountryList = list(China = Data_CH,
@@ -108,14 +108,23 @@ AnalysesDrakePlan <- drake_plan(
                      Colorado = Data_CO,
                      Database = Database0) %>%
     map(LogTransformation),  #Log transforming trait data (height, mass and area)
+  
+  # make a list with all data sets but without Database
+  CountryList_WD = list(China = Data_CH,
+                     Peru = Data_PE,
+                     Svalbard = Data_SV,
+                     Norway = Data_NO,
+                     Colorado = Data_CO) %>%
+    map(LogTransformation),  #Log transforming trait data (height, mass and area)
 
   
-  #### CALCULATIONS, ANALYSES, FIGURES
   #Calculating trait means
-  # Countries
-  TraitMeans = map_df(CountryList, CalculateTraitMeans),
-  
-  
+  TraitMeans = map_df(CountryList, CalculateTraitMeans)
+) 
+
+
+# CWTrait Means
+CWTraitMeanDrakePlan <- drake_plan(
   #Calculating community weighted trait means
   Full_CWTraitMeans = CommunityW_TraitMeans(CountryList, TraitMeans),
   CWTMeans = CommunityW_Means(Full_CWTraitMeans)
@@ -145,7 +154,8 @@ AnalysesDrakePlan <- drake_plan(
 
 # combine import and analysis to master drake plan
 MasterDrakePlan <- ImportDrakePlan %>% 
-  bind_rows(AnalysesDrakePlan)
+  bind_rows(CountryListAndTraitMeanDrakePlan) %>% 
+  bind_rows(CWTraitMeanDrakePlan)
 
 #configure and make drake plan
 config <- drake_config(MasterDrakePlan)
