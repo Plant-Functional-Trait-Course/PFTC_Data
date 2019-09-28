@@ -3,19 +3,17 @@
 #######################
 
 source("R/CountryListAndTraitMeanDrakePlan.R")
+source("R/CWTM_Bootstrapping.R")
 
 # CWTrait Means
 CWTraitMeanDrakePlan <- drake_plan(
   #Calculating community weighted trait means
   Full_CWTraitMeans = CommunityW_TraitMeans(CountryList, TraitMeans),
-  CWTMeans = CommunityW_Means(Full_CWTraitMeans)
-)
+  CWTMeans = CommunityW_Means(Full_CWTraitMeans),
 
-
-
-# Bootstrapped CWM
-#BootstrapMoments_All = CountryList_trans %>% 
-# map_df(CWM_Bootstrapping),
+  # Bootstrapped CWM (use CountryList without database, not fixed yet)
+  BootstrapMoments_All = CountryList[-6] %>%
+    map_df(CWM_Bootstrapping)
 
 # Summarize Bootstrap Moments
 #BootstrapMoments = SummarizeBootMoments(BootstrapMoments_All),
@@ -30,7 +28,7 @@ CWTraitMeanDrakePlan <- drake_plan(
 #GradientSkewPlot = MakeSkewFigure(CW_Means_Bootstrapped_Bio),
 #GradientKurtPlot = MakeKurtFigure(CW_Means_Bootstrapped_Bio)
 
-#)
+)
 
 
 # combine import and analysis to master drake plan
