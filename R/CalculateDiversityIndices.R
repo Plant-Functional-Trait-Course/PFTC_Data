@@ -1,12 +1,15 @@
-CalculateDiversityIndices <- function(dat){
-  dat2 <- dat %>% 
-    group_by(Year, Site, PlotID) %>%  
+CalculateDiversityIndices <- function(countrylist){
+  diversity <- countrylist$comunity %>% 
+    # Calculate species pool per gradient
+    group_by(Country) %>% 
+    mutate(spPool = n()) %>% 
+    group_by(Country, Gradient, Site, PlotID, spPool) %>%  
     summarise(n = n(),
-              Richness = n 
-              #Diversity = diversity(Cover), 
-              #N1 = exp(Diversity),
-              #Evenness = Diversity/log(Richness),
-              sumAbundance = sum(Cover)
-    )
-  return(dat2)
+              Richness = n,
+              Diversity = diversity(Cover), 
+              N1 = exp(Diversity),
+              Evenness = Diversity/log(Richness),
+              sumAbundance = sum(Cover))
+  
+  return(diversity)
 }
