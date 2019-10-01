@@ -2,12 +2,14 @@ source("R/CountryListAndTraitMeanDrakePlan.R")
 
 # CWTrait Means
 CWTraitMeanDrakePlan <- drake_plan(
-  #Calculating community weighted trait means
-  Full_CWTraitMeans = CommunityW_TraitMeans(CountryList, TraitMeans),
-  CWTMeans = CommunityW_Means(Full_CWTraitMeans)
+  #Making local, site, regional and global level trait means
+  Full_TraitMeans = Community_TraitMeans(CountryList, TraitMeans),
+  #Deciding what level you want to filter for 80% of the community, here I chose the global level
+  Community_Trait = Threshold_filter(Full_TraitMeans, TraitMean_global),
+  #Calculating community weighted means
+  CW_Traits = CommunityW_TraitMeans(Community_Trait)
+  #CWTMeans = CommunityW_Means(Full_CWTraitMeans)
 )
-
-
 
 # Bootstrapped CWM
 #BootstrapMoments_All = CountryList_trans %>% 
