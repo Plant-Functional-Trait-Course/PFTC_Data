@@ -31,7 +31,7 @@ CalculateTraitMeans <- function(countrylist){
     } 
     
     meanTraits <- meanTraits %>% 
-      select(-Value_trans, -Value) %>% 
+      select(-Value, -Value_trans) %>% 
       ungroup() %>% 
       distinct() %>% 
       mutate(TraitMean_global = if_else(Country == "Database",
@@ -40,7 +40,6 @@ CalculateTraitMeans <- function(countrylist){
              TraitMean_regional = if_else(Country == "Database",
                                           true = NA_real_,
                                           false = TraitMean_regional))
-
   return(meanTraits)
 }
 
@@ -57,13 +56,14 @@ CalculateTraitMeans <- function(countrylist){
 
 #country <- CountryList[[1]]
 #trait <- TraitMeans
-CommunityW_TraitMeans <- function(countrylist, meantrait) {  
+Community_TraitMeans <- function(countrylist, meantrait) {  
   
   dat2 <- countrylist[names(countrylist) != "Database"] %>% 
     map_df("community") %>% 
     # Calculate total sum of cover for each plot and percent cover per species per plot
     group_by(Country, Site, Gradient, BlockID, PlotID) %>% 
-    mutate(SumCover = sum(Cover), PercentCover = Cover / SumCover * 100) %>% 
+    mutate(SumCover = sum(Cover),
+           PercentCover = Cover / SumCover * 100) %>% 
     
     # join site level means
     left_join(meantrait %>% 
@@ -88,11 +88,15 @@ CommunityW_TraitMeans <- function(countrylist, meantrait) {
       left_join(meantrait %>% 
                   select(TraitMean_plot, Country, Taxon, Site, Trait_trans, BlockID, PlotID),
                 by = c("Country", "Trait_trans", "Taxon", "Site", "BlockID", "PlotID"))
+  
+  return(dat2)
+}
 
-# close function here!!!
+
+Community_TraitMeans <- function(community_trait) {  
   
   # make new function for selecting 80% on different levels (plot, site, ...)
-  CommunityCover_PlotLevel <- dat2 %>% 
+  CommunityCover_PlotLevel <- community_trait %>% 
     group_by(Country, Site, Gradient, BlockID, PlotID, Trait_trans) %>% 
     mutate(PercentCover2 = ifelse(!is.na(TraitMean_plot), PercentCover, NA),
            CommCover_plot = sum(PercentCover2, na.rm = TRUE))
