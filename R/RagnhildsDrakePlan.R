@@ -1,4 +1,5 @@
 source("R/CountryListAndTraitMeanDrakePlan.R")
+source("R/ClimateData_v2.R")
 
 # CWTrait Means
 CWTraitMeanDrakePlan <- drake_plan(
@@ -7,8 +8,9 @@ CWTraitMeanDrakePlan <- drake_plan(
   #Deciding what level you want to filter for 80% of the community, here I chose the global level
   Community_Trait = Threshold_filter(Full_TraitMeans, TraitMean_global),
   #Calculating community weighted means
-  CW_Traits = CommunityW_TraitMeans(Community_Trait)
+  CW_Traits = CommunityW_TraitMeans(Community_Trait),
   #CWTMeans = CommunityW_Means(Full_CWTraitMeans)
+  Coordinates = map_df(CountryList, MakeCoordinates)
 )
 
 # Bootstrapped CWM
