@@ -93,10 +93,9 @@ Community_TraitMeans <- function(countrylist, meantrait) {
   return(dat2)
 }
 
-# Something is happening in the function below that makes it only work with SValbard data... Fix
 
 Threshold_filter <- function(community_trait, trait_level) {  
-  
+
   trait_level2 <- enquo(trait_level)
   
   # make new function for selecting 80% on different levels (plot, site, ...)
