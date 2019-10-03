@@ -61,12 +61,13 @@ ImportClean_China <- function(){
   
   ### IMPORT DATA
   # meta data
-  metaCH = tibble(Country = "CH",
-                          Gradient = "1",
-                          Site = c("H", "A", "M", "L"),
-                          Elevation = c(4100, 3850, 3500, 3000),
-                          Latitude = c(29.90742, 29.88911, 29.86192, 29.84347),
-                          Longitude = c(102.0118, 102.0173, 102.0360, 102.0343))
+  # metaCH = tibble(Country = "CH",
+  #                         Gradient = "1",
+  #                         Site = c("H", "A", "M", "L"),
+  #                         Elevation = c(4100, 3850, 3500, 3000),
+  #                         Latitude = c(29.90742, 29.88911, 29.86192, 29.84347),
+  #                         Longitude = c(102.0118, 102.0173, 102.0360, 102.0343))
+  metaCH = read_delim("data/metaCH.csv", delim = ";")
   # meta community data
   metaCommunityCH_raw = get(load(file = file_in("data/metaCommunity_CH_2012_2016.Rdata")))
   # community data
