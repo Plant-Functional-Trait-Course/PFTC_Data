@@ -110,14 +110,15 @@ Threshold_filter <- function(community_trait, trait_level) {
 }
 
 
-CommunityW_TraitMeans <- function(community_trait) {  
+CommunityW_TraitMeans <- function(community_trait, climate_data) {  
   
   ### Calculate Community weighted means
   dat2 <- community_trait %>%
   gather(key = TraitLevel, value = TraitMean, TraitMean_plot, TraitMean_site, TraitMean_regional, TraitMean_global) %>% 
   group_by(Country, Site, BlockID, PlotID, Trait_trans, TraitLevel) %>% 
   mutate(CWTraitMean = weighted.mean(TraitMean, Cover, na.rm=TRUE)) %>% 
-  ungroup()
+  ungroup() %>% 
+    left_join(climate_data, by = c("Country", "Site"))
 
   return(dat2)
 }
