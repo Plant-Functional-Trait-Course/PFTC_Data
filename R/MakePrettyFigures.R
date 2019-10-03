@@ -67,11 +67,11 @@ MakeKurtFigure <- function(CW_Means_Bootstrapped_Bio){
 
 
 
-MakeLocal_Global_plot_SLA <- function(CW_Traits){
+MakeLocal_Global_plot_SLA <- function(CW_Traits, MetaBioclim){
   myplot <- CW_Traits %>% 
     filter(Trait_trans == "SLA_cm2_g") %>% 
     mutate(TraitLevel = factor(TraitLevel, level = c("TraitMean_global", "TraitMean_regional", "TraitMean_site", "TraitMean_plot"))) %>% 
-    ggplot(aes(x = TraitLevel, y = CWTraitMean, fill = TraitLevel)) +
+    ggplot(aes(x = MeanTempWarmestQuarter, y = CWTraitMean, fill = TraitLevel)) +
     geom_boxplot() +
     labs(x = "Level of trait collection", y = "Community weighted mean SLA") +
     facet_wrap(~ Country, scales = "free_y")
