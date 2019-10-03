@@ -8,7 +8,7 @@
 CleanColoradoMeta <- function(metaCO_raw){
   Almont <- tibble(Site = "Almont",
               Elevation = 2475,
-              Longitude = 107.0,
+              Longitude = -107.0,
               Latitude = 38.7,
               Country = "CO",
               Gradient = "1")
