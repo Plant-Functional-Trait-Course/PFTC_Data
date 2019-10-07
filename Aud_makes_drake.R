@@ -1,3 +1,4 @@
+#**********************************************************************
 library(drake)
 
 r_make(source = "R/AudsDrakePlan.R")
@@ -5,9 +6,42 @@ r_make(source = "R/AudsDrakePlan.R")
 failed()
 
 #view dependency graph
-r_vis_drake_graph(source = "R/Gradient-analysis-with-drake.R", targets_only = TRUE)
+r_vis_drake_graph(source = "R/AudsDrakePlan.R", targets_only = TRUE)
+
+#**********************************************************************
 
 
+Bmoments <- BootstrapMoments_All %>% 
+  group_by(Country, Year, Site, Gradient, BlockID, PlotID, Trait_trans) %>% 
+  summarise(n = n(),
+            meanMean = mean(Mean), CIlow.Mean = meanMean - sd(Mean), CIhigh.Mean = meanMean + sd(Mean),
+            meanVar = mean(Variance), CIlow.Var = meanVar - sd(Variance), CIhigh.Var = meanVar + sd(Variance),
+            meanSkew = mean(Skewness), CIlow.Skew = meanSkew - sd(Skewness), CIhigh.Skew = meanSkew + sd(Skewness),
+            meanKurt = mean(Kurtosis), CIlow.Kurt = meanKurt - sd(Kurtosis), CIhigh.Kurt = meanKurt + sd(Kurtosis))
+
+
+Bmoments %>%
+  left_join(meta) %>% 
+  filter(!is.na(Trait_trans), Trait_trans %in% c("Wet_Mass_g", "Dry_Mass_g", "Leaf_Area_cm2", "Leaf_Thickness_Ave_mm", "LDMC", "SLA_cm2_g", "Plant_Height_cm", "C_percent", "N_percent")) %>% 
+  ungroup() %>% 
+  mutate(Trait_trans = factor(Trait_trans, level = c("Wet_Mass_g", "Dry_Mass_g", "Leaf_Area_cm2", "Leaf_Thickness_Ave_mm", "LDMC", "SLA_cm2_g", "Plant_Height_cm", "C_percent", "N_percent"))) %>% 
+  mutate(CG = paste(Country, Gradient, sep = "")) %>% 
+  ggplot(aes(x = Elevation, y = meanMean, colour = CG)) +
+  geom_point(aes()) +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap( ~ Trait_trans, scales = "free_y")
+
+
+Bmoments %>%
+  left_join(meta) %>% 
+  filter(!is.na(Trait_trans), Trait_trans %in% c("Wet_Mass_g", "Dry_Mass_g", "Leaf_Area_cm2", "Leaf_Thickness_Ave_mm", "LDMC", "SLA_cm2_g", "Plant_Height_cm", "C_percent", "N_percent")) %>% 
+  ungroup() %>% 
+  mutate(Trait_trans = factor(Trait_trans, level = c("Wet_Mass_g", "Dry_Mass_g", "Leaf_Area_cm2", "Leaf_Thickness_Ave_mm", "LDMC", "SLA_cm2_g", "Plant_Height_cm", "C_percent", "N_percent"))) %>% 
+  mutate(CG = paste(Country, Gradient, sep = "")) %>% 
+  filter(meanVar < 10000) %>% 
+  ggplot(aes(x = Elevation, y = meanVar, colour = CG)) +
+  geom_point(aes()) +
+  geom_smooth(method = "lm", se = FALSE)
 
 ### TODO
 # !!! SV: NA       SV           NA       NA   NANA     NANANA
@@ -17,24 +51,15 @@ r_vis_drake_graph(source = "R/Gradient-analysis-with-drake.R", targets_only = TR
 #   1 SV       2018 3C    C        1       3CA    Trisetum…     0
 
 loadd(CountryList)
+loadd(CountryList_WD)
 loadd(TraitMeans)
 loadd(CWTMeans)
+loadd(BootstrapMoments_All)
 library(ggplot2)
 library(vegan)
 library("broom")
 
-CalculateDiversity <- function(CountryList){
-  diversity <- CountryList$community %>% 
-    left_join(CountryList$meta, by = c("Country", "Site", "Gradient")) %>% 
-    group_by(Country, Gradient, Elevation, Latitude) %>% 
-    mutate(spPool = n()) %>% 
-    group_by(Country, Gradient, Elevation, Latitude, Site, PlotID, spPool) %>%  
-    summarise(Richness = n(),
-              Diversity = diversity(Cover), 
-              N1 = exp(Diversity),
-              Evenness = Diversity/log(Richness))
-  return(diversity)
-}
+
 
 dat <- map_df(CountryList[-6], CalculateDiversity) %>% 
   filter(!is.na(Gradient)) %>% 
