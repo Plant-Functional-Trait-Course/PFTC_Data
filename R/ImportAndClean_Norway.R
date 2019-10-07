@@ -141,7 +141,7 @@ ImportClean_Norway <- function(){
   spNO = read_excel(file_in("data/fsystematics_species.xlsx"))
   #spNO = target(drop_and_load.xlsx(myfile = "transplant/USE THIS DATA/Norway/systematics_species.xlsx", localpath = "data/fsystematics_species.xlsx"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/systematics_species.xlsx")$content_hash))
   # trait
-  traitNO_raw <- read_delim(file = file_in("data/traitdata_NO.csv"), col_names = TRUE, delim = ";")
+  traitNO_raw <- read_delim(file = file_in("data/traitdata_NO.csv"), col_names = TRUE, delim = ",")
   #traitNO_raw = target(drop_and_load.csv(myfile = "transplant/USE THIS DATA/Norway/traitdata_NO.csv", localpath = "data/traitdata_NO.csv"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/traitdata_NO.csv")$content_hash))
   # flux
   fluxNO <- get(load(file_in("data/standardControlFluxNO_2016.Rdata")))
