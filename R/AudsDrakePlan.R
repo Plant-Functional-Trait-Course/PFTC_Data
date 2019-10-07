@@ -2,11 +2,16 @@
 ### Auds Drake Plan ###
 #######################
 
+source("R/CalculateDiversityIndices.R")
 source("R/CountryListAndTraitMeanDrakePlan.R")
 source("R/CWTM_Bootstrapping.R")
 
 # CWTrait Means
 CWTraitMeanDrakePlan <- drake_plan(
+  # Calculate diversity indices
+  Diversity = CountryList_WD %>% 
+    map_df(CalculateDiversityIndices),
+  
   #Calculating community weighted trait means
   Full_CWTraitMeans = CommunityW_TraitMeans(CountryList, TraitMeans),
   CWTMeans = CommunityW_Means(Full_CWTraitMeans),
