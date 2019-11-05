@@ -38,7 +38,8 @@ CleanSvalbardCommunity <- function(communitySV_raw){
     mutate(Taxon = recode(Taxon, "micranthes hieracifolia" = "micranthes hieraciifolia"),
            Taxon = stringi::stri_trans_totitle(
              Taxon, 
-             opts_brkiter = stringi::stri_opts_brkiter(type = "sentence")))
+             opts_brkiter = stringi::stri_opts_brkiter(type = "sentence"))) %>% 
+    filter(Cover != 0)
 
   return(communitySV)
 }

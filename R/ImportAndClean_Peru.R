@@ -38,7 +38,10 @@ CleanPeruCommunity <- function(communityPE_raw){
            BlockID = as.character(1),
            PlotID = paste(Site, PlotID, Treatment, sep="_"),
            Gradient = as.character(1)) %>% 
-    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover)
+    # replace NA value
+    mutate(Cover = ifelse(Site == "TRE" & PlotID == 3 & Taxon == "Neurolepsis sp"), 6, Cover) %>% 
+    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
+    filter(Cover != 0)
   return(communityPE)
 }
 
