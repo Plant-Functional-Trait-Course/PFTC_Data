@@ -49,6 +49,8 @@ CleanChinaTrait <- function(traitCH_raw){
            ID = paste(Site, Treatment, Taxon, Individual_number, Leaf_number, sep = "_")) %>% 
     select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC, C_percent, N_percent , CN_ratio, dN15_percent, dC13_percent, P_AVG, P_Std_Dev, P_Co_Var) %>% 
     gather(key = Trait, value = Value, -Country, -Year, -Site, -Gradient, -BlockID, -PlotID, -Taxon) %>% 
+    # remove high N values
+    filter(Trait == "N_percent", Value > 9) %>% 
     filter(!is.na(Value))
   
   return(traitCH)
