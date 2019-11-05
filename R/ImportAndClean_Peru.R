@@ -38,7 +38,8 @@ CleanPeruCommunity <- function(communityPE_raw){
            BlockID = as.character(1),
            PlotID = paste(Site, PlotID, Treatment, sep="_"),
            Gradient = as.character(1)) %>% 
-    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) 
+    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
+    filter(!is.na(Cover))
   return(communityPE)
 }
 
