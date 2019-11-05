@@ -84,6 +84,10 @@ CleanNorwayCommunity <- function(communityNO_raw, spNO){
     mutate(Cover = as.numeric(Cover),
            BlockID = as.character(BlockID)) %>% 
     select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
+    # Remove duplicate values
+    group_by(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
+    summarise(n = n()) %>% 
+    filter(n == 1) %>% 
     filter(!is.na(Cover), 
            !Cover == 0,
            !is.na(Taxon))
