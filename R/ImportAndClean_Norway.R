@@ -84,7 +84,9 @@ CleanNorwayCommunity <- function(communityNO_raw, spNO){
     mutate(Cover = as.numeric(Cover),
            BlockID = as.character(BlockID)) %>% 
     select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
-    filter(!is.na(Cover), !Cover == 0)
+    filter(!is.na(Cover), 
+           !Cover == 0,
+           !is.na(Taxon))
   
   return(communityNO)
 }
