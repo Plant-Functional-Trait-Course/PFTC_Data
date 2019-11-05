@@ -105,6 +105,8 @@ CleanNorwayTrait <- function(traitNO_raw){
     gather(key = Trait, value = Value, -Country, -Year, -Site, -Gradient, -Taxon) %>% 
     filter(!is.na(Value)) %>% 
     mutate(Taxon = recode(Taxon, "Empetrum nigrum subsp. Hermaphroditum" = "Empetrum nigrum")) %>% 
+    # remove white space in Viola palustris
+    mutate(Taxon = trimws(Taxon, which = "right")) %>% 
     filter(!is.na(Value)) %>% 
     mutate(Country = "NO") #Overwrite junk...
   
