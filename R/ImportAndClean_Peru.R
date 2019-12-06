@@ -63,6 +63,9 @@ CleanPeruTrait <- function(traitPE_raw){
 #### IMPORT, CLEAN AND MAKE LIST #### 
 ImportClean_Peru <- function(){
   
+  #### DOWNLOAD DATA FROM OSF
+
+  
   ### IMPORT DATA
   # meta data
   metaPE_raw = get(load(file = file_in("data/metaPE.Rdata")))
@@ -77,7 +80,7 @@ ImportClean_Peru <- function(){
   # flux
   fluxPE = load("data/standardControlFluxPE_2016.Rdata")
   #fluxPE = target(drop_and_load(myfile = "transplant/USE THIS DATA/PFTC3_Peru/standardControlFluxPE_2016.Rdata", localpath = "data/standardControlFluxPE_2016.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC3_Peru/standardControlFluxPE_2016.Rdata")$content_hash))
-  
+  hierarchyPE = c("Country", "Site", "BlockID", "PlotID")
   
   
   ### CLEAN DATA SETS
@@ -92,7 +95,8 @@ ImportClean_Peru <- function(){
                  metaCommunity = metaCommunityPE,
                  community = communityPE,
                  trait = traitPE,
-                 flux = fluxPE)
+                 flux = fluxPE,
+                 trait_hierarchy = hierarchyNO)
   
   return(Data_PE)
 }

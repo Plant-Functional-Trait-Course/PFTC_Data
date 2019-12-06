@@ -154,7 +154,7 @@ ImportClean_Norway <- function(){
   # flux
   fluxNO <- get(load(file_in("data/standardControlFluxNO_2016.Rdata")))
   #fluxNO_raw = target(drop_and_load(myfile = "transplant/USE THIS DATA/Norway/standardControlFluxNO_2016.Rdata", localpath = "data/standardControlFluxNO_2016.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/standardControlFluxNO_2016.Rdata")$content_hash))
-  
+  hierarchyNO = c("Country", "Site")
   
   ### CLEAN DATA
   metaNO = CleanNorwayMeta(metaNO_raw)
@@ -167,7 +167,8 @@ ImportClean_Norway <- function(){
   Data_NO = list(meta = metaNO,
                  metaCommunity = metaCommunityNO,
                  community = communityNO,
-                 trait = traitNO)
+                 trait = traitNO,
+                 trait_hierarchy = hierarchyNO)
                  #flux = fluxNO)
   
   return(Data_NO)

@@ -97,6 +97,7 @@ ImportClean_Colorado <- function(){
   # flux
   fluxCO <- load("data/standardControlFluxCO_2016.Rdata")
   #fluxCO = target(drop_and_load(myfile = "transplant/USE THIS DATA/Colorado/standardControlFluxCO_2016.Rdata", localpath = "data/standardControlFluxCO_2016.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Colorado/standardControlFluxCO_2016.Rdata")$content_hash))
+  hierarchyCO = c("Country", "Site", "BlockID", "PlotID")
   
   ### CLEAN DATA SETS
   ## CN_Gongga
@@ -110,7 +111,8 @@ ImportClean_Colorado <- function(){
                  metaCommunity = metaCommunityCO,
                  community = communityCO,
                  trait = traitCO,
-                 flux = fluxCO)
+                 flux = fluxCO,
+                 trait_hierarchy = hierarchyCO)
   
   return(Data_CO)
 }

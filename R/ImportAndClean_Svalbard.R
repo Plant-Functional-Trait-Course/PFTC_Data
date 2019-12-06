@@ -82,7 +82,7 @@ ImportClean_Svalbard <- function(){
   # flux
   fluxSV <- load("data/standardControlFluxSV_2016.Rdata")
   #fluxSV = target(drop_and_load(myfile = "transplant/USE THIS DATA/PFTC4_Svalbard/standardControlFluxSV_2016.Rdata", localpath = "data/standardControlFluxSV_2016.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC4_Svalbard/standardControlFluxSV_2016.Rdata")$content_hash))
-  
+  hierarchySV = c("Country", "Site", "BlockID", "PlotID")
 
   
   ### CLEAN DATA SETS
@@ -97,7 +97,8 @@ ImportClean_Svalbard <- function(){
                  metaCommunity = metaCommunitySV,
                  community = communitySV,
                  trait = traitSV,
-                 flux = fluxSV)
+                 flux = fluxSV,
+                 trait_hierarchy = hierarchySV)
   
   return(Data_SV)
 }

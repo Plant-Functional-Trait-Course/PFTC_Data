@@ -57,7 +57,6 @@ CleanChinaTrait <- function(traitCH_raw){
 }
 
 
-
 #### IMPORT, CLEAN AND MAKE LIST #### 
 ImportClean_China <- function(){
   
@@ -81,7 +80,7 @@ ImportClean_China <- function(){
   # flux data
   fluxCH = get(load(file = file_in("data/standardControlFluxCH_2016.Rdata")))
   #fluxCH = target(drop_and_load(myfile = "transplant/USE THIS DATA/standardControlFluxCH_2016.Rdata", localpath = "data/standardControlFluxCH_2016.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/standardControlFluxCH_2016.Rdata")$content_hash))
-
+  hierarchyCH = c("Country", "Site", "BlockID", "PlotID")
   
   ### CLEAN DATA SETS
   ## CN_Gongga
@@ -94,7 +93,8 @@ ImportClean_China <- function(){
                  metaCommunity = metaCommunityCH,
                  community = communityCH,
                  trait = traitCH,
-                 flux = fluxCH)
+                 flux = fluxCH,
+                 trait_hierarchy = hierarchyCH)
   
   return(Data_CH)
 }
