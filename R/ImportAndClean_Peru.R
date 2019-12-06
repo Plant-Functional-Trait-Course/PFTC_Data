@@ -96,7 +96,7 @@ ImportClean_Peru <- function(){
                  community = communityPE,
                  trait = traitPE,
                  flux = fluxPE,
-                 trait_hierarchy = hierarchyNO)
+                 trait_hierarchy = hierarchyPE)
   
   return(Data_PE)
 }
