@@ -7,7 +7,12 @@ library("readxl")
 library("lubridate")
 library("rdrop2")
 library("e1071")
-library("readr")
+#devtools::install_github("richardjtelford/traitstrap")
+library("traitstrap")
+#remotes::install_github("centerforopenscience/osfr")
+#devtools::install_github("Between-the-Fjords/downloader")
+library("downloader")
+
 
 pn <- . %>% print(n = Inf)
 
@@ -36,18 +41,16 @@ source("R/MakePrettyFigures.R")
 ### RAW DATA
 # CH
 # Check taxon between comm and trait: Aud
-# CH remove high nitrogen values: CountryList$China$trait %>% filter(Trait == "N_percent", Value > 7) %>% pn: Aud
-# China data: Lichen2 and Lichen have different values...?
+# Later: China comm meta data: Lichen2 and Lichen have different values...?
 # same for moss and bryophytes.
 
 # NO
-# NO: duplicate cover values -> group_by and distinct: Ragnhild, make comment to remove when we get new comm data.
+# comm: I removed rows where Taxon was NA -> Ragnhild
+# comm: I removed 3 duplicate species at SKJ PlotID Skj3XC ->
+
 
 # CO
-# Check species name in comm and trait if they are the same. Some sp1, need to get real names.
 # Check plot and block and site id, if that matches in comm and trait
-# Lorah CO species names
-# -> Ragnhild
 
 # SV
 ### Check turfs with low cover of traits:
