@@ -11,6 +11,7 @@ library("e1071")
 library("traitstrap")
 #remotes::install_github("centerforopenscience/osfr")
 #devtools::install_github("Between-the-Fjords/downloader")
+library("osfr")
 library("downloader")
 
 
