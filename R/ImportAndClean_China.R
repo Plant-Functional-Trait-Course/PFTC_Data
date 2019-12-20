@@ -57,29 +57,33 @@ CleanChinaTrait <- function(traitCH_raw){
 }
 
 
-#### IMPORT, CLEAN AND MAKE LIST #### 
+#### DOWNLOAD, IMPORT, CLEAN AND MAKE LIST #### 
 ImportClean_China <- function(){
+  
+  # Download files from OSF
+  get_file(node = "7mzjk", 
+           file = "metaCH.csv", 
+           path = "data_cleaned")
+  
+  get_file(node = "7mzjk", 
+           file = "community_2012_2016_China.csv", 
+           path = "data_cleaned")
+  
+  get_file(node = "7mzjk", 
+           file = "traits_2015_2016_China.csv", 
+           path = "data_cleaned")
   
   ### IMPORT DATA
   # meta data
-  # metaCH = tibble(Country = "CH",
-  #                         Gradient = "1",
-  #                         Site = c("H", "A", "M", "L"),
-  #                         Elevation = c(4100, 3850, 3500, 3000),
-  #                         Latitude = c(29.90742, 29.88911, 29.86192, 29.84347),
-  #                         Longitude = c(102.0118, 102.0173, 102.0360, 102.0343))
-  metaCH = read_delim("data/metaCH.csv", delim = ";")
+  metaCH = read_delim(file_in("data_cleaned/metaCH.csv"), delim = ";")
   # meta community data
   metaCommunityCH_raw = get(load(file = file_in("data/metaCommunity_CH_2012_2016.Rdata")))
   # community data
-  communityCH_raw = get(load(file = file_in("data/cover_thin_CH_2012_2016.Rdata")))
-  #communityCH_raw = target(drop_and_load(myfile = "transplant/USE THIS DATA/cover_thin_CH_2012_2016.Rdata", localpath = "data/cover_thin_CH_2012_2016.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/cover_thin_CH_2012_2016.Rdata")$content_hash))
+  communityCH_raw = read_csv(file_in("data_cleaned/community_2012_2016_China.csv"))
   # trait data
-  traitCH_raw = get(load(file = file_in("data/traits_2015_2016_China.Rdata")))
-  #traitCH_raw = target(drop_and_load(myfile = "transplant/USE THIS DATA/traits.Rdata", localpath = "data/traits_2015_2016_China.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/traits.Rdata")$content_hash))
+  traitCH_raw = read_csv(file_in("data_cleaned/traits_2015_2016_China.csv"))
   # flux data
   fluxCH = get(load(file = file_in("data/standardControlFluxCH_2016.Rdata")))
-  #fluxCH = target(drop_and_load(myfile = "transplant/USE THIS DATA/standardControlFluxCH_2016.Rdata", localpath = "data/standardControlFluxCH_2016.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/standardControlFluxCH_2016.Rdata")$content_hash))
   hierarchyCH = c("Country", "Site", "BlockID", "PlotID")
   
   ### CLEAN DATA SETS

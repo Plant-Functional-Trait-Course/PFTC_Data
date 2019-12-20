@@ -2,7 +2,7 @@
 library(drake)
 
 r_make(source = "R/AudsDrakePlan.R")
-
+loadd()
 failed()
 
 #view dependency graph
