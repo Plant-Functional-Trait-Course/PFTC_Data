@@ -42,7 +42,6 @@ ggplot() +
   coord_equal() +
   labs(x="", y = "", fill = "Elevation\n") + 
   scale_y_continuous(limits = c(-25, 85)) +
-  scale_fill_viridis(option = "inferno") +
-  #scale_fill_gradient(low = "grey0", high = "grey100", limits=c(-416,4000)) + 
-  geom_point(data = coords, aes(x = Longitude, y = Latitude), colour  = "#E69F00") + 
-  theme_bw()
+  scale_fill_viridis() +
+  geom_point(data = coords, aes(x = Longitude, y = Latitude), colour  = "#D55E00", size = 3) + 
+  theme_classic()
