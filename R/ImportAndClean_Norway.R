@@ -140,7 +140,11 @@ ImportClean_Norway <- function(){
   
   ### IMPORT DATA
   # meta data
-  metaNO_raw = get(load(file = file_in("data/metaNO.Rdata")))
+  #Download files from OSF
+  get_file(node = "7mzjk",
+           file = "metaNO.csv",
+           path = "data_cleaned")
+  
   # meta community
   metaCommunityNO_raw = get(load(file = file_in("data/metaCommunityNO_2016.Rdata")))
   # community and sp data
