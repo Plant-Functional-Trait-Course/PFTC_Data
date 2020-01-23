@@ -4,15 +4,6 @@
 
 
 #### CLEANING DATA ####
-# Cleaning Svalbard meta
-CleanSvalbardMeta <- function(metaSV_raw){
-  metaSV <- metaSV_raw %>% 
-    mutate(Site = paste(Site, Gradient, sep =""))
-  
-  return(metaSV)
-}
-
-
 # Cleaning Svalbard meta community
 CleanSvalbardMetaCommunity <- function(metaCommunitySV_raw){
   metaCommunitySV <- metaCommunitySV_raw %>%
@@ -69,8 +60,13 @@ CleanSvalbardTrait <- function(traitSV_raw){
 ImportClean_Svalbard <- function(){
   
   ### IMPORT DATA
+  #Download files from OSF
+  get_file(node = "7mzjk",
+           file = "metaSV.csv",
+           path = "data_cleaned")
   # meta data
-  metaSV_raw = get(load(file = file_in("data/metaSV.Rdata")))
+  metaCH = read_delim(file_in("data_cleaned/metaSV.csv"), delim = ";")
+  
   # meta community
   metaCommunitySV_raw = get(load(file = file_in("data/metaCommunitySV_2018.Rdata")))
   # community
@@ -87,7 +83,6 @@ ImportClean_Svalbard <- function(){
   
   ### CLEAN DATA SETS
   ## CN_Gongga
-  metaSV = CleanSvalbardMeta(metaSV_raw)
   metaCommunitySV = CleanSvalbardMetaCommunity(metaCommunitySV_raw)
   communitySV = CleanSvalbardCommunity(communitySV_raw)
   traitSV = CleanSvalbardTrait(traitSV_raw)
