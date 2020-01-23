@@ -4,14 +4,6 @@
 
 
 #### CLEANING DATA ####
-# Cleaning Peru meta
-CleanPeruMeta <- function(metaPE_raw){
-  metaPE <- metaPE_raw %>%
-    mutate(Gradient = "1")
-  
-  return(metaPE)
-}
-
 
 # Cleaning Peru metaCommunity
 CleanPeruMetaCommunity <- function(metaCommunityPE_raw){
@@ -68,7 +60,11 @@ ImportClean_Peru <- function(){
   
   ### IMPORT DATA
   # meta data
-  metaPE_raw = get(load(file = file_in("data/metaPE.Rdata")))
+  #Download files from OSF
+  get_file(node = "7mzjk",
+           file = "metaPE.csv",
+           path = "data_cleaned")
+  
   # meta community
   metaCommunityPE_raw = get(load(file = file_in("data/metaCommunity_PE_2018.Rdata")))
   # community
@@ -84,8 +80,6 @@ ImportClean_Peru <- function(){
   
   
   ### CLEAN DATA SETS
-  ## CN_Gongga
-  metaPE = CleanPeruMeta(metaPE_raw)
   metaCommunityPE = CleanPeruMetaCommunity(metaCommunityPE_raw)
   communityPE = CleanPeruCommunity(communityPE_raw)
   traitPE = CleanPeruTrait(traitPE_raw)
