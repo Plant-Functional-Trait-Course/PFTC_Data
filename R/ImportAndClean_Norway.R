@@ -5,14 +5,14 @@
 
 #### CLEANING DATA ####
 #Cleaning Norway Meta
-CleanNorwayMeta <- function(metaNO_raw){
-  metaNO <- metaNO_raw %>%
-    mutate(Gradient = case_when(Site %in% c("Fau", "Alr", "Ulv") ~ as.character(1),
-                                Site %in% c("Vik", "Hog", "Lav") ~ as.character(2),
-                                Site %in% c("Arh", "Ram", "Gud") ~ as.character(3),
-                                Site %in% c("Ovs", "Ves", "Skj") ~ as.character(4)))
-  return(metaNO)
-}  
+# CleanNorwayMeta <- function(metaNO_raw){
+#   metaNO <- metaNO_raw %>%
+#     mutate(Gradient = case_when(Site %in% c("Fau", "Alr", "Ulv") ~ as.character(1),
+#                                 Site %in% c("Vik", "Hog", "Lav") ~ as.character(2),
+#                                 Site %in% c("Arh", "Ram", "Gud") ~ as.character(3),
+#                                 Site %in% c("Ovs", "Ves", "Skj") ~ as.character(4)))
+#   return(metaNO)
+# }  
 
 
 #Cleaning Norway Meta Community 
@@ -157,7 +157,6 @@ ImportClean_Norway <- function(){
   hierarchyNO = c("Country", "Site")
   
   ### CLEAN DATA
-  metaNO = CleanNorwayMeta(metaNO_raw)
   metaCommunityNO = CleanNorwayMetaCommunity(metaCommunityNO_raw)
   communityNO = CleanNorwayCommunity(communityNO_raw, spNO)
   traitNO = CleanNorwayTrait(traitNO_raw)
