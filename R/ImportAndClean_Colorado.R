@@ -4,25 +4,6 @@
 
 
 #### CLEANING DATA ####
-# Cleaning Colorado meta
-CleanColoradoMeta <- function(metaCO_raw){
-  Almont <- tibble(Site = "Almont",
-              Elevation = 2475,
-              Longitude = -107.0,
-              Latitude = 38.7,
-              Country = "CO",
-              Gradient = "1")
-  
-  metaCO <- metaCO_raw %>% 
-    mutate(Country = "CO",
-           Gradient = "1",
-           Site = as.character(Site)) %>% 
-    bind_rows(Almont)
-  
-  return(metaCO)
-}
-
-
 #Cleaning Colorado Meta Community
 CleanColoradoMetaCommunity <- function(metaCommunityCO_raw){
   metaCommunityCO <- metaCommunityCO_raw %>%
@@ -85,7 +66,11 @@ ImportClean_Colorado <- function(){
   
   ### IMPORT DATA
   # meta data
-  metaCO_raw = get(load(file = file_in("data/metaCO.Rdata")))
+  #Download files from OSF
+  get_file(node = "7mzjk",
+           file = "metaCO.csv",
+           path = "data_cleaned")
+  
   # meta community
   metaCommunityCO_raw  = get(load(file = file_in("data/metaCommunityCO_2016.Rdata")))
   # community
@@ -101,7 +86,6 @@ ImportClean_Colorado <- function(){
   
   ### CLEAN DATA SETS
   ## CN_Gongga
-  metaCO = CleanColoradoMeta(metaCO_raw)
   metaCommunityCO = CleanColoradoMetaCommunity(metaCommunityCO_raw)
   communityCO = CleanColoradoCommunity(communityCO_raw)
   traitCO = CleanColoradoTrait(traitCO_raw)
