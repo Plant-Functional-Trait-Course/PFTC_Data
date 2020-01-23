@@ -59,11 +59,13 @@ ImportClean_Peru <- function(){
 
   
   ### IMPORT DATA
-  # meta data
   #Download files from OSF
   get_file(node = "7mzjk",
            file = "metaPE.csv",
            path = "data_cleaned")
+  
+  # meta data
+  metaCH = read_delim(file_in("data_cleaned/metaPE.csv"), delim = ";")
   
   # meta community
   metaCommunityPE_raw = get(load(file = file_in("data/metaCommunity_PE_2018.Rdata")))

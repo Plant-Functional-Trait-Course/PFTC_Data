@@ -65,12 +65,12 @@ CleanColoradoTrait <- function(traitCO_raw){
 ImportClean_Colorado <- function(){
   
   ### IMPORT DATA
-  # meta data
   #Download files from OSF
   get_file(node = "7mzjk",
            file = "metaCO.csv",
            path = "data_cleaned")
-  
+  # meta data
+  metaCH = read_delim(file_in("data_cleaned/metaCO.csv"), delim = ";")
   # meta community
   metaCommunityCO_raw  = get(load(file = file_in("data/metaCommunityCO_2016.Rdata")))
   # community

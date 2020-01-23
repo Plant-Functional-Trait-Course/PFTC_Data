@@ -139,11 +139,12 @@ CleanNorwayFlux <- function(fluxNO_raw){
 ImportClean_Norway <- function(){
   
   ### IMPORT DATA
-  # meta data
   #Download files from OSF
   get_file(node = "7mzjk",
            file = "metaNO.csv",
            path = "data_cleaned")
+  # meta data
+  metaCH = read_delim(file_in("data_cleaned/metaNO.csv"), delim = ";")
   
   # meta community
   metaCommunityNO_raw = get(load(file = file_in("data/metaCommunityNO_2016.Rdata")))

@@ -60,17 +60,17 @@ CleanChinaTrait <- function(traitCH_raw){
 #### DOWNLOAD, IMPORT, CLEAN AND MAKE LIST #### 
 ImportClean_China <- function(){
   
-  # Download files from OSF
-  get_file(node = "7mzjk", 
-           file = "metaCH.csv", 
+  #Download files from OSF
+  get_file(node = "7mzjk",
+           file = "metaCH.csv",
            path = "data_cleaned")
-  
-  get_file(node = "7mzjk", 
-           file = "community_2012_2016_China.csv", 
+
+  get_file(node = "7mzjk",
+           file = "community_2012_2016_China.csv",
            path = "data_cleaned")
-  
-  get_file(node = "7mzjk", 
-           file = "traits_2015_2016_China.csv", 
+
+  get_file(node = "7mzjk",
+           file = "traits_2015_2016_China.csv",
            path = "data_cleaned")
   
   ### IMPORT DATA
