@@ -92,7 +92,7 @@ ImportClean_Peru <- function(){
   # trait
   traitPE_raw = read_csv(file_in("data_cleaned/PFTC3.7_Traits_2018_Peru_cleaned.csv"))
   # flux
-  fluxPE = load("data_cleaned/standardControlFluxPE_2016.Rdata")
+  fluxPE = get(load("data_cleaned/standardControlFluxPE_2016.Rdata"))
   hierarchyPE = c("Country", "Site", "BlockID", "PlotID")
   
   ## CLEAN DATA SETS
