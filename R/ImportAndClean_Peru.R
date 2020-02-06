@@ -55,33 +55,47 @@ CleanPeruTrait <- function(traitPE_raw){
 #### IMPORT, CLEAN AND MAKE LIST #### 
 ImportClean_Peru <- function(){
   
-  #### DOWNLOAD DATA FROM OSF
-
-  
-  ### IMPORT DATA
-  #Download files from OSF
+  ## DOWNLOAD DATA FROM OSF
+  # meta
   get_file(node = "7mzjk",
            file = "metaPE.csv",
-           path = "data_cleaned")
-  
-  # meta data
-  metaCH = read_delim(file_in("data_cleaned/metaPE.csv"), delim = ";")
-  
-  # meta community
-  metaCommunityPE_raw = get(load(file = file_in("data/metaCommunity_PE_2018.Rdata")))
+           path = "data_cleaned",
+           remote_path = "Peru")
   # community
-  communityPE_raw = get(load(file = file_in("data/CommunityCover_2018_Peru.Rdata")))
-  #communityPE_raw = target(drop_and_load(myfile = "transplant/USE THIS DATA/PFTC3_Peru/CommunityCover_2018_Peru.Rdata", localpath = "data/CommunityCover_2018_Peru.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC3_Peru/CommunityCover_2018_Peru.Rdata")$content_hash))
-  # trait
-  traitPE_raw = get(load(file = file_in("data/traits_2018_Peru_cleaned.Rdata")))
-  #traitPE_raw = target(drop_and_load(myfile = "transplant/USE THIS DATA/PFTC3_Peru/traits_2018_Peru_cleaned.Rdata", localpath = "data/traits_2018_Peru_cleaned.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC3_Peru/traits_2018_Peru_cleaned.Rdata")$content_hash))
+  get_file(node = "7mzjk",
+           file = "PFTC3.1_CommunityCover_2018_Peru.csv",
+           path = "data_cleaned",
+           remote_path = "Peru")
+  # metaCommunity
+  get_file(node = "7mzjk",
+           file = "metaCommunity_PE_2018.Rdata",
+           path = "data_cleaned",
+           remote_path = "Peru")
+  # traits
+  get_file(node = "7mzjk",
+           file = "PFTC3.7_Traits_2018_Peru_cleaned.csv",
+           path = "data_cleaned",
+           remote_path = "Peru")
   # flux
-  fluxPE = load("data/standardControlFluxPE_2016.Rdata")
-  #fluxPE = target(drop_and_load(myfile = "transplant/USE THIS DATA/PFTC3_Peru/standardControlFluxPE_2016.Rdata", localpath = "data/standardControlFluxPE_2016.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC3_Peru/standardControlFluxPE_2016.Rdata")$content_hash))
+  get_file(node = "7mzjk",
+           file = "standardControlFluxPE_2016.Rdata",
+           path = "data_cleaned",
+           remote_path = "Peru")
+  
+  ## IMPORT DATA
+  # meta data
+  metaPE = read_csv(file_in("data_cleaned/metaPE.csv"))
+  # meta community
+  metaCommunityPE_raw = get(load(file = file_in("data_cleaned/metaCommunity_PE_2018.Rdata")))
+  # community
+  communityPE_raw = read_csv(file_in("data_cleaned/PFTC3.1_CommunityCover_2018_Peru.csv"))
+  # trait
+  traitPE_raw = read_csv(file_in("data_cleaned/PFTC3.7_Traits_2018_Peru_cleaned.csv"))
+  # flux
+  fluxPE = load("data_cleaned/standardControlFluxPE_2016.Rdata")
   hierarchyPE = c("Country", "Site", "BlockID", "PlotID")
   
-  
-  ### CLEAN DATA SETS
+  ## CLEAN DATA SETS
   metaCommunityPE = CleanPeruMetaCommunity(metaCommunityPE_raw)
   communityPE = CleanPeruCommunity(communityPE_raw)
   traitPE = CleanPeruTrait(traitPE_raw)
