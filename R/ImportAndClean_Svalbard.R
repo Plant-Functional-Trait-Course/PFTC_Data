@@ -59,11 +59,36 @@ CleanSvalbardTrait <- function(traitSV_raw){
 #### IMPORT, CLEAN AND MAKE LIST #### 
 ImportClean_Svalbard <- function(){
   
-  ### IMPORT DATA
-  #Download files from OSF
+
+  ## DOWNLOAD DATA FROM OSF
+  # meta
   get_file(node = "7mzjk",
            file = "metaSV.csv",
-           path = "data_cleaned")
+           path = "data_cleaned",
+           remote_path = "Svalbard")
+  # community
+  get_file(node = "7mzjk",
+           file = "metaSV.csv",
+           path = "data_cleaned",
+           remote_path = "Svalbard")
+  # metaCommunity
+  get_file(node = "7mzjk",
+           file = "metaSV.csv",
+           path = "data_cleaned",
+           remote_path = "Svalbard")
+  # traits
+  get_file(node = "7mzjk",
+           file = "metaSV.csv",
+           path = "data_cleaned",
+           remote_path = "Svalbard")
+  # flux
+  get_file(node = "7mzjk",
+           file = "standardControlFluxSV_2016.Rdata",
+           path = "data_cleaned",
+           remote_path = "Svalbard")
+
+  
+  ### IMPORT DATA
   # meta data
   metaCH = read_delim(file_in("data_cleaned/metaSV.csv"), delim = ";")
   
