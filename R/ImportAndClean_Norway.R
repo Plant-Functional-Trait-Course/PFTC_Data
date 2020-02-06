@@ -4,17 +4,6 @@
 
 
 #### CLEANING DATA ####
-#Cleaning Norway Meta
-# CleanNorwayMeta <- function(metaNO_raw){
-#   metaNO <- metaNO_raw %>%
-#     mutate(Gradient = case_when(Site %in% c("Fau", "Alr", "Ulv") ~ as.character(1),
-#                                 Site %in% c("Vik", "Hog", "Lav") ~ as.character(2),
-#                                 Site %in% c("Arh", "Ram", "Gud") ~ as.character(3),
-#                                 Site %in% c("Ovs", "Ves", "Skj") ~ as.character(4)))
-#   return(metaNO)
-# }  
-
-
 #Cleaning Norway Meta Community 
 CleanNorwayMetaCommunity <- function(metaCommunityNO_raw){
   metaCommunityNO <- metaCommunityNO_raw %>%
@@ -138,14 +127,17 @@ CleanNorwayFlux <- function(fluxNO_raw){
 #### IMPORT, CLEAN AND MAKE LIST #### 
 ImportClean_Norway <- function(){
   
-  ### IMPORT DATA
-  #Download files from OSF
+
+  ## DOWNLOAD DATA FROM OSF
+  # meta
   get_file(node = "7mzjk",
            file = "metaNO.csv",
-           path = "data_cleaned")
-  # meta data
-  metaCH = read_delim(file_in("data_cleaned/metaNO.csv"), delim = ";")
+           path = "data_cleaned",
+           remote_path = "Norway")
   
+  ## IMPORT DATA
+  # meta data
+  metaNO = read_csv(file_in("data_cleaned/metaNO.csv"))
   # meta community
   metaCommunityNO_raw = get(load(file = file_in("data/metaCommunityNO_2016.Rdata")))
   # community and sp data
@@ -157,23 +149,22 @@ ImportClean_Norway <- function(){
   traitNO_raw <- read_delim(file = file_in("data/traitdata_NO.csv"), col_names = TRUE, delim = ",")
   #traitNO_raw = target(drop_and_load.csv(myfile = "transplant/USE THIS DATA/Norway/traitdata_NO.csv", localpath = "data/traitdata_NO.csv"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/traitdata_NO.csv")$content_hash))
   # flux
-  fluxNO <- get(load(file_in("data/standardControlFluxNO_2016.Rdata")))
-  #fluxNO_raw = target(drop_and_load(myfile = "transplant/USE THIS DATA/Norway/standardControlFluxNO_2016.Rdata", localpath = "data/standardControlFluxNO_2016.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/standardControlFluxNO_2016.Rdata")$content_hash))
+  fluxNO_raw <- get(load(file_in("data/standardControlFluxNO_2016.Rdata")))
   hierarchyNO = c("Country", "Site")
   
   ### CLEAN DATA
   metaCommunityNO = CleanNorwayMetaCommunity(metaCommunityNO_raw)
   communityNO = CleanNorwayCommunity(communityNO_raw, spNO)
   traitNO = CleanNorwayTrait(traitNO_raw)
-  #fluxNO = CleanNorwayFlux(fluxNO_raw)
+  fluxNO = CleanNorwayFlux(fluxNO_raw)
   
   # Make list
   Data_NO = list(meta = metaNO,
                  metaCommunity = metaCommunityNO,
                  community = communityNO,
                  trait = traitNO,
-                 trait_hierarchy = hierarchyNO)
-                 #flux = fluxNO)
+                 trait_hierarchy = hierarchyNO,
+                 flux = fluxNO)
   
   return(Data_NO)
 }
