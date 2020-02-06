@@ -86,13 +86,13 @@ ImportClean_China <- function(){
   # meta data
   metaCH = read_delim(file_in("data_cleaned/metaCH.csv"), delim = ";")
   # meta community data
-  metaCommunityCH_raw = get(load(file = file_in("data/metaCommunity_CH_2012_2016.Rdata")))
+  metaCommunityCH_raw = get(load(file = file_in("data_cleaned/metaCommunity_CH_2012_2016.Rdata")))
   # community data
   communityCH_raw = read_csv(file_in("data_cleaned/community_2012_2016_China.csv"))
   # trait data
   traitCH_raw = read_csv(file_in("data_cleaned/PFTC1.2_China_2015_2016_Traits.csv"), col_types = cols(Treatment = col_character()))
   # flux data
-  fluxCH = get(load(file = file_in("data/standardControlFluxCH_2016.Rdata")))
+  fluxCH = get(load(file = file_in("data_cleaned/standardControlFluxCH_2016.Rdata")))
   hierarchyCH = c("Country", "Site", "BlockID", "PlotID")
   
   ## CLEAN DATA SETS
