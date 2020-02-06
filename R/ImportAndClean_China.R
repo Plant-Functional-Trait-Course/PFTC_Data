@@ -37,17 +37,16 @@ CleanChinaCommunity <- function(communityCH_raw){
 # Clean China trait data
 CleanChinaTrait <- function(traitCH_raw){
   traitCH <- traitCH_raw %>% 
-    filter(Project %in% c("LOCAL", "0", "C")) %>% 
-    mutate(Treatment = plyr::mapvalues(Project, c("C", "0", "LOCAL"), c("C", "O", "Gradient"))) %>% 
+    filter(Treatment %in% c("LOCAL", "0", "C")) %>% 
+    mutate(Treatment = plyr::mapvalues(Treatment, c("C", "0", "LOCAL"), c("C", "O", "Gradient"))) %>% 
     mutate(Taxon = trimws(Taxon)) %>% 
     mutate(Year = year(Date),
            Country = "CH",
            Gradient = as.character(1),
            Project = "T") %>% 
-    rename(BlockID = Location) %>%
     mutate(PlotID = paste(BlockID, Treatment, sep = "-"),
            ID = paste(Site, Treatment, Taxon, Individual_number, Leaf_number, sep = "_")) %>% 
-    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC, C_percent, N_percent , CN_ratio, dN15_percent, dC13_percent, P_AVG, P_Std_Dev, P_Co_Var) %>% 
+    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC, C_percent, N_percent , CN_ratio, dN15_percent, dC13_percent, P_percent, P_Std_Dev, P_Co_Var) %>% 
     gather(key = Trait, value = Value, -Country, -Year, -Site, -Gradient, -BlockID, -PlotID, -Taxon) %>% 
     # remove high N values
     filter(!c(Trait == "N_percent" & Value > 9)) %>% 
@@ -60,20 +59,30 @@ CleanChinaTrait <- function(traitCH_raw){
 #### DOWNLOAD, IMPORT, CLEAN AND MAKE LIST #### 
 ImportClean_China <- function(){
   
-  #Download files from OSF
-  get_file(node = "7mzjk",
+  ## DOWNLOAD DATA FROM OSF
+  # meta data
+  get_file(node = "f3knq",
            file = "metaCH.csv",
            path = "data_cleaned")
-
+  # community
   get_file(node = "7mzjk",
            file = "community_2012_2016_China.csv",
+           path = "data_cleaned",
+           remote_path = "China")
+  # meta community
+  get_file(node = "4hjzu",
+           file = "metaCommunity_CH_2012_2016.Rdata",
            path = "data_cleaned")
-
-  get_file(node = "7mzjk",
-           file = "traits_2015_2016_China.csv",
+  # traits
+  get_file(node = "emzgf",
+           file = "PFTC1.2_China_2015_2016_Traits.csv",
+           path = "data_cleaned")
+  # flux
+  get_file(node = "f3knq",
+           file = "standardControlFluxCH.Rdata",
            path = "data_cleaned")
   
-  ### IMPORT DATA
+  ## IMPORT DATA
   # meta data
   metaCH = read_delim(file_in("data_cleaned/metaCH.csv"), delim = ";")
   # meta community data
@@ -81,13 +90,12 @@ ImportClean_China <- function(){
   # community data
   communityCH_raw = read_csv(file_in("data_cleaned/community_2012_2016_China.csv"))
   # trait data
-  traitCH_raw = read_csv(file_in("data_cleaned/traits_2015_2016_China.csv"))
+  traitCH_raw = read_csv(file_in("data_cleaned/PFTC1.2_China_2015_2016_Traits.csv"), col_types = cols(Treatment = col_character()))
   # flux data
   fluxCH = get(load(file = file_in("data/standardControlFluxCH_2016.Rdata")))
   hierarchyCH = c("Country", "Site", "BlockID", "PlotID")
   
-  ### CLEAN DATA SETS
-  ## CN_Gongga
+  ## CLEAN DATA SETS
   metaCommunityCH = CleanChinaMetaCommunity(metaCommunityCH_raw)
   communityCH = CleanChinaCommunity(communityCH_raw)
   traitCH = CleanChinaTrait(traitCH_raw)
