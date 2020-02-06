@@ -10,9 +10,8 @@ library("e1071")
 #devtools::install_github("richardjtelford/traitstrap")
 library("traitstrap")
 #remotes::install_github("centerforopenscience/osfr")
-#devtools::install_github("Between-the-Fjords/downloader")
-library("osfr")
-library("downloader")
+#devtools::install_github("Between-the-Fjords/dataDownloader")
+library("dataDownloader")
 
 
 pn <- . %>% print(n = Inf)
