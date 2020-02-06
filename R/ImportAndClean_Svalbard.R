@@ -68,17 +68,17 @@ ImportClean_Svalbard <- function(){
            remote_path = "Svalbard")
   # community
   get_file(node = "7mzjk",
-           file = "metaSV.csv",
+           file = "communitySV_2018.Rdata",
            path = "data_cleaned",
            remote_path = "Svalbard")
   # metaCommunity
   get_file(node = "7mzjk",
-           file = "metaSV.csv",
+           file = "metaCommunitySV_2018.Rdata",
            path = "data_cleaned",
            remote_path = "Svalbard")
   # traits
   get_file(node = "7mzjk",
-           file = "metaSV.csv",
+           file = "traitsGradients_SV_2018.Rdata",
            path = "data_cleaned",
            remote_path = "Svalbard")
   # flux
@@ -90,19 +90,15 @@ ImportClean_Svalbard <- function(){
   
   ### IMPORT DATA
   # meta data
-  metaCH = read_delim(file_in("data_cleaned/metaSV.csv"), delim = ";")
-  
+  metaCH = read_csv(file_in("data_cleaned/metaSV.csv"))
   # meta community
   metaCommunitySV_raw = get(load(file = file_in("data/metaCommunitySV_2018.Rdata")))
   # community
   communitySV_raw <- get(load(file = file_in("data/communitySV_2018.Rdata")))
-  #communitySV_raw = target(drop_and_load(myfile = "transplant/USE THIS DATA/PFTC4_Svalbard/communitySV_2018.Rdata", localpath = "data/communitySV_2018.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC4_Svalbard/communitySV_2018.Rdata")$content_hash))
   # trait
   traitSV_raw <- get(load(file = file_in("data/traitsGradients_SV_2018.Rdata")))
-  #traitSV_raw = target(drop_and_load(myfile = "transplant/USE THIS DATA/PFTC4_Svalbard/traitsGradients_SV_2018.Rdata", localpath = "data/traitsGradients_SV_2018.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC4_Svalbard/traitsGradients_SV_2018.Rdata")$content_hash))
   # flux
-  fluxSV <- load("data/standardControlFluxSV_2016.Rdata")
-  #fluxSV = target(drop_and_load(myfile = "transplant/USE THIS DATA/PFTC4_Svalbard/standardControlFluxSV_2016.Rdata", localpath = "data/standardControlFluxSV_2016.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/PFTC4_Svalbard/standardControlFluxSV_2016.Rdata")$content_hash))
+  fluxSV <- get(load("data/standardControlFluxSV_2016.Rdata"))
   hierarchySV = c("Country", "Site", "BlockID", "PlotID")
 
   
