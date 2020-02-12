@@ -91,7 +91,7 @@ ImportClean_Colorado <- function(){
   metaCommunityCO_raw  = get(load(file = file_in("data/metaCommunityCO_2016.Rdata")))
   # community
   communityCO_raw <- read_csv(file = "data/Abundance_Data_2016_final.csv", col_names = TRUE)
-  species_dictionaryCO <- read_csv(file = "data/Lorah_scrubbed_notes2.csv", col_names = TRUE)
+  species_dictionaryCO <- read_csv(file = "data/Lorah_scrubbed_notes.csv", col_names = TRUE)
   #communityCO_raw = target(drop_and_load.csv(myfile = "transplant/USE THIS DATA/Colorado/CO_gradient_2016_Species_Cover.csv", localpath = "data/CO_gradient_2016_Species_Cover.csv"),trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Colorado/CO_gradient_2016_Species_Cover.csv")$content_hash))
   # trait
   traitCO_raw <- read_csv(file = "data/rmbl_trait_data_master.csv", col_names = TRUE)
@@ -105,7 +105,7 @@ ImportClean_Colorado <- function(){
   ## CN_Gongga
   metaCommunityCO = CleanColoradoMetaCommunity(metaCommunityCO_raw)
   communityCO = CleanColoradoCommunity(communityCO_raw)
-  traitCO = CleanColoradoTrait(species_dictionary, traitCO_raw)
+  traitCO = CleanColoradoTrait(species_dictionaryCO, traitCO_raw)
   
   # Make list
   Data_CO = list(meta = metaCO,
