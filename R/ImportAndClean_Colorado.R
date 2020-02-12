@@ -97,7 +97,7 @@ ImportClean_Colorado <- function(){
   traitCO_raw <- read_csv(file = "data/rmbl_trait_data_master.csv", col_names = TRUE)
   #traitCO_raw = target(drop_and_load.csv(myfile = "transplant/USE THIS DATA/Colorado/rmbl_trait_data_master.csv", localpath = "data/rmbl_trait_data_master.csv"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Colorado/rmbl_trait_data_master.csv")$content_hash))
   # flux
-  fluxCO <- load("data/standardControlFluxCO_2016.Rdata")
+  fluxCO <- get(load("data/standardControlFluxCO_2016.Rdata"))
   #fluxCO = target(drop_and_load(myfile = "transplant/USE THIS DATA/Colorado/standardControlFluxCO_2016.Rdata", localpath = "data/standardControlFluxCO_2016.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Colorado/standardControlFluxCO_2016.Rdata")$content_hash))
   hierarchyCO = c("Country", "Site", "BlockID")
   
