@@ -90,7 +90,7 @@ ImportClean_Svalbard <- function(){
   
   ### IMPORT DATA
   # meta data
-  metaCH = read_csv(file_in("data_cleaned/metaSV.csv"))
+  metaSV = read_csv(file_in("data_cleaned/metaSV.csv"))
   # meta community
   metaCommunitySV_raw = get(load(file = file_in("data/metaCommunitySV_2018.Rdata")))
   # community
