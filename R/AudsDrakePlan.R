@@ -2,41 +2,53 @@
 ### Auds Drake Plan ###
 #######################
 
-source("R/CountryListAndTraitMeanDrakePlan.R")
+### LOAD LIBRARIES
+library("drake")
+library("tidyverse")
+library("readxl")
+library("lubridate")
+library("rdrop2")
+library("e1071")
+#devtools::install_github("richardjtelford/traitstrap")
+library("traitstrap")
+#devtools::install_github("Between-the-Fjords/dataDownloader")
+library("dataDownloader")
+
+# tricks
+pn <- . %>% print(n = Inf)
+
+### DRAKE CONFIGURATIONS
+pkgconfig::set_config("drake::strings_in_dots" = "literals")
+
+
+### IMPORT FUNCTION FILES
+source("R/ImportAndClean_China.R")
+source("R/ImportAndClean_Peru.R")
+source("R/ImportAndClean_Svalbard.R")
+source("R/ImportAndClean_Norway.R")
+source("R/ImportAndClean_Colorado.R")
+source("R/ImportAndClean_Database.R")
+
+source("R/CommunityWeightedTraitMeans.R")
+
+source("R/MakePrettyFigures.R")
+
 #source("R/CWTM_Bootstrapping.R")
 
-# CWTrait Means
-CWTraitMeanDrakePlan <- drake_plan(
 
-  # Calculate CWTM
-  Full_TraitMeans = Community_TraitMeans(CountryList, TraitMeans),
-  #Deciding what level you want to filter for 80% of the community, here I chose the global level
-  Community_Trait = Threshold_filter(Full_TraitMeans, TraitMean_global)
-  
-  # Bootstrapped CWM (use CountryList without database, not fixed yet)
-  #BootstrapMoments_All = CountryList %>%
-    #map_df(CWM_Bootstrapping)
-
-# Summarize Bootstrap Moments
-#BootstrapMoments = SummarizeBootMoments(BootstrapMoments_All),
+### IMPORT DRAKE PLANS
+source("R/PrettyImportPlan.R")
+source("R/DataProcessingPlan.R")
+source("R/MakePrettyFiguresPlan.R")
 
 
-#BootstrapMoments_Bio = BootstrapMoments %>% 
-# left_join(metaBioclim, by = c("Country", "Site")),
-
-#GradientPlot = MakeFigure(BootstrapMoments),
-#GradientMeanPlot = MakeMeanFigure(CW_Means_Bootstrapped_Bio),
-#GradientVarPlot = MakeVarFigure(CW_Means_Bootstrapped_Bio),
-#GradientSkewPlot = MakeSkewFigure(CW_Means_Bootstrapped_Bio),
-#GradientKurtPlot = MakeKurtFigure(CW_Means_Bootstrapped_Bio)
-
-)
 
 
-# combine import and analysis to master drake plan
-MasterDrakePlan <- ImportDrakePlan %>% 
-  bind_rows(CountryListAndTraitMeanDrakePlan) %>% 
-  bind_rows(CWTraitMeanDrakePlan)
+
+### COMBINING THE DRAKE PLANS 
+MasterDrakePlan <-  bind_rows(ImportDrakePlan, 
+                              CountryListAndTraitMeanDrakePlan) 
+#CWTraitMeanDrakePlan
 
 #configure and make drake plan
 config <- drake_config(MasterDrakePlan)
