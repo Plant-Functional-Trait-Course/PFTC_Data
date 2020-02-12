@@ -23,39 +23,52 @@ CleanColoradoMetaCommunity <- function(metaCommunityCO_raw){
 #Cleaning Colorado Community
 CleanColoradoCommunity <- function(communityCO_raw){
   communityCO <- communityCO_raw %>%
-    filter(!is.na(site)) %>% 
-    filter(!species_or_ground_cover %in% c("Bare (Bare soil + Litter + Dead)", "Rock", "Total Graminoid", "Total Herb", "Total Shrub", "Bare soil", "Litter", "Dead")) %>% 
-    select(-X16, -X17, -X18, -X19, -X20, -X21, -X22, -X23, -X24, -X25, -X26, -plot1_count, -plot2_count, -plot3_count, -plot4_count, -plot5_count, -total_site_percent) %>% 
-    tidyr::gather(key = PlotID, value = Cover, -site, -date_yyyymmdd, -species_or_ground_cover, -growth_habit) %>% 
-    mutate(Country = "CO",
-           Year = year(date_yyyymmdd)) %>% 
-    rename(Site = site, Taxon = species_or_ground_cover, functionalGroup = growth_habit) %>%
-    mutate(PlotID = recode(PlotID, "plot_3_pct" = "plot3_pct"),
-           Gradient = as.character(1),
-           BlockID = as.character(1)) %>% 
-    mutate(PlotID = recode(PlotID, "plot1_pct" = "1", "plot2_pct" = "2", "plot3_pct" = "3", "plot4_pct" = "4", "plot5_pct" = "5"),
-           PlotID = paste(Site, PlotID, sep = "_")) %>% 
-    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
+    select(-"Common name/Morpho", -Total, -"Photo taken?", -"Specimen collected?") %>% 
+    pivot_longer(cols = c(`Plot 1`:`Plot 5`), names_to = "PlotID", values_to = "Cover") %>% 
+    rename("Taxon" = "Species") %>% 
+    mutate(Date = dmy(Date),
+           Country = "CO",
+           Year = year(Date),
+           Gradient = as.character(1)) %>% 
+    mutate(BlockID = recode(PlotID, "Plot 1" = "1", "Plot 2" = "2", "Plot 3" = "3", "Plot 4" = "4", "Plot 5" = "5")) %>% 
+    select(Country, Year, Site, Gradient, BlockID, Taxon, Cover) %>% 
     filter(!is.na(Cover), !Cover == 0)
+
   return(communityCO)
 }
 
 
 #Cleaning Colorado Trait
-CleanColoradoTrait <- function(traitCO_raw){
+CleanColoradoTrait <- function(species_dictionaryCO, traitCO_raw){
+  Row5 <- tribble(
+    ~Site, ~Species_from_abundance_data, ~Likely_same_species_from_trait_data,
+    "Almont",   "Elymus elymoides", "Hordeum jubatum",
+    "Almont",   "Elymus elymoides", "Hesperostipa comata"
+  )
+  
+  species_dictionaryCO <- species_dictionaryCO %>% 
+    slice(-5) %>% 
+    bind_rows(Row5) %>% 
+    filter(is.na(Notes)) %>% 
+    select(-Notes)
+  
   traitCO <- traitCO_raw %>% 
-    filter(site %in% c("Almont", "CBT", "Road", "Pfeiler", "PBM", "Cinnamon")) %>% 
+    filter(site %in% c("Almont", "CBT", "Road", "Pfeiler", "Cinnamon")) %>% 
     select(year, site, block, taxon_std, leaf_area, wet_mass, dry_mass, SLA, height_flower, height_leaf, height, height_2, thickness, pc_C, pc_N, pc_P, d13C, d15N,  C_N,  N_C,  N_P) %>% 
-    rename(Year = year, Site = site, PlotID = block, Taxon = taxon_std, Leaf_Area_cm2 = leaf_area, Wet_Mass_g = wet_mass, Dry_Mass_g = dry_mass, SLA_cm2_g = SLA, Plant_Height_cm = height_flower, Leaf_Thickness_Ave_mm = thickness, C_percent = pc_C, N_percent = pc_N, dC13_percent = d13C, dN15_percent = d15N, CN_ratio = C_N, NC_ratio = N_C, NP_ratio = N_P, P_AVG = pc_P) %>%
+    rename(Year = year, Site = site, BlockID = block, Taxon = taxon_std, Leaf_Area_cm2 = leaf_area, Wet_Mass_g = wet_mass, Dry_Mass_g = dry_mass, SLA_cm2_g = SLA, Plant_Height_cm = height_flower, Leaf_Thickness_Ave_mm = thickness, C_percent = pc_C, N_percent = pc_N, dC13_percent = d13C, dN15_percent = d15N, CN_ratio = C_N, NC_ratio = N_C, NP_ratio = N_P, P_percent = pc_P) %>%
     mutate(Country = "CO",
            LDMC = Dry_Mass_g/Wet_Mass_g) %>%
     mutate(Gradient = as.character(1),
-           BlockID = as.character(1),
-           PlotID = paste(Site, gsub("Block", "", PlotID), sep = "_")) %>% 
-    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC, C_percent, N_percent, dC13_percent, dN15_percent, CN_ratio, NC_ratio, NP_ratio, P_AVG) %>% 
-    mutate_at(., vars(C_percent, N_percent, dC13_percent, dN15_percent, CN_ratio, NC_ratio, NP_ratio, P_AVG), funs(as.numeric(.))) %>% 
-    tidyr::gather(key = Trait, value = Value, -Country, -Year, -Site, -BlockID, -PlotID, -Gradient, -Taxon) %>% 
-    filter(!is.na(Value))
+           BlockID = gsub("Block|block", "", BlockID)) %>% 
+    select(Country, Year, Site, BlockID, Gradient, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC, P_percent, C_percent, N_percent, dC13_percent, dN15_percent, CN_ratio, NC_ratio, NP_ratio) %>% 
+    mutate_at(., vars(P_percent, C_percent, N_percent, dC13_percent, dN15_percent, CN_ratio, NC_ratio, NP_ratio), funs(as.numeric(.))) %>% 
+    pivot_longer(cols = c(Plant_Height_cm:NP_ratio), names_to = "Trait", values_to = "Value") %>% 
+    filter(!is.na(Value)) %>% 
+    filter(!is.na(Taxon)) %>% 
+    # Replace species to match the community dataset
+    left_join(species_dictionaryCO, by = c("Site", "Taxon" = "Likely_same_species_from_trait_data")) %>% 
+    mutate(Taxon = if_else(!is.na(Species_from_abundance_data), Species_from_abundance_data, Taxon)) %>% 
+    select(-Species_from_abundance_data)
   
   return(traitCO)
 }  
@@ -64,17 +77,21 @@ CleanColoradoTrait <- function(traitCO_raw){
 #### IMPORT, CLEAN AND MAKE LIST #### 
 ImportClean_Colorado <- function(){
   
-  ### IMPORT DATA
+  ## DOWNLOAD FROM OSF
   #Download files from OSF
   get_file(node = "7mzjk",
            file = "metaCO.csv",
-           path = "data_cleaned")
+           path = "data_cleaned",
+           remote_path = "Colorado")
+  
+  ## IMPORT DATA
   # meta data
-  metaCH = read_delim(file_in("data_cleaned/metaCO.csv"), delim = ";")
+  metaCO = read_csv(file_in("data_cleaned/metaCO.csv")) %>% filter(Site  != "PBM")
   # meta community
   metaCommunityCO_raw  = get(load(file = file_in("data/metaCommunityCO_2016.Rdata")))
   # community
-  communityCO_raw <- read_csv(file = "data/CO_gradient_2016_Species_Cover.csv", col_names = TRUE)
+  communityCO_raw <- read_csv(file = "data/Abundance_Data_2016_final.csv", col_names = TRUE)
+  species_dictionaryCO <- read_csv(file = "data/Lorah_scrubbed_notes2.csv", col_names = TRUE)
   #communityCO_raw = target(drop_and_load.csv(myfile = "transplant/USE THIS DATA/Colorado/CO_gradient_2016_Species_Cover.csv", localpath = "data/CO_gradient_2016_Species_Cover.csv"),trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Colorado/CO_gradient_2016_Species_Cover.csv")$content_hash))
   # trait
   traitCO_raw <- read_csv(file = "data/rmbl_trait_data_master.csv", col_names = TRUE)
@@ -82,13 +99,13 @@ ImportClean_Colorado <- function(){
   # flux
   fluxCO <- load("data/standardControlFluxCO_2016.Rdata")
   #fluxCO = target(drop_and_load(myfile = "transplant/USE THIS DATA/Colorado/standardControlFluxCO_2016.Rdata", localpath = "data/standardControlFluxCO_2016.Rdata"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Colorado/standardControlFluxCO_2016.Rdata")$content_hash))
-  hierarchyCO = c("Country", "Site", "BlockID", "PlotID")
+  hierarchyCO = c("Country", "Site", "BlockID")
   
   ### CLEAN DATA SETS
   ## CN_Gongga
   metaCommunityCO = CleanColoradoMetaCommunity(metaCommunityCO_raw)
   communityCO = CleanColoradoCommunity(communityCO_raw)
-  traitCO = CleanColoradoTrait(traitCO_raw)
+  traitCO = CleanColoradoTrait(species_dictionary, traitCO_raw)
   
   # Make list
   Data_CO = list(meta = metaCO,
