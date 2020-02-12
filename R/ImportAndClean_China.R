@@ -35,22 +35,29 @@ CleanChinaCommunity <- function(communityCH_raw){
 
 
 # Clean China trait data
-CleanChinaTrait <- function(traitCH_raw){
-  traitCH <- traitCH_raw %>% 
-    filter(Treatment %in% c("LOCAL", "0", "C")) %>% 
-    mutate(Treatment = plyr::mapvalues(Treatment, c("C", "0", "LOCAL"), c("C", "O", "Gradient"))) %>% 
+CleanChinaTrait <- function(LeaftraitCH_raw, ChemtraitCH_raw){
+  Leaftrait_Long <- LeaftraitCH_raw %>% 
+    select(-c(Leaf_Thickness_1_mm:Leaf_Thickness_3_mm), -c(Leaf_Thickness_4_mm:Leaf_Thickness_6_mm)) %>% 
+    pivot_longer(cols = c(Wet_Mass_g:LDMC), names_to = "Trait", values_to = "Value")
+    
+    Chemtrait_Long <- ChemtraitCH_raw %>% 
+      select(-n) %>% 
+      pivot_longer(cols = c(P_percent:dC13_percent), names_to = "Trait", values_to = "Value")
+    
+    traitsCH <- Leaftrait_Long %>% 
+      bind_rows(Chemtrait_Long) %>% 
+      filter(!is.na(Value)) %>% 
+      filter(Treatment %in% c("LOCAL", "0", "C")) %>%
+      mutate(Treatment = plyr::mapvalues(Treatment, c("C", "0", "LOCAL"), c("C", "O", "Gradient"))) %>%
     mutate(Taxon = trimws(Taxon)) %>% 
     mutate(Year = year(Date),
            Country = "CH",
            Gradient = as.character(1),
            Project = "T") %>% 
-    mutate(PlotID = paste(BlockID, Treatment, sep = "-"),
+    mutate(PlotID = paste(destBlockID, Treatment, sep = "-"),
            ID = paste(Site, Treatment, Taxon, Individual_number, Leaf_number, sep = "_")) %>% 
-    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC, C_percent, N_percent , CN_ratio, dN15_percent, dC13_percent, P_percent, P_Std_Dev, P_Co_Var) %>% 
-    gather(key = Trait, value = Value, -Country, -Year, -Site, -Gradient, -BlockID, -PlotID, -Taxon) %>% 
-    # remove high N values
-    filter(!c(Trait == "N_percent" & Value > 9)) %>% 
-    filter(!is.na(Value))
+    rename("BlockID" = "destBlockID") %>% 
+    select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Trait, Value)
   
   return(traitCH)
 }
@@ -75,7 +82,10 @@ ImportClean_China <- function(){
            path = "data_cleaned")
   # traits
   get_file(node = "emzgf",
-           file = "PFTC1.2_China_2015_2016_Traits.csv",
+           file = "PFTC1.2_China_2015_2016_LeafTraits.csv",
+           path = "data_cleaned")
+  get_file(node = "emzgf",
+           file = "PFTC1.2_China_2015_2016_ChemicalTraits.csv",
            path = "data_cleaned")
   # flux
   get_file(node = "f3knq",
@@ -90,7 +100,8 @@ ImportClean_China <- function(){
   # community data
   communityCH_raw = read_csv(file_in("data_cleaned/community_2012_2016_China.csv"))
   # trait data
-  traitCH_raw = read_csv(file_in("data_cleaned/PFTC1.2_China_2015_2016_Traits.csv"), col_types = cols(Treatment = col_character()))
+  LeaftraitCH_raw = read_csv(file_in("data_cleaned/PFTC1.2_China_2015_2016_LeafTraits.csv"), col_types = cols(Treatment = col_character(), StoichLabel = col_character()))
+  ChemtraitCH_raw = read_csv(file_in("data_cleaned/PFTC1.2_China_2015_2016_ChemicalTraits.csv"), col_types = cols(Treatment = col_character(), StoichLabel = col_character()))
   # flux data
   fluxCH = get(load(file = file_in("data_cleaned/standardControlFluxCH_2016.Rdata")))
   hierarchyCH = c("Country", "Site", "BlockID", "PlotID")
@@ -98,7 +109,7 @@ ImportClean_China <- function(){
   ## CLEAN DATA SETS
   metaCommunityCH = CleanChinaMetaCommunity(metaCommunityCH_raw)
   communityCH = CleanChinaCommunity(communityCH_raw)
-  traitCH = CleanChinaTrait(traitCH_raw)
+  traitCH = CleanChinaTrait(LeaftraitCH_raw, ChemtraitCH_raw)
   
   # Make list
   Data_CH = list(meta = metaCH,
