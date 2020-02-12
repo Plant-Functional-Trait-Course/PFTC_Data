@@ -44,7 +44,7 @@ CleanChinaTrait <- function(LeaftraitCH_raw, ChemtraitCH_raw){
       select(-n) %>% 
       pivot_longer(cols = c(P_percent:dC13_percent), names_to = "Trait", values_to = "Value")
     
-    traitsCH <- Leaftrait_Long %>% 
+    traitCH <- Leaftrait_Long %>% 
       bind_rows(Chemtrait_Long) %>% 
       filter(!is.na(Value)) %>% 
       filter(Treatment %in% c("LOCAL", "0", "C")) %>%
@@ -89,7 +89,7 @@ ImportClean_China <- function(){
            path = "data_cleaned")
   # flux
   get_file(node = "f3knq",
-           file = "standardControlFluxCH.Rdata",
+           file = "standardControlFluxCH_2016.Rdata",
            path = "data_cleaned")
   
   ## IMPORT DATA
