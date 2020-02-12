@@ -16,11 +16,8 @@ CountryListAndTraitMeanDrakePlan <- drake_plan(
 ) 
 
 
-
-#### DATA PROSESSING PLAN ####
-
-
-# CWTrait Means
+#### CALCULATE CWM USING BOOTSTRAPPING
+# Using traitstrap package: imputation, bootstrapping, moments
 CWTraitMeanDrakePlan <- drake_plan(
   
   # Calculate CWTM
