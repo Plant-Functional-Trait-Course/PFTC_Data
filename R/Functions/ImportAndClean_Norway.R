@@ -75,11 +75,12 @@ CleanNorwayCommunity <- function(communityNO_raw, spNO){
     select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
     # Remove duplicate values
     group_by(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Cover) %>% 
-    summarise(n = n()) %>% 
-    filter(n == 1) %>% 
-    filter(!is.na(Cover), 
-           !Cover == 0,
-           !is.na(Taxon))
+    filter(n() == 1) %>% 
+    # Remove duplicate sp in turf Skj3XC
+    group_by(Country, Year, Site, Gradient, BlockID, PlotID, Taxon) %>% 
+    filter(n() == 1) %>% 
+    # remove NA in Taxon
+    filter(!is.na(Taxon))
   
   return(communityNO)
 }
@@ -103,7 +104,9 @@ CleanNorwayTrait <- function(traitNO_raw){
     # remove white space in Viola palustris
     mutate(Taxon = trimws(Taxon, which = "right")) %>% 
     filter(!is.na(Value)) %>% 
-    mutate(Country = "NO") #Overwrite junk...
+    mutate(Country = "NO",
+           BlockID = "dummyBlockID",
+           PlotID = "dummyPlotID") #Overwrite junk...
   
   return(traitNO)
 }
