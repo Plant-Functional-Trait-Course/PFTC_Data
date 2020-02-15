@@ -20,6 +20,13 @@ CountryListAndTraitMeanDrakePlan <- drake_plan(
 # Using traitstrap package: imputation, bootstrapping, moments
 DataProcessingDrakePlan <- drake_plan(
   
+  # Meta data
+  MetaData = map_df(CountryList, ~ mutate(.x$meta, Gradient = as.character(Gradient))),
+  
+  # Diversity indices
+  Diversity = CalculateDiversityIndices(CountryList),
+  
+  
   #Deciding what level you want to filter for 80% of the community, here I chose the global level
   #Community_Trait = Threshold_filter(Full_TraitMeans, TraitMean_global)
   
