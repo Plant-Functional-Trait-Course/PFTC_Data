@@ -7,7 +7,9 @@
 # Cleaning Peru meta
 CleanPeruMeta <- function(metaPE_raw){
   metaPE <- metaPE_raw %>% 
-    mutate(Country = "PE")
+    mutate(Country = "PE") %>% 
+    filter(Site != "OCC",
+           Gradient != "BB")
   return(metaPE)
 }
   
