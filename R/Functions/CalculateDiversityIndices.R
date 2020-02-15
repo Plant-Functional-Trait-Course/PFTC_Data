@@ -1,5 +1,5 @@
-CalculateDiversityIndices <- function(countrylist){
-  diversity <- countrylist$comunity %>% 
+CalculateDiversityIndices <- function(CountryList){
+  diversity <- CountryList$community %>% 
     # Calculate species pool per gradient
     group_by(Country) %>% 
     mutate(spPool = n()) %>% 
