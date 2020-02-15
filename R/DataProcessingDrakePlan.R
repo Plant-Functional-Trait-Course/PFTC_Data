@@ -18,16 +18,13 @@ CountryListAndTraitMeanDrakePlan <- drake_plan(
 
 #### CALCULATE CWM USING BOOTSTRAPPING
 # Using traitstrap package: imputation, bootstrapping, moments
-CWTraitMeanDrakePlan <- drake_plan(
+DataProcessingDrakePlan <- drake_plan(
   
-  # Calculate CWTM
-  Full_TraitMeans = Community_TraitMeans(CountryList, TraitMeans),
   #Deciding what level you want to filter for 80% of the community, here I chose the global level
-  Community_Trait = Threshold_filter(Full_TraitMeans, TraitMean_global)
+  #Community_Trait = Threshold_filter(Full_TraitMeans, TraitMean_global)
   
-  # Bootstrapped CWM (use CountryList without database, not fixed yet)
-  #BootstrapMoments_All = CountryList %>%
-  #map_df(CWM_Bootstrapping)
+  # Bootstrapped CWM
+  HappyMoments = BootstrappedCWM(CountryList)
   
   # Summarize Bootstrap Moments
   #BootstrapMoments = SummarizeBootMoments(BootstrapMoments_All),
