@@ -13,7 +13,8 @@ ImportDrakePlan <- drake_plan(
   Data_CO = ImportClean_Colorado(),
 
   # Climate
-  Climate = get(load(file = file_in("R/ClimateMetadata/MetaBioclimAllCountries.RData")))
+  Climate = read_csv(file_in("data/MetaClimate.csv"))
+
 )
 
 # WIth DB
