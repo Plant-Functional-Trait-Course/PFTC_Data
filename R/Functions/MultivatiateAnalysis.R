@@ -7,7 +7,7 @@ NMDSOrdination <- function(CountryList){
   set.seed(42)
   cols <- c(PlotID = "1")
   
-  comm_wide <- CountryList$Colorado$community %>% 
+  comm_wide <- CountryList$community %>% 
     # add plotID in colorado
     add_column(!!!cols[!names(cols) %in% names(.)]) %>% 
     pivot_wider(names_from = Taxon, values_from = Cover, values_fill = list(Cover = 0)) 
@@ -24,11 +24,4 @@ NMDSOrdination <- function(CountryList){
   return(fNMDS)
 }
 
-
-
-CommunityOrdinationPlot <- ggplot(fNMDS, aes(x = NMDS1, y = NMDS2, group = Site, colour = Site)) +
-  geom_point() +
-  coord_equal() +
-  labs(x = "NMDS axis 1", y = "NMDS axis 2") +
-  theme_classic()
 
