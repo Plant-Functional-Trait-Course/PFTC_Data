@@ -24,7 +24,7 @@ DataProcessingDrakePlan <- drake_plan(
   MetaData = map_df(CountryList, ~ mutate(.x$meta, Gradient = as.character(Gradient))),
   
   # Diversity indices
-  Diversity = CalculateDiversityIndices(CountryList),
+  Diversity = map_df(CountryList, CalculateDiversityIndices),
   
   
   #Deciding what level you want to filter for 80% of the community, here I chose the global level
