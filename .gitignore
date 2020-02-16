@@ -52,6 +52,8 @@ vignettes/*.pdf
 *.sqlite
 *.dat
 *.RData.Tmp1
+*.RData
+*.Rdata
 *.rds
 
 #rasters & shapefiles
@@ -59,6 +61,7 @@ vignettes/*.pdf
 *.blw
 *.hdr
 *.prj
+*.tif
 
 #figures & output
 *.png
