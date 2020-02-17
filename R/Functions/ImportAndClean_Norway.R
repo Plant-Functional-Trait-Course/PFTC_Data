@@ -80,7 +80,8 @@ CleanNorwayCommunity <- function(communityNO_raw, spNO){
     group_by(Country, Year, Site, Gradient, BlockID, PlotID, Taxon) %>% 
     filter(n() == 1) %>% 
     # remove NA in Taxon
-    filter(!is.na(Taxon))
+    filter(!is.na(Taxon)) %>% 
+    ungroup()
   
   return(communityNO)
 }

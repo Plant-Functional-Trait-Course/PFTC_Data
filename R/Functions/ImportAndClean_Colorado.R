@@ -32,7 +32,9 @@ CleanColoradoCommunity <- function(communityCO_raw){
            Gradient = as.character(1)) %>% 
     mutate(BlockID = recode(PlotID, "Plot 1" = "1", "Plot 2" = "2", "Plot 3" = "3", "Plot 4" = "4", "Plot 5" = "5")) %>% 
     select(Country, Year, Site, Gradient, BlockID, Taxon, Cover) %>% 
-    filter(!is.na(Cover), !Cover == 0)
+    filter(!is.na(Cover), !Cover == 0) %>% 
+    # add dummy variable
+    mutate(PlotID = "1")
 
   return(communityCO)
 }
@@ -48,9 +50,7 @@ CleanColoradoTrait <- function(species_dictionaryCO, traitCO_raw){
   
   species_dictionaryCO <- species_dictionaryCO %>% 
     slice(-5) %>% 
-    bind_rows(Row5) %>% 
-    filter(is.na(Notes)) %>% 
-    select(-Notes)
+    bind_rows(Row5)
   
   traitCO <- traitCO_raw %>% 
     filter(site %in% c("Almont", "CBT", "Road", "Pfeiler", "Cinnamon")) %>% 
@@ -59,7 +59,9 @@ CleanColoradoTrait <- function(species_dictionaryCO, traitCO_raw){
     mutate(Country = "CO",
            LDMC = Dry_Mass_g/Wet_Mass_g) %>%
     mutate(Gradient = as.character(1),
-           BlockID = gsub("Block|block", "", BlockID)) %>% 
+           BlockID = gsub("Block|block", "", BlockID),
+           # add dummy variable
+           PlotID = "1") %>% 
     select(Country, Year, Site, BlockID, Gradient, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC, P_percent, C_percent, N_percent, dC13_percent, dN15_percent, CN_ratio, NC_ratio, NP_ratio) %>% 
     mutate_at(., vars(P_percent, C_percent, N_percent, dC13_percent, dN15_percent, CN_ratio, NC_ratio, NP_ratio), funs(as.numeric(.))) %>% 
     pivot_longer(cols = c(Plant_Height_cm:NP_ratio), names_to = "Trait", values_to = "Value") %>% 
