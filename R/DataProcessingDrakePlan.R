@@ -11,8 +11,6 @@ CountryListAndTraitMeanDrakePlan <- drake_plan(
                      Colorado = Data_CO) %>%
     map(LogTransformation)  #Log transforming trait data (height, mass and area)
   
-  #Calculating trait means
-  #TraitMeans = map_df(CountryList, CalculateTraitMeans)
 ) 
 
 
@@ -24,14 +22,16 @@ DataProcessingDrakePlan <- drake_plan(
   MetaData = map_df(CountryList, ~ mutate(.x$meta, Gradient = as.character(Gradient))),
   
   # Diversity indices
-  Diversity = map_df(CountryList, CalculateDiversityIndices),
+  Diversity = map_df(CountryList, CalculateDiversityIndices) %>% 
+    left_join(Climate, by = c("Country", "Gradient", "Site")),
   
   
   #Deciding what level you want to filter for 80% of the community, here I chose the global level
   #Community_Trait = Threshold_filter(Full_TraitMeans, TraitMean_global)
   
   # Bootstrapped CWM
-  HappyMoments = BootstrappedCWM(CountryList)
+  HappyMoments = BootstrappedCWM(CountryList) %>% 
+    left_join(Climate, by = c("Country", "Gradient", "Site"))
   
   # Summarize Bootstrap Moments
   #BootstrapMoments = SummarizeBootMoments(BootstrapMoments_All),
