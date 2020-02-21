@@ -26,3 +26,33 @@ BootstrappedCWM <- function(ImputetTraits){
   
 }
 
+
+
+
+# Summarize moments
+# the SummariseBootMoments should fix this
+SummariseHappyMoments <- function(HappyMoments){
+  
+  SummarizedMoments <- HappyMoments %>% 
+    group_by(Country, Gradient, Site, BlockID, PlotID, PlotID, Trait_trans) %>% 
+    summarise(
+      n = n(),
+      Mean = mean(.data$mean),
+      CIlow.mean = .data$Mean - sd(.data$mean),
+      CIhigh.mean = .data$Mean + sd(.data$mean),
+      
+      Var = mean(.data$variance),
+      CIlow.var = .data$Var - sd(.data$variance),
+      CIhigh.var = .data$Var + sd(.data$variance),
+      
+      Skew = mean(.data$skewness),
+      CIlow.skew = .data$Skew - sd(.data$skewness),
+      CIhigh.skew = .data$Skew + sd(.data$skewness),
+      
+      Kurt = mean(.data$kurtosis),
+      CIlow.kurt = .data$Kurt - sd(.data$kurtosis),
+      CIhigh.Kurt = .data$Kurt + sd(.data$kurtosis)
+    )
+  
+}
+

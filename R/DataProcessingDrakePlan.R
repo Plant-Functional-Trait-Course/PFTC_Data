@@ -34,19 +34,11 @@ DataProcessingDrakePlan <- drake_plan(
   
   # Bootstrapped CWM
   HappyMoments = BootstrappedCWM(ImputetTraits) %>% 
-    left_join(Climate, by = c("Country", "Gradient", "Site"))
+    left_join(Climate, by = c("Country", "Gradient", "Site")),
   
   # Summarize Bootstrap Moments
-  #BootstrapMoments = SummarizeBootMoments(BootstrapMoments_All),
-  
-  
-  #BootstrapMoments_Bio = BootstrapMoments %>% 
-  # left_join(metaBioclim, by = c("Country", "Site")),
-  
-  #GradientPlot = MakeFigure(BootstrapMoments),
-  #GradientMeanPlot = MakeMeanFigure(CW_Means_Bootstrapped_Bio),
-  #GradientVarPlot = MakeVarFigure(CW_Means_Bootstrapped_Bio),
-  #GradientSkewPlot = MakeSkewFigure(CW_Means_Bootstrapped_Bio),
-  #GradientKurtPlot = MakeKurtFigure(CW_Means_Bootstrapped_Bio)
+  #BootstrapMoments = SummarizeBootMoments(HappyMoments)
+  SummarisedMoments = SummariseHappyMoments(HappyMoments)  %>% 
+    left_join(Climate, by = c("Country", "Gradient", "Site"))
   
 )
