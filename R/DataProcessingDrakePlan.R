@@ -29,8 +29,11 @@ DataProcessingDrakePlan <- drake_plan(
   #Deciding what level you want to filter for 80% of the community, here I chose the global level
   #Community_Trait = Threshold_filter(Full_TraitMeans, TraitMean_global)
   
+  # Inmpute traits
+  ImputetTraits = ImputeTraits(CountryList),
+  
   # Bootstrapped CWM
-  HappyMoments = BootstrappedCWM(CountryList) %>% 
+  HappyMoments = BootstrappedCWM(ImputetTraits) %>% 
     left_join(Climate, by = c("Country", "Gradient", "Site"))
   
   # Summarize Bootstrap Moments
