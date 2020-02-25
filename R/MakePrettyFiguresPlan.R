@@ -6,6 +6,9 @@ MakePrettyFiguresPlan <- drake_plan(
   PFTCMap = MakePrettyMap(CountryList),
   
   # Coverage Plot
-  CoverageFigure <- CoverageFigure(ImputetTraits)
+  CoveragePlot = MakeCoverageFigure(ImputetTraits),
+  
+  # Trait plots
+  GradientMeanPlot = MakeMeanFigure(SummarisedMoments)
   
 )
