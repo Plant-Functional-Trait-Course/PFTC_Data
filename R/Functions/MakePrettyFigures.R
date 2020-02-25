@@ -1,3 +1,33 @@
+### Coverage Plan
+
+CoverageFigure <- function(ImputetTraits){
+  
+  CoverageFig <- map(.x = ImputetTraits, ~ filter(., Trait == "Leaf_Area_cm2")) %>% 
+    map_df(fortify, .id = "FullCountry") %>% 
+  mutate(level = factor(level, levels = c("Country", "Site", "BlockID", "PlotID"))) %>% 
+    ggplot(aes(x = .id, y = s, fill = level)) +
+    geom_col() +
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_fill_viridis_d() +
+    labs(x = "", y = "Proportion of cover", fill = "Data source") +
+    facet_wrap(~FullCountry, scales = "free_x") +
+    theme_bw() +
+    theme(axis.text.x = element_blank())
+  
+  return(CoverageFig)
+}
+
+
+
+
+
+
+
+
+
+
+
+
 MakeFigure <- function(BootstrapMoments){
   myplot <- BootstrapMoments %>% 
     filter(!is.na(Trait), !Trait %in% c("P_Co_Var", "P_Std_Dev", "NC_ratio", "NP_ratio")) %>% 
