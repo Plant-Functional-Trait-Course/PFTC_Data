@@ -24,8 +24,8 @@ RegressionDiversityIndeces <- function(Diversity){
     mutate(PropAbundance = Richness / spPool_regional) %>%
     pivot_longer(cols = c("Richness", "Evenness"), names_to = "Index", values_to = "Value") %>%
     group_by(CG, Index) %>%
-    nest() %>%
-    mutate(mod = map(data, ~lmer(Value ~ Elevation + (1|Site), data = .x)), result = map(mod, tidy)) %>%  # or glance
+    nest() %>% 
+    mutate(mod = map(data, ~ lmer(Value ~ Elevation + (1|Site), data = .x)), result = map(mod, tidy)) %>%  # or glance
     unnest(result)
 
   return(Result)
