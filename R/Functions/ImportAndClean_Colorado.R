@@ -23,6 +23,7 @@ CleanColoradoMetaCommunity <- function(metaCommunityCO_raw){
 #Cleaning Colorado Community
 CleanColoradoCommunity <- function(communityCO_raw){
   communityCO <- communityCO_raw %>%
+    filter(Site != "PBM") %>% 
     select(-"Common name/Morpho", -Total, -"Photo taken?", -"Specimen collected?") %>% 
     pivot_longer(cols = c(`Plot 1`:`Plot 5`), names_to = "PlotID", values_to = "Cover") %>% 
     rename("Taxon" = "Species") %>% 
