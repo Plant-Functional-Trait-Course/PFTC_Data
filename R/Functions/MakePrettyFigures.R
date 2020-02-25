@@ -1,8 +1,8 @@
-### Coverage Plan
+### Coverage Figure
 
-CoverageFigure <- function(ImputetTraits){
+MakeCoverageFigure <- function(ImputetTraits){
   
-  CoverageFig <- map(.x = ImputetTraits, ~ filter(., Trait == "Leaf_Area_cm2")) %>% 
+  CoverageFigure <- map(.x = ImputetTraits, ~ filter(., Trait == "Leaf_Area_cm2")) %>% 
     map_df(fortify, .id = "FullCountry") %>% 
   mutate(level = factor(level, levels = c("Country", "Site", "BlockID", "PlotID"))) %>% 
     ggplot(aes(x = .id, y = s, fill = level)) +
@@ -14,7 +14,7 @@ CoverageFigure <- function(ImputetTraits){
     theme_bw() +
     theme(axis.text.x = element_blank())
   
-  return(CoverageFig)
+  return(CoverageFigure)
 }
 
 
