@@ -63,7 +63,7 @@ CleanColoradoTrait <- function(species_dictionaryCO, traitCO_raw){
            BlockID = gsub("Block|block", "", BlockID),
            # add dummy variable
            PlotID = "1") %>% 
-    select(Country, Year, Site, BlockID, Gradient, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC, P_percent, C_percent, N_percent, dC13_percent, dN15_percent, CN_ratio, NC_ratio, NP_ratio) %>% 
+    select(Country, Year, Site, BlockID, PlotID, Gradient, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC, P_percent, C_percent, N_percent, dC13_percent, dN15_percent, CN_ratio, NC_ratio, NP_ratio) %>% 
     mutate_at(., vars(P_percent, C_percent, N_percent, dC13_percent, dN15_percent, CN_ratio, NC_ratio, NP_ratio), funs(as.numeric(.))) %>% 
     pivot_longer(cols = c(Plant_Height_cm:NP_ratio), names_to = "Trait", values_to = "Value") %>% 
     filter(!is.na(Value)) %>% 
@@ -71,7 +71,7 @@ CleanColoradoTrait <- function(species_dictionaryCO, traitCO_raw){
     # Replace species to match the community dataset
     left_join(species_dictionaryCO, by = c("Site", "Taxon" = "Likely_same_species_from_trait_data")) %>% 
     mutate(Taxon = if_else(!is.na(Species_from_abundance_data), Species_from_abundance_data, Taxon)) %>% 
-    select(-Species_from_abundance_data)
+    select(-Species_from_abundance_data, -Notes)
   
   return(traitCO)
 }  
