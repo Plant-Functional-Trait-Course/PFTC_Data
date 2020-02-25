@@ -53,7 +53,7 @@ CleanPeruTrait <- function(traitPE_raw){
     mutate(BlockID = as.character(1),
            PlotID = paste(Site, PlotID, Treatment, sep="_"),
            Gradient = Treatment) %>%
-    filter(LDMC <= 1) %>% # these leaves need checking!!!
+    mutate(LDMC ifelse(LDMC >= 1, NA, LDMC)) %>% # these leaves need checking!!!
     select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC) %>% 
     gather(key = Trait, value = Value, -Country, -Year, -Site, -BlockID, -PlotID, -Gradient, -Taxon) %>% 
     mutate(Taxon = recode(Taxon, "Agrostis 2" = "Agrostis sp2")) %>% 
