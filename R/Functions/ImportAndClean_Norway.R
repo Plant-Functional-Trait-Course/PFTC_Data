@@ -154,7 +154,7 @@ ImportClean_Norway <- function(){
   #traitNO_raw = target(drop_and_load.csv(myfile = "transplant/USE THIS DATA/Norway/traitdata_NO.csv", localpath = "data/traitdata_NO.csv"), trigger = trigger(change = drop_get_metadata(path = "transplant/USE THIS DATA/Norway/traitdata_NO.csv")$content_hash))
   # flux
   fluxNO_raw <- get(load(file_in("data/standardControlFluxNO_2016.Rdata")))
-  hierarchyNO = c("Country", "Site")
+  hierarchyNO = c("Country", "Site", "BlockID", "PlotID")
   
   ### CLEAN DATA
   metaCommunityNO = CleanNorwayMetaCommunity(metaCommunityNO_raw)
