@@ -9,7 +9,7 @@ CleanPeruMeta <- function(metaPE_raw){
   metaPE <- metaPE_raw %>% 
     mutate(Country = "PE") %>% 
     filter(Site != "OCC",
-           Gradient != "BB")
+           Gradient == "C")
   return(metaPE)
 }
   
@@ -24,7 +24,7 @@ CleanPeruMetaCommunity <- function(metaCommunityPE_raw){
            cover.shrub.layer = as.numeric(cover.shrub.layer),
            cover.field.layer = as.numeric (cover.field.layer),
            Country = "PE") %>% 
-    filter(Treatment %in% c("C", "B")) %>% 
+    filter(Treatment %in% c("C")) %>% 
     rename(Forb = Forbs, Graminoid = Graminoids, Fern = Ferns) %>% 
     select(Site, Year, PlotID, Treatment, Forb, Graminoid, Shrub, Fern, BareGround, Rock, Litter, MedianHeight_cm, Vascular, Gradient, Country)
   return(metaCommunityPE)
@@ -35,7 +35,7 @@ CleanPeruMetaCommunity <- function(metaCommunityPE_raw){
 
 CleanPeruCommunity <- function(communityPE_raw){
   communityPE <- communityPE_raw %>% 
-    filter(Treatment %in% c("C", "B")) %>% 
+    filter(Treatment %in% c("C")) %>% 
     mutate(Country = "PE", 
            BlockID = as.character(1),
            PlotID = paste(Site, PlotID, Treatment, sep="_"),
@@ -49,15 +49,16 @@ CleanPeruCommunity <- function(communityPE_raw){
 
 CleanPeruTrait <- function(traitPE_raw){
   traitPE <- traitPE_raw %>%
-    filter(Treatment %in% c("C", "B")) %>% 
+    filter(Treatment %in% c("C")) %>% 
     mutate(BlockID = as.character(1),
            PlotID = paste(Site, PlotID, Treatment, sep="_"),
            Gradient = Treatment) %>%
-    mutate(LDMC ifelse(LDMC >= 1, NA, LDMC)) %>% # these leaves need checking!!!
+    filter(LDMC < 1 | is.na(LDMC)) %>% # These should be checked!
     select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC) %>% 
     gather(key = Trait, value = Value, -Country, -Year, -Site, -BlockID, -PlotID, -Gradient, -Taxon) %>% 
     mutate(Taxon = recode(Taxon, "Agrostis 2" = "Agrostis sp2")) %>% 
-    filter(!is.na(Value))
+    filter(!is.na(Value)) %>% 
+    filter(!Value %in% c(Inf))
   
   return(traitPE)
   
