@@ -30,8 +30,8 @@ BootstrappedCWM <- function(ImputetTraits){
 
 BootstrappedCWM_Site <- function(ImputetTraits){
 
-dd <- map(.x = ImputetTraits, ~ mutate(., level = recode(level, "BlockID" = "Site", "PlotID" = "Site")))
-map2(dd, ImputetTraits, ~{
+ImputetTraits2 <- map(.x = ImputetTraits, ~ mutate(., level = recode(level, "BlockID" = "Site", "PlotID" = "Site")))
+HappyMoments_Site <- map2(ImputetTraits2, ImputetTraits, ~{
   attr(.x, "attrib") <- attr(.y, "attrib")
   .x}) %>%
     map_df(.x = ., ~ trait_np_bootstrap(imputed_traits = .x))
@@ -39,6 +39,31 @@ map2(dd, ImputetTraits, ~{
   return(HappyMoments_Site)
 
 }
+
+
+MomentRegression <- function(HappyMoments_Site){
+  res <- HappyMoments_Site %>% 
+    filter(Trait_trans %in% c("Plant_Height_cm_log", "Dry_Mass_g_log", "Leaf_Area_cm2_log", "Leaf_Thickness_Ave_mm", "LDMC", "SLA_cm2_g")) %>% 
+    mutate(CG = paste(Country, Gradient, sep = "")) %>% 
+    pivot_longer(cols = c(mean, variance, skewness, kurtosis), names_to = "Moment", values_to = "Value") %>% 
+    mutate(Moment = factor(Moment, levels = c("mean", "variance", "skewness", "kurtosis"))) %>% 
+    filter(!is.na(Value),
+           !Value %in% c(-Inf, Inf, NaN)) %>% 
+    group_by(Country, Trait_trans, Moment) %>%
+    nest() %>%
+    mutate(mod = map(data, ~ lmer(Value ~ MeanTemp + (1|Site), data = .x)), result = map(mod, tidy)) %>% 
+    unnest(result) %>% 
+      filter(term == "MeanTemp") %>% 
+      mutate(CI.lower = estimate - 1.96 * std.error,
+             CI.higher = estimate + 1.96 * std.error,
+             OverlapZero = case_when(CI.lower > 0 & CI.higher > 0 ~ "no",
+                                     CI.lower < 0 & CI.higher < 0 ~ "no",
+                                     TRUE ~ "yes"))
+  
+  return(res)
+}
+
+
 
 
 # Summarize moments
