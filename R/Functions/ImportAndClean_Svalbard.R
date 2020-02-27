@@ -12,6 +12,7 @@ CleanSvalbardMetaCommunity <- function(metaCommunitySV_raw){
     mutate(Lichen = rowSums(select(., Lichen_soil, Lichen_rock), na.rm = TRUE),
            Site = paste(Site, PlotID, sep="")) %>% 
     rename(Bryophyte = Bryophytes) %>% 
+    filter(Gradient == "C") %>% 
     select(Gradient, Site, PlotID, MedianHeight_cm, Vascular, Bryophyte, Lichen, Rock, BareGround, BioCrust, Litter, Country, Year, Project)
   return(metaCommunitySV)
 }
@@ -30,8 +31,9 @@ CleanSvalbardCommunity <- function(communitySV_raw){
            Taxon = stringi::stri_trans_totitle(
              Taxon, 
              opts_brkiter = stringi::stri_opts_brkiter(type = "sentence"))) %>% 
-    filter(Cover != 0) #%>% 
-    #filter(Site != "NANA")
+    filter(Gradient == "C") %>% 
+    filter(Cover != 0) %>% 
+    filter(Site != "NANA")
 
   return(communitySV)
 }
@@ -49,6 +51,7 @@ CleanSvalbardTrait <- function(traitSV_raw){
     select(Country, Year, Site, Gradient, BlockID, PlotID, Taxon, Plant_Height_cm, Wet_Mass_g, Dry_Mass_g, Leaf_Thickness_Ave_mm, Leaf_Area_cm2, SLA_cm2_g, LDMC) %>% 
     gather(key = Trait, value = Value, -Country, -Year, -Site, -Gradient, -BlockID, -PlotID, -Taxon) %>% 
     filter(!is.na(Value)) %>% 
+    filter(Gradient == "C") %>% 
     mutate(Taxon = stringi::stri_trans_totitle(
       Taxon, 
       opts_brkiter = stringi::stri_opts_brkiter(type = "sentence")))
@@ -91,7 +94,8 @@ ImportClean_Svalbard <- function(){
   
   ### IMPORT DATA
   # meta data
-  metaSV = read_csv(file_in("data_cleaned/metaSV.csv"))
+  metaSV = read_csv(file_in("data_cleaned/metaSV.csv")) %>% 
+    filter(Gradient == "C")
   # meta community
   metaCommunitySV_raw = get(load(file = file_in("data/metaCommunitySV_2018.Rdata")))
   # community
