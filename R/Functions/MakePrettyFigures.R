@@ -98,6 +98,27 @@ SmileyPlot <- function(){
 
 
 
+DiverstiyPlot <- function(Diversity){
+  DivPlot <- Diversity %>% 
+    filter(Gradient != "B") %>% 
+    mutate(Biogeo = case_when(Country %in% c("PE") ~ "Tropic",
+                              Country %in% c("CO", "NO", "CH") ~ "Temperate",
+                              TRUE ~ "Arctic")) %>% 
+    ggplot(aes(x = Elevation, y = Richness, colour = Country)) +
+    geom_point() +
+    geom_point(aes(y = Evenness * 20)) +
+    scale_colour_viridis_d(option = "plasma", end = 0.9) +
+    geom_smooth(method = "lm") +
+    geom_smooth(aes(x = Elevation, y = Evenness * 20), method = "lm", linetype = "dashed") +
+    scale_y_continuous(sec.axis = sec_axis(~./20)) +
+    labs(y = "", title = "Richenss and evenness") +
+    facet_wrap(~ Biogeo, scales = "free_x") +
+    theme_bw() +
+    theme(panel.grid = element_blank())
+  
+  return(DivPlot)
+}
+
 
 
 
