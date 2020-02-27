@@ -5,8 +5,9 @@ ImputeTraits <- function(CountryList){
   
   ImputetTraits <- map(.x = CountryList, 
                        ~trait_impute(comm = .x$community,
-                                     traits = .x$trait %>% select(-Gradient, -Year), 
+                                     traits = .x$trait %>% select(-Gradient, -Year),
                                      scale_hierarchy = .x$trait_hierarchy,
+                                     #scale_hierarchy = .x$trait_hierarchy[1:2],
                                      taxon_col = "Taxon",
                                      trait_col = "Trait_trans",
                                      value_col = "Value_trans", 
@@ -27,14 +28,26 @@ BootstrappedCWM <- function(ImputetTraits){
 }
 
 
+BootstrappedCWM_Site <- function(ImputetTraits){
+
+dd <- map(.x = ImputetTraits, ~ mutate(., level = recode(level, "BlockID" = "Site", "PlotID" = "Site")))
+map2(dd, ImputetTraits, ~{
+  attr(.x, "attrib") <- attr(.y, "attrib")
+  .x}) %>%
+    map_df(.x = ., ~ trait_np_bootstrap(imputed_traits = .x))
+
+  return(HappyMoments_Site)
+
+}
 
 
 # Summarize moments
-# the SummariseBootMoments should fix this
+# the SummariseBootMoments should be used fix this
 SummariseHappyMoments <- function(HappyMoments){
   
   SummarizedMoments <- HappyMoments %>% 
-    group_by(Country, Gradient, Site, BlockID, PlotID, PlotID, Trait_trans) %>% 
+    group_by(Country, Gradient, Site, BlockID, PlotID, Trait_trans) %>% 
+    #group_by(Country, Gradient, Site, Trait_trans) %>% 
     summarise(
       n = n(),
       Mean = mean(.data$mean),
