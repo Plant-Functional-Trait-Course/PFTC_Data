@@ -14,5 +14,17 @@ LogTransformation <- function(Country){
     Country$trait <- Country$trait %>% fun()
   }
   
+  # Scale trait values
+  Country$trait <- Country$trait %>% 
+    mutate(Value_trans = scale(Value_trans, scale = TRUE)) 
+  
   return(Country)
 }
+
+# ScaleTraits <- function(CountryList){
+#   
+#   CountryList$trait <- CountryList$trait %>% 
+#     mutate(Value_trans = scale(Value_trans, scale = TRUE)) 
+#   
+#   return(CountryList$trait)
+# }
