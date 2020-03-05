@@ -18,6 +18,7 @@ library("vegan")
 library("lme4")
 library("ggvegan")
 library("grid")
+library("patchwork")
 
 # tricks
 pn <- . %>% print(n = Inf)
@@ -25,6 +26,7 @@ pn <- . %>% print(n = Inf)
 ### DRAKE CONFIGURATIONS
 pkgconfig::set_config("drake::strings_in_dots" = "literals")
 
+theme_set(theme_bw(base_size = 15))
 
 ### IMPORT FUNCTION FILES
 source("R/Functions/ImportAndClean_China.R")
