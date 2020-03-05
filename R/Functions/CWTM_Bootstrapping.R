@@ -43,7 +43,7 @@ HappyMoments_Site <- map2(ImputetTraits2, ImputetTraits, ~{
 
 MomentRegression <- function(HappyMoments_Site){
   res <- HappyMoments_Site %>% 
-    filter(Trait_trans %in% c("Plant_Height_cm_log", "Dry_Mass_g_log", "Leaf_Area_cm2_log", "Leaf_Thickness_Ave_mm", "LDMC", "SLA_cm2_g")) %>% 
+    filter(Trait_trans %in% c("Plant_Height_cm_log", "Wet_mass_g_log", "Dry_Mass_g_log", "Leaf_Thickness_Ave_mm", "Leaf_Area_cm2_log", "LDMC", "SLA_cm2_g")) %>% 
     mutate(CG = paste(Country, Gradient, sep = "")) %>% 
     pivot_longer(cols = c(mean, variance, skewness, kurtosis), names_to = "Moment", values_to = "Value") %>% 
     mutate(Moment = factor(Moment, levels = c("mean", "variance", "skewness", "kurtosis"))) %>% 
@@ -52,7 +52,7 @@ MomentRegression <- function(HappyMoments_Site){
     group_by(Country, Trait_trans, Moment) %>%
     nest() %>%
     mutate(mod = map(data, ~ lmer(Value ~ MeanTemp + (1|Site), data = .x)), result = map(mod, tidy)) %>% 
-    unnest(result) %>% 
+  unnest(result) %>% 
       filter(term == "MeanTemp") %>% 
       mutate(CI.lower = estimate - 1.96 * std.error,
              CI.higher = estimate + 1.96 * std.error,
@@ -62,8 +62,6 @@ MomentRegression <- function(HappyMoments_Site){
   
   return(res)
 }
-
-
 
 
 # Summarize moments
