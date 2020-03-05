@@ -7,6 +7,8 @@ DataAnalysisDrakePlan <- drake_plan(
   ResultsDiversity = RegressionDiversityIndeces(Diversity),
   
   # NMDS Ordination
-  fNMDS = map_df(CountryList, NMDSOrdination)
+  fNMDS = map_df(CountryList, NMDSOrdination),
 
+  # Regression on Moments
+  RegMoment = MomentRegression(HappyMoments_Site)
 ) 
