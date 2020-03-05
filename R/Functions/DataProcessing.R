@@ -1,4 +1,4 @@
-# TRANSFORMING THE TRAITS
+# TRANSFORMING AND SCALING THE TRAITS
 LogTransformation <- function(Country){
   
   #Making a function to log transform some traits in a new column of the previous trait dataset
@@ -14,17 +14,10 @@ LogTransformation <- function(Country){
     Country$trait <- Country$trait %>% fun()
   }
   
-  # Scale trait values
-  Country$trait <- Country$trait %>% 
-    mutate(Value_trans = scale(Value_trans, scale = TRUE)) 
+  # Country$trait <- Country$trait %>%
+  #   group_by(Trait_trans) %>% 
+  #   mutate(Value_trans = scale(Value_trans)[1])
   
   return(Country)
 }
 
-# ScaleTraits <- function(CountryList){
-#   
-#   CountryList$trait <- CountryList$trait %>% 
-#     mutate(Value_trans = scale(Value_trans, scale = TRUE)) 
-#   
-#   return(CountryList$trait)
-# }
