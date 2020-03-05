@@ -58,6 +58,7 @@ CleanPeruTrait <- function(traitPE_raw){
     gather(key = Trait, value = Value, -Country, -Year, -Site, -BlockID, -PlotID, -Gradient, -Taxon) %>% 
     mutate(Taxon = recode(Taxon, "Agrostis 2" = "Agrostis sp2")) %>% 
     filter(!is.na(Value)) %>% 
+    filter(!(Trait == "SLA_cm2_g" & Value > 500)) %>% 
     filter(!Value %in% c(Inf))
   
   return(traitPE)
