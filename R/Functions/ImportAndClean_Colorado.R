@@ -68,6 +68,8 @@ CleanColoradoTrait <- function(species_dictionaryCO, traitCO_raw){
     pivot_longer(cols = c(Plant_Height_cm:NP_ratio), names_to = "Trait", values_to = "Value") %>% 
     filter(!is.na(Value)) %>% 
     filter(!is.na(Taxon)) %>% 
+    filter(!(Trait == "SLA_cm2_g" & Value > 500),
+           !(Trait == "SLA_cm2_g" & Value < 5)) %>% 
     # Replace species to match the community dataset
     left_join(species_dictionaryCO, by = c("Site", "Taxon" = "Likely_same_species_from_trait_data")) %>% 
     mutate(Taxon = if_else(!is.na(Species_from_abundance_data), Species_from_abundance_data, Taxon)) %>% 
@@ -75,7 +77,6 @@ CleanColoradoTrait <- function(species_dictionaryCO, traitCO_raw){
   
   return(traitCO)
 }  
-
 
 #### IMPORT, CLEAN AND MAKE LIST #### 
 ImportClean_Colorado <- function(){
