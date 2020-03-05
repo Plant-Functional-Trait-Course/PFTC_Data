@@ -106,6 +106,7 @@ CleanNorwayTrait <- function(traitNO_raw){
     mutate(Taxon = trimws(Taxon, which = "right")) %>% 
     filter(!is.na(Value)) %>% 
     filter(Value != Inf) %>% 
+    filter(!(Trait == "SLA_cm2_g" & Value > 500)) %>% 
     mutate(Country = "NO",
            BlockID = "dummyBlockID",
            PlotID = "dummyPlotID") #Overwrite junk...
