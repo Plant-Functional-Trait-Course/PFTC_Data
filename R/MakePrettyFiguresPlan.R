@@ -7,7 +7,7 @@ MakePrettyFiguresPlan <- drake_plan(
   
   # Coverage Plot
   CoveragePlot = MakeCoverageFigure(ImputetTraits),
-  #CoverageSiteLevelPlot = MakeCoverageSiteLevel(ImputetTraits),
+  CoverageSiteLevelPlot = MakeCoverageSiteLevel(ImputetTraits),
   
   # Trait plots
   GradientMeanPlot = MakeMeanFigure(SummarisedMoments),
