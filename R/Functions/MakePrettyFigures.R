@@ -40,21 +40,21 @@ MakeCoverageSiteLevel <- function(ImputetTraits){
 # Plot summarised moments - mean
 MakeMeanFigure <- function(SummarisedMoments_Site){
 
-  GradientMeanPlot <- SummarisedMoments_Site %>% 
-    filter(Trait_trans %in% c("Plant_Height_cm_log")) %>% 
-    select(-c(MeanDiurnalRange:PrecColdQuart)) %>% 
-    pivot_longer(cols = c("Mean", "Var", "Skew", "Kurt"), names_to = "Moment", values_to = "Value") %>% 
+  GradientMeanPlot <- SummarisedMoments_Site %>%
+    filter(Trait_trans %in% c("Plant_Height_cm_log")) %>%
+    select(-c(MeanDiurnalRange:PrecColdQuart)) %>%
+    pivot_longer(cols = c("Mean", "Var", "Skew", "Kurt"), names_to = "Moment", values_to = "Value") %>%
     mutate(Moment = recode(Moment, "Mean" = "mean", "Var" = "variance", "Skew" = "skewness", "Kurt" = "kurtosis"),
-           Moment = factor(Moment, levels = c("mean", "variance", "skewness", "kurtosis"))) %>% 
+           Moment = factor(Moment, levels = c("mean", "variance", "skewness", "kurtosis"))) %>%
     mutate(CG = paste(Country, Gradient, sep = ""),
-           FullCountry = recode(Country, "CH" = "China", "CO" = "Colorado", "NO" = "Norway", "PE" = "Peru", "SV" = "Svalbard")) %>% 
+           FullCountry = recode(Country, "CH" = "China", "CO" = "Colorado", "NO" = "Norway", "PE" = "Peru", "SV" = "Svalbard")) %>%
     mutate(GradNum = case_when(Gradient %in% c("1", "C") ~ 1,
                                Gradient %in% c("2") ~ 2,
                                Gradient %in% c("3") ~ 3,
-                               Gradient %in% c("4") ~ 4)) %>% 
-    left_join(RegMoment %>% select(-data, -mod), by = c("Country", "Trait_trans", "Moment")) %>% 
-    filter(Moment == "mean") %>% 
-    ggplot(aes(x = MeanTemp, y = Value, color = FullCountry, linetype = OverlapZero)) +
+                               Gradient %in% c("4") ~ 4)) %>%
+    left_join(RegMoment %>% select(-data, -mod), by = c("Country", "Trait_trans", "Moment")) %>%
+    filter(Moment == "mean") %>%
+    ggplot(aes(x = VPD, y = Value, color = FullCountry, linetype = OverlapZero)) +
     geom_point() +
     scale_colour_viridis_d(option = "plasma", end = 0.9) +
     labs(x = "Mean annual temperature in °C", y = "", title = "log(Plant height in cm)", colour = "") +
@@ -66,6 +66,7 @@ MakeMeanFigure <- function(SummarisedMoments_Site){
           axis.title = element_text(size = 15),
           axis.text = element_text(size = 12),
           legend.text = element_text(size = 12))
+  return(GradientMeanPlot)
 }
 
 
