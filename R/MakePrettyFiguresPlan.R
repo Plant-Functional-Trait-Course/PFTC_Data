@@ -10,7 +10,7 @@ MakePrettyFiguresPlan <- drake_plan(
   CoverageSiteLevelPlot = MakeCoverageSiteLevel(ImputetTraits),
   
   # Trait plots
-  GradientMeanPlot = MakeMeanFigure(SummarisedMoments),
+  GradientMeanPlot = MakeMeanFigure(SummarisedMoments_Site),
   
   # Richness and evenness
   RichnessEvenness = DiverstiyPlot(Diversity)
