@@ -3,36 +3,31 @@
 #################################
 
 # LOAD LIBRARIES
+#devtools::install_github("audhalbritter/PFTCFunctions")
+#devtools::install_github("tidyverse/googlesheets4")
 library("tidyverse")
 library("lubridate")
-library("googlesheets")
+library("googlesheets4")
 library("readxl")
 library("R.utils")
 library("broom")
 library("googledrive")
+library("devtools")
+library("PFTCFunctions")
+
 
 pn <- . %>% print(n = Inf)
 
 
 ############################################################################
 #### ENVELOPE CODES ####
-# Function to create unique hashcodes (Peru: seed = 1; Svalbard: seed = 32)
-get_envelope_codes <- function(seed){
-  all_codes <- crossing(A = LETTERS, B = LETTERS, C = LETTERS) %>% 
-    mutate(code = paste0(A, B, C), 
-           hash = (1L:n()) %% 10000L,
-           hash = withSeed(sample(hash), seed, sample.kind = "Rounding"),
-           hash = formatC(hash, width = 4, format = "d", flag = "0"),
-           hashcode = paste0(code, hash)) %>% 
-    select(hashcode)
-  return(all_codes)
-}
+# Get unique hashcodes (Peru: seed = 1; Svalbard: seed = 32)
 
 # Create list with all valid IDs per country
-creat_ID_list <- function(envelope_codes){
-  all_codes <- get_envelope_codes(seed = 1) %>% 
+creat_ID_list <- function(){
+  all_codes <- get_PFTC_envelope_codes(seed = 1) %>% 
     mutate(Site = "Peru") %>% 
-    bind_rows(get_envelope_codes(seed = 32) %>% 
+    bind_rows(get_PFTC_envelope_codes(seed = 32) %>% 
                 mutate(Site = "Svalbard"))
   return(all_codes)
 }
@@ -50,16 +45,19 @@ import_phosphorus_data <- function(){
 
 # pull of standard, calculate R2, choose standard for absorbance curve, make regression and plot
 get_standard <- function(p){
-  standard_concentration <- data_frame(Standard = c(0, 2, 4, 8, 12, 16),
+  standard_concentration <- tibble(Standard = c(0, 2, 4, 8, 12, 16),
                                        Concentration = c(0, 0.061, 0.122, 0.242, 0.364, 0.484))
   
   Standard <- p %>% 
-    select(Batch, Individual_Nr, Sample_Absorbance) %>% 
+    select(Site, Batch, Individual_Nr, Sample_Absorbance) %>% 
     filter(Individual_Nr %in% c("Standard1", "Standard2"),
            # remove batch if Sample_Absorbance is NA; Sample has not been measured
            !is.na(Sample_Absorbance)) %>% 
-    group_by(Batch, Individual_Nr) %>% 
-    nest(.key = "standard") %>% 
+    group_by(Site, Batch, Individual_Nr) %>% 
+    # not a good solution!!!
+    mutate(n = n()) %>% 
+    filter(n == 6) %>% 
+    nest(standard = c(Sample_Absorbance)) %>% 
     mutate(standard = map(standard, bind_cols, standard_concentration)) 
   
   return(Standard)
@@ -83,7 +81,7 @@ plot_standards <- function(Standard){
 standard_model <- function(Standard){
   ModelResult <- Standard %>% 
     mutate(correlation = map_dbl(standard, ~cor(.$Sample_Absorbance, .$Concentration, use = "pair"))) %>% 
-    group_by(Batch) %>% 
+    group_by(Site, Batch) %>% 
     slice(which.max(correlation)) %>% 
     mutate(fit = map(standard, ~lm(Concentration ~ Sample_Absorbance, .)))
   return(ModelResult)
@@ -97,8 +95,8 @@ original_phosphor_data <- function(p, ModelResult){
     filter(!Individual_Nr %in% c("Standard1", "Standard2"),
            # remove samples without mass
            !is.na(Sample_Mass)) %>% 
-    group_by(Batch) %>% 
-    nest(.key = "data") %>% 
+    group_by(Site, Batch) %>% 
+    nest(data = c(Individual_Nr:Name_measured)) %>% 
     # add estimate from model
     left_join(ModelResult %>% select(-Individual_Nr), by = "Batch")
   
@@ -159,7 +157,7 @@ corrected_phosphor_data <- function(OriginalValues, CorrectionFactor){
 
 
 ### Check IDs
-checkIDs <- function(CorrectedValues, all_codes){
+checkIDs_P <- function(CorrectedValues, all_codes){
   NotMatching <- CorrectedValues %>% 
     anti_join(all_codes, by = c("Individual_Nr" = "hashcode", "Site" = "Site")) %>% 
       select(Batch, Site, Individual_Nr)
@@ -168,21 +166,22 @@ checkIDs <- function(CorrectedValues, all_codes){
 }
 
 ############################################################################
-#### CN DATA ####
+#### ISOTOPE DATA ####
 # download isotope data from google drive
 download_isotope_data <- function(){
-  path <- "EnquistLab_CNP_Workflow/Isotope data"
-  list_of_files <- drive_ls(path = path, pattern = "xlsx") %>% 
-    pull(id)
+  path <- "EnquistLab_CNP_Workflow/IsotopeData"
+  list_of_files <- drive_ls(path = path, pattern = "xlsx") 
   
-  map(list_of_files, ~drive_download(as_id(.), path = file.path("isotope_data", .), overwrite = TRUE))
-
+  map2(.x = list_of_files$id,
+         .y = list_of_files$name,
+         ~ drive_download(as_id(.x), path = file.path("isotope_data", .y), overwrite = TRUE))
+  invisible()
 }
 
 
 # import CN and isotope data and merge
 import_cn_data <- function(import_path_name){
-  # CN mass
+  # Import CN mass from CNP data set
   cnp <- gs_title("CNP_Template")
   cn_mass <- gs_read(ss = cnp, ws = "CN") %>% 
     mutate(Samples_Nr = as.character(Samples_Nr)) %>% 
@@ -203,10 +202,15 @@ import_cn_data <- function(import_path_name){
   return(cn_data) 
 }
 
+
+cn_d <- cn_mass %>% 
+  full_join(cn_isotopes, by = c("Samples_Nr", "Individual_Nr", "Site", "Row", "Column"))
+cn_d %>% 
+  filter(is.na(Sample_Mass) | is.na(C_percent))
 # add date measured
 #mutate(date_measured = date)
 
-
+# Is this needed?
 check_cn_data <- function(cn_data){
   # check not matching ids
   not_matching_ids <- cn_data %>% 
@@ -214,13 +218,44 @@ check_cn_data <- function(cn_data){
   return(not_matching_ids)
 }
 
-# join all tables, and test IDs !!!
+# join all tables
 merge_cnp_data <- function(cn_data, CorrectedValues){
   cnp_data <- cn_data %>% 
-    full_join(CorrectedValues, by = c("Individual_Nr", "Site"))
+    full_join(CorrectedValues, by = c("Individual_Nr", "Site", "Batch"))
   return(cnp_data)
 }
 
+
+### Check IDs from cn dataset
+checkIDs_cn_mass <- function(all_codes){
+  cnp <- gs_title("CNP_Template")
+  cn_mass <- gs_read(ss = cnp, ws = "CN") %>% 
+    mutate(Samples_Nr = as.character(Samples_Nr)) %>% 
+    as_tibble()
+  
+  NotMatching <- cn_mass %>% 
+    anti_join(all_codes, by = c("Individual_Nr" = "hashcode", "Site" = "Site")) %>% 
+    select(Batch, Site, Individual_Nr)
+  return(NotMatching)
+  
+}
+
+checkIDs_cn_isotope <- function(all_codes){
+  # Read isotope data
+  list_files <- dir(path = import_path_name, pattern = "\\.xlsx$", full.names = TRUE)
+  cn_isotopes <- map(list_files, read_excel, skip = 13) %>% 
+    map_df(~{select(.,-c(...12:...17)) %>% 
+        slice(1:grep("Analytical precision, 1-sigma", ...1)-1) %>% 
+        filter(!is.na(...1)) %>% 
+        rename(Samples_Nr = ...1, Individual_Nr = `Sample ID`, Site = ...3, Row = R, Column = C, C_percent = `C%`, N_percent = `N%`, CN_ratio = `C/N`, dN15_percent = `δ15N ‰(ATM)`, dC13_percent = `δ13C ‰(PDB)`, Remark_CN = ...11)
+    })
+  
+  NotMatching <- cn_isotopes %>% 
+    anti_join(all_codes, by = c("Individual_Nr" = "hashcode", "Site" = "Site")) %>% 
+    select(Site, Individual_Nr)
+  return(NotMatching)
+  
+}
 
 
 ############################################################################
@@ -233,8 +268,7 @@ make_report <- function(import_path_name, file_name = NULL){
   
   # run all functions
   RedWheatValue <- 0.137
-  envelope_codes <- import_phosphorus_data()
-  all_codes <- creat_ID_list(envelope_codes)
+  all_codes <- creat_ID_list()
   
   p <- import_phosphorus_data()
   standard <- get_standard(p)
@@ -244,6 +278,7 @@ make_report <- function(import_path_name, file_name = NULL){
   OriginalValues <- original_phosphor_data(p, ModelResult)
   CorrectionFactor <- calculate_correction_factor(OriginalValues, RedWheatValue = RedWheatValue)
   CorrectedValues <- corrected_phosphor_data(OriginalValues, CorrectionFactor)
+  WrongIDs_P <- checkIDs_P(CorrectedValues, all_codes)
   
   # import cn and isotope data, merge the two data sets
   message("Downloading isotope data")
@@ -251,13 +286,18 @@ make_report <- function(import_path_name, file_name = NULL){
   
   cn_data <- import_cn_data(import_path_name)
   
+  # check wrong IDs
+  WrongIDs_cn_mass <- checkIDs_cn_mass(all_codes)
+  WrongIDs_cn_mass <- checkIDs_cn_mass(all_codes)
+  
+  # not sure what this does!!!?
   check_cn <- check_cn_data(cn_data)
   
   # merge cnp data and output
   cnp <- merge_cnp_data(cn_data, CorrectedValues)
   
   if(!is.null(file_name)){
-    write_csv(x = cnp, path = paste0("cnp_results/", file_name, ".csv"))
+    write_csv(x = cnp, path = paste0("EnquistLab_CNP_Workflow/cnp_results/", file_name, ".csv"))
   }
   
   standard %>% 
@@ -266,8 +306,6 @@ make_report <- function(import_path_name, file_name = NULL){
     slice(1:2) %>% 
     pull(Batch) %>% 
     map(~rmarkdown::render("EnquistLab_CNP_Workflow/EnquistLab_CNP_Workflow.Rmd", params = list(batch_nr = .), output_dir = "EnquistLab_CNP_Workflow/Results", output_file = paste0("Results_CNP_Workflow_", ., ".pdf")))
-  
-  
 }
 
 ### To do!!!
