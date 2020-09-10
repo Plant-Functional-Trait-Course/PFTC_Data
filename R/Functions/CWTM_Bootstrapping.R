@@ -42,7 +42,7 @@ HappyMoments_Site <- map2(ImputetTraits2, ImputetTraits, ~{
 
 
 MomentRegression <- function(HappyMoments_Site){
-  res <- HappyMoments_Site %>% 
+  happyMoment_results <- HappyMoments_Site %>% 
     filter(Trait_trans %in% c("Plant_Height_cm_log", "Wet_mass_g_log", "Dry_Mass_g_log", "Leaf_Thickness_Ave_mm", "Leaf_Area_cm2_log", "LDMC", "SLA_cm2_g")) %>% 
     mutate(CG = paste(Country, Gradient, sep = "")) %>% 
     pivot_longer(cols = c(mean, variance, skewness, kurtosis), names_to = "Moment", values_to = "Value") %>% 
@@ -60,7 +60,7 @@ MomentRegression <- function(HappyMoments_Site){
                                      CI.lower < 0 & CI.higher < 0 ~ "no",
                                      TRUE ~ "yes"))
   
-  return(res)
+  return(happyMoment_results)
 }
 
 
@@ -89,6 +89,7 @@ SummariseHappyMoments <- function(HappyMoments){
       CIlow.kurt = .data$Kurt - sd(.data$kurtosis),
       CIhigh.Kurt = .data$Kurt + sd(.data$kurtosis)
     )
+  return(SummarizedMoments)
   
 }
 
